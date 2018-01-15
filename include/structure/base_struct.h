@@ -14,11 +14,11 @@ struct Singleton
     static T & instance()
     {
         static T only;
-        return T;
+        return only;
     }
 protected:
     ~Singleton(){}
-}
+};
 
 template<typename T>
 struct AutoMem
