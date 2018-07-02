@@ -8,6 +8,7 @@
 #ifndef HEAD_H
 #define HEAD_H
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 

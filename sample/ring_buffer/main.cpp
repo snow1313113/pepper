@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../include/structure/ring_queue.h"
+#include "../../include/structure/ring_buffer.h"
 using namespace std;
 using namespace Pepper;
 
@@ -11,8 +11,9 @@ struct Test
 
 int main()
 {
-    RingQueue<Test, 5> queue;
+    FixedRingBuffer<Test, 5> queue;
     Test test;
+    queue.Clear();
 
     cout << "queue capacity: " << queue.Capacity() << " , size: " << queue.Size() << endl;
 
@@ -57,7 +58,6 @@ int main()
         cout << "queue is empty, size: " << queue.Size() << endl;
     else
         cout << "queue is not empty, size: " << queue.Size() << endl;
-
     return 0;
 }
 

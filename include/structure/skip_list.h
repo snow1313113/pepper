@@ -8,8 +8,8 @@
 #ifndef MEM_RANK_H
 #define MEM_RANK_H
 
-#include <cassert>
 #include <vector>
+#include "../head.h"
 using std::vector;
 
 namespace Pepper
@@ -97,6 +97,8 @@ public:
 
     public:
         friend class MemRank;
+        Iterator() = default;
+
         const T & operator*() const
         {
             return m_rank->ref_2_node(m_node_ref)->info;

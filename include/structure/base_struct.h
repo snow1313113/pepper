@@ -39,7 +39,8 @@ class AutoRes
     public:
         typedef void(T::*T_F)();
         AutoRes(T * p_, T_F f_):m_ptr(p_),m_fun(f_){}
-        ~AutoRes() {
+        ~AutoRes()
+        {
             if(m_ptr)
                 (m_ptr->*m_fun)();
         }
@@ -52,5 +53,13 @@ class AutoRes
         T * m_ptr;
         T_F m_fun;
 };
+
+template<typename T>
+struct Link
+{
+    T prev;
+    T next;
+};
+
 
 }

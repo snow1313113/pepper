@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../include/structure/fix_mem_pool.h"
+#include "../../include/structure/fixed_mem_pool.h"
 using namespace std;
 using namespace Pepper;
 
@@ -12,7 +12,8 @@ struct Test
 int main()
 {
     FixedMemPool<Test> mem_pool;
-    if (mem_pool.init() == false)
+    uint8_t * mem = new uint8_t[sizeof(Test) * 1000];
+    if (mem_pool.init(mem, sizeof(Test) * 1000) == false)
     {
         cout << "init error" << endl;
     }
