@@ -11,7 +11,10 @@
 #include "head.h"
 #include "utils/traits_utils.h"
 
-template<typename T, size_t MAX_SIZE, typename HASH = SimpleHash<T>>
+namespace Pepper
+{
+
+template<typename T, size_t MAX_SIZE, typename HASH = SimpleHash<T> >
 class MemSet
 {
 public:
@@ -316,6 +319,8 @@ typename MemSet<T, MAX_SIZE, HASH>::Iterator MemSet<T, MAX_SIZE, HASH>::Iterator
     Iterator temp = (*this);
     ++(*this);
     return temp;
+}
+
 }
 
 #endif
