@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../include/structure/base_struct.h"
+#include "../../include/base_struct.h"
 using namespace std;
 using namespace Pepper;
 

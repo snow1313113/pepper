@@ -8,8 +8,8 @@
 #ifndef MEM_LIST_H
 #define MEM_LIST_H
 
-#include "../head.h"
-#include "../utils/traits_utils.h"
+#include "head.h"
+#include "utils/traits_utils.h"
 #include "base_struct.h"
 
 namespace Pepper

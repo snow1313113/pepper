@@ -1,6 +1,6 @@
 /*
  * * file name: algorithm_util.h
- * * description: ...
+ * * description: 当年闲的蛋疼写的东西，后面再整理看看，如果没用就删掉吧
  * * author: lemonxu
  * * create time:2018  1 12
  * */

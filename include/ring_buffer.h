@@ -9,8 +9,8 @@
 #define RING_BUFFER_H
 
 #include <algorithm>
-#include "../head.h"
-#include "../utils/traits_utils.h"
+#include "head.h"
+#include "utils/traits_utils.h"
 
 namespace Pepper
 {

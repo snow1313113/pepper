@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../include/structure/fixed_mem_pool.h"
+#include "../../include/fixed_mem_pool.h"
 using namespace std;
 using namespace Pepper;
 

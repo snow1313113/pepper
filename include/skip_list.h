@@ -9,22 +9,12 @@
 #define MEM_RANK_H
 
 #include <vector>
-#include "../head.h"
+#include "head.h"
+#include "utils/traits_utils.h"
 using std::vector;
 
 namespace Pepper
 {
-
-/// 获取Key
-template <class T>
-struct ExtractKey
-{
-    typedef T Key_Type;
-    const Key_Type & operator()(const T & x) const
-    {
-        return x;
-    }
-};
 
 // 对于自定义复合类型T，需要特化两个类，ExtractKey和std::less
 // 或者自己实现类似的类作为模板参数也可以
@@ -34,7 +24,7 @@ template<typename T,
 class MemRank
 {
 private:
-    typedef typename T_Key::Key_Type Key_Type;
+    typedef typename T_Key::KeyType KeyType;
     static const size_t SKIPTABLE_P = 10;
 
     struct MRNode
@@ -162,19 +152,19 @@ public:
     /// 插入一个节点，不判断是否存在
     bool insert_node(const T & info_);
     /// 删除一个节点
-    bool delete_node(const Key_Type & key_);
+    bool delete_node(const KeyType & key_);
     bool delete_node(const T & info_);
     /// 获取对应节点的排名
     size_t get_rank(const T & info_) const;
-    size_t get_rank(const Key_Type & key_, T & info_) const;
+    size_t get_rank(const KeyType & key_, T & info_) const;
     /// 获得排在最前面的N个节点，从高到低
     size_t get_top_n(size_t n_, vector<T> & vec_) const;
     /// 获取排在最后面的N个节点，从低到高
     size_t get_last_n(size_t n_, vector<T> & vec_) const;
     /// 获取对应节点的前面n个节点
-    bool get_pre_n(const Key_Type & key_, size_t n_, vector<T> & vec_) const;
+    bool get_pre_n(const KeyType & key_, size_t n_, vector<T> & vec_) const;
     /// 获取对应节点的后面n个节点
-    bool get_next_n(const Key_Type & key_, size_t n_, vector<T> & vec_) const;
+    bool get_next_n(const KeyType & key_, size_t n_, vector<T> & vec_) const;
 
     /// 获取排行榜列表开始的迭代器
     Iterator begin() const;
@@ -220,7 +210,7 @@ private:
     }
 
     /// 查找对应节点
-    MRNode * find(const Key_Type & key_) const;
+    MRNode * find(const KeyType & key_) const;
     bool delete_node(MRNode * node_);
     MRNode * alloc_node();
     void free_node(MRNode * node_);
@@ -395,7 +385,7 @@ bool MemRank<T, T_Key, T_Compare>::insert_node(const T & info_)
     }
 
     // 插入hash表中
-    const Key_Type & key = T_Key()(info_);
+    const KeyType & key = T_Key()(info_);
     size_t * slot_ref = ref_2_uint(m_header->hash_head_ref + (key % m_header->bucket_num) * sizeof(size_t));
     new_node->next = *slot_ref;
     *slot_ref = ptr_2_ref(new_node);
@@ -406,7 +396,7 @@ bool MemRank<T, T_Key, T_Compare>::insert_node(const T & info_)
 }
 
 template<typename T, typename T_Key, typename T_Compare>
-bool MemRank<T, T_Key, T_Compare>::delete_node(const Key_Type & key_)
+bool MemRank<T, T_Key, T_Compare>::delete_node(const KeyType & key_)
 {
     MRNode * p = find(key_);
     if(p != NULL)
@@ -421,7 +411,7 @@ bool MemRank<T, T_Key, T_Compare>::delete_node(const T & info_)
 }
 
 template<typename T, typename T_Key, typename T_Compare>
-size_t MemRank<T, T_Key, T_Compare>::get_rank(const Key_Type & key_, T & info_) const
+size_t MemRank<T, T_Key, T_Compare>::get_rank(const KeyType & key_, T & info_) const
 {
     MRNode * p = find(key_);
     if(p == NULL)
@@ -512,7 +502,7 @@ size_t MemRank<T, T_Key, T_Compare>::get_last_n(size_t n_, vector<T> & vec_) con
 }
 
 template<typename T, typename T_Key, typename T_Compare>
-bool MemRank<T, T_Key, T_Compare>::get_pre_n(const Key_Type & key_, size_t n_, vector<T> & vec_) const
+bool MemRank<T, T_Key, T_Compare>::get_pre_n(const KeyType & key_, size_t n_, vector<T> & vec_) const
 {
     MRNode * p = find(key_);
     if(p == NULL)
@@ -536,7 +526,7 @@ bool MemRank<T, T_Key, T_Compare>::get_pre_n(const Key_Type & key_, size_t n_, v
 }
 
 template<typename T, typename T_Key, typename T_Compare>
-bool MemRank<T, T_Key, T_Compare>::get_next_n(const Key_Type & key_, size_t n_, vector<T> & vec_) const
+bool MemRank<T, T_Key, T_Compare>::get_next_n(const KeyType & key_, size_t n_, vector<T> & vec_) const
 {
     MRNode * p = find(key_);
     if(p == NULL)
@@ -575,7 +565,7 @@ typename MemRank<T, T_Key, T_Compare>::Iterator MemRank<T, T_Key, T_Compare>::en
 }
 
 template<typename T, typename T_Key, typename T_Compare>
-typename MemRank<T, T_Key, T_Compare>::MRNode * MemRank<T, T_Key, T_Compare>::find(const Key_Type & key_) const
+typename MemRank<T, T_Key, T_Compare>::MRNode * MemRank<T, T_Key, T_Compare>::find(const KeyType & key_) const
 {
     size_t slot_ref = *(ref_2_uint(m_header->hash_head_ref + (key_ % m_header->bucket_num) * sizeof(size_t)));
     while(slot_ref != 0)
@@ -635,7 +625,7 @@ bool MemRank<T, T_Key, T_Compare>::delete_node(MemRank<T, T_Key, T_Compare>::MRN
     }
 
     // 从hash中删除
-    const Key_Type & key = T_Key()(node_->info);
+    const KeyType & key = T_Key()(node_->info);
     size_t * pre = ref_2_uint(m_header->hash_head_ref + (key % m_header->bucket_num) * sizeof(size_t));
     size_t hash_ref = *pre;
     while(hash_ref != 0)
