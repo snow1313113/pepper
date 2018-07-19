@@ -9,7 +9,7 @@
 #define MEM_RANK_H
 
 #include <vector>
-#include "head.h"
+#include "inner/head.h"
 #include "utils/traits_utils.h"
 using std::vector;
 

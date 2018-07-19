@@ -9,7 +9,7 @@
 #define RING_BUFFER_H
 
 #include <algorithm>
-#include "head.h"
+#include "inner/head.h"
 #include "utils/traits_utils.h"
 
 namespace Pepper

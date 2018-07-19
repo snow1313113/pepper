@@ -8,7 +8,7 @@
 #ifndef MEM_LIST_H
 #define MEM_LIST_H
 
-#include "head.h"
+#include "inner/head.h"
 #include "utils/traits_utils.h"
 #include "base_struct.h"
 
@@ -135,7 +135,7 @@ public:
     Iterator End();
 
 private:
-    typedef Link<IntType> Link;
+    typedef Link<IntType> LinkNode;
 
 private:
     IntType m_used;
@@ -144,7 +144,7 @@ private:
     // 使用的节点下标，m_link的下标
     IntType m_raw_used;
     // 第一个节点作为flag
-    Link m_link[MAX_SIZE + 1];
+    LinkNode m_link[MAX_SIZE + 1];
     T m_value[MAX_SIZE];
 };
 
@@ -204,7 +204,7 @@ typename MemList<T, MAX_SIZE>::Iterator  MemList<T, MAX_SIZE>::PushFront(const T
     assert(empty_index > 0);
     m_value[empty_index - 1] = value_;
 
-    Link & head = m_link[0];
+    LinkNode & head = m_link[0];
     m_link[head.next].prev = empty_index;
     m_link[empty_index].prev = 0;
     m_link[empty_index].next = head.next;
@@ -237,7 +237,7 @@ typename MemList<T, MAX_SIZE>::Iterator  MemList<T, MAX_SIZE>::PushBack(const T 
     assert(empty_index > 0);
     m_value[empty_index - 1] = value_;
 
-    Link & head = m_link[0];
+    LinkNode & head = m_link[0];
     m_link[head.prev].next = empty_index;
     m_link[empty_index].prev = head.prev;
     m_link[empty_index].next = 0;
@@ -253,9 +253,9 @@ void MemList<T, MAX_SIZE>::PopFront()
 {
     if (IsEmpty() == false)
     {
-        Link & head = m_link[0];
+        LinkNode & head = m_link[0];
         IntType del_index = head.next;
-        Link & del_link = m_link[del_index];
+        LinkNode & del_link = m_link[del_index];
 
         head.next = del_link.next;
         m_link[del_link.next].prev = 0;
@@ -274,9 +274,9 @@ void MemList<T, MAX_SIZE>::PopBack()
 {
     if (IsEmpty() == false)
     {
-        Link & head = m_link[0];
+        LinkNode & head = m_link[0];
         IntType del_index = head.prev;
-        Link & del_link = m_link[del_index];
+        LinkNode & del_link = m_link[del_index];
 
         head.prev = del_link.prev;
         m_link[del_link.prev].next = 0;
@@ -295,9 +295,9 @@ void MemList<T, MAX_SIZE>::Erase(const Iterator & it_)
 {
     assert(it_.m_list == this);
     assert(m_used > 0);
-    Link & del_link = m_link[it_.m_index];
-    Link & prev_link = m_link[del_link.prev];
-    Link & next_link = m_link[del_link.next];
+    LinkNode & del_link = m_link[it_.m_index];
+    LinkNode & prev_link = m_link[del_link.prev];
+    LinkNode & next_link = m_link[del_link.next];
     prev_link.next = del_link.next;
     next_link.prev = del_link.prev;
 
