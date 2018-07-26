@@ -32,7 +32,7 @@ public:
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
     std::pair<Iterator, bool> Insert(const T & value_);
     /// 激活一下节点
-    const Iterator Active(const T & value_) const;
+    Iterator Active(const T & value_);
 
 private:
     typedef Link<IntType> LinkNode;
@@ -76,7 +76,7 @@ std::pair<typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator, 
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-const typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Active(const T & value_) const
+typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Active(const T & value_)
 {
     HASH hash;
     IntType bucket_index = hash(value_) % BaseType::BUCKETS_SIZE;
@@ -97,7 +97,7 @@ const typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator BaseM
         head.next = index; 
     }
 
-    return BaseType::MakeIterator(this, index);
+    return BaseType::MakeIterator(index);
 }
 
 }

@@ -63,6 +63,22 @@ int main()
             cout << endl;
     }
 
+    // 测试激活
+    for (size_t i = 0; i < MAX_SIZE; ++i)
+    {
+        s.Active(temp[i]);
+    }
+    cout << "-----------------------------" << endl;
+    count = 0;
+    for (auto beg = s.Begin(), end = s.End();
+            beg != end; ++beg)
+    {
+        cout << (*beg) << " ";
+        ++count;
+        if (count % 5 == 0)
+            cout << endl;
+    }
+
     // 测试删除
     for (size_t i = 0; i < MAX_SIZE; ++i)
     {
