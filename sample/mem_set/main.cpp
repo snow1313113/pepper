@@ -26,7 +26,7 @@ int main()
             temp[i] = 0;
         else
             //temp[i] = arand_range(1, max_num);
-            temp[i] = i * (i + 1);
+            temp[i] = i * (i + 1) + 1;
     }
 
     // 测试插入
