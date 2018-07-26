@@ -14,9 +14,9 @@ namespace Pepper
 {
 
 template<typename T, size_t MAX_SIZE, typename HASH = SimpleHash<T>, typename IS_EQUAL = IsEqual<T> >
-struct MemSet : public BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, (sizeof(T) > 4 && MAX_SIZE <= 40) || (sizeof(T) <= 4 && MAX_SIZE <= 50) >
+struct MemSet : public BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, IsMinSizeMemSet<T, MAX_SIZE>::IS_MIN >
 {
-    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, (sizeof(T) > 4 && MAX_SIZE <= 40) || (sizeof(T) <= 4 && MAX_SIZE <= 50) > BaseType;
+    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, IsMinSizeMemSet<T, MAX_SIZE>::IS_MIN > BaseType;
     typedef typename BaseType::IntType IntType;
     typedef typename BaseType::ValueType ValueType;
     typedef typename BaseType::Iterator Iterator;

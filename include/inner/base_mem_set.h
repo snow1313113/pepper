@@ -15,6 +15,12 @@
 namespace Pepper
 {
 
+template<typename T, size_t SIZE>
+struct IsMinSizeMemSet
+{
+    enum {IS_MIN = (sizeof(T) > 4 && SIZE <= 40) || (sizeof(T) <= 4 && SIZE <= 50)};
+};
+
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
 class BaseMemSet;
 
