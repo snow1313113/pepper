@@ -254,6 +254,18 @@ struct SimpleHash<uint64_t>
 
 //////////////////////////////////////////////////////////////////////////////
 
+template <class T>
+struct IsEqual
+{
+    typedef T KeyType;
+    bool operator()(const T & x, const T & y) const
+    {
+        return x == y;
+    }
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
 /// 获取Key
 template <class T>
 struct ExtractKey
