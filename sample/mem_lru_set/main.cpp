@@ -64,11 +64,12 @@ int main()
     }
 
     // 测试激活
-    for (size_t i = 0; i < MAX_SIZE; ++i)
+    for (size_t i = MAX_SIZE; i > 0; --i)
     {
-        s.Active(temp[i]);
+        s.Active(temp[i - 1]);
     }
-    cout << "-----------------------------" << endl;
+
+    cout << "-------------after active-------------" << endl;
     count = 0;
     for (auto beg = s.Begin(), end = s.End();
             beg != end; ++beg)

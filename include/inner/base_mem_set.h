@@ -22,12 +22,11 @@ struct IsMinSizeMemSet
 };
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-class BaseMemSet;
+struct BaseMemSet;
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-class BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>
+struct BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>
 {
-public:
     typedef typename FixIntType<MAX_SIZE>::IntType IntType;
     typedef T ValueType;
 
@@ -49,7 +48,6 @@ public:
         // 不提供operator--函数了，为了省空间用了单向链表，没法做性能很好的前向迭代
     };
 
-public:
     /// 清空列表
     void Clear();
     /// 列表是否空
@@ -62,29 +60,33 @@ public:
     size_t Capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
     std::pair<Iterator, bool> Insert(const T & value_);
-    /// 找到节点的迭代器
+    IntType Insert(IntType bucket_index_, const T & value_);
+    /// 找到节点
     const Iterator Find(const T & value_) const;
     Iterator Find(const T & value_);
-    /// 是否存在，其实和find是类似的
+    IntType FindIndex(const T & value_) const;
+    IntType FindIndex(IntType bucket_index_, const T & value_) const;
+    /// 是否存在
     bool IsExist(const T & value_) const;
     /// 删除一个，根据迭代器
-    void Erase(const Iterator & it_);
+    IntType Erase(const Iterator & it_);
     /// 删除一个，根据值
-    void Erase(const T & value_);
+    IntType Erase(const T & value_);
     /// 迭代器
     const Iterator Begin() const;
     const Iterator End() const;
     Iterator Begin();
     Iterator End();
 
-protected:
-    IntType Find(IntType bucket_index_, const T & value_) const;
-    IntType FindFirstUsedBucket() const;
-    IntType Insert(IntType bucket_index_, const T & value_);
-    const Iterator MakeIterator(IntType index_) const;
-    Iterator MakeIterator(IntType index_);
+    // 这两个函数加得很无奈，需要通过index来构造迭代器，但是又不想把接口暴露出来
+    // 结果导致了需要通过BaseMemSet来做，有点蛋疼
+    const T & Deref(IntType index_) const;
+    T & Deref(IntType index_);
 
-    static const size_t BUCKETS_SIZE = CalcPrime<MAX_SIZE>::PRIME;
+    static IntType GetBucketIndex(const T & value_);
+
+private:
+    IntType FindFirstUsedBucket() const;
 
 private:
     /// 使用了多少个节点
@@ -94,11 +96,19 @@ private:
     // 使用的节点下标，m_next的下标，加入这个是为了clear的时候不用做多余的操作
     IntType m_raw_used;
     // 找一个比max_size小素数会好一点
+    static const size_t BUCKETS_SIZE = CalcPrime<MAX_SIZE>::PRIME;
     IntType m_buckets[BUCKETS_SIZE];
     /// 存储链表下标，每一个和value数组一一对应，为了字节对齐
     IntType m_next[MAX_SIZE];
     T m_value[MAX_SIZE];
 };
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::GetBucketIndex(const T & value_)
+{
+    HASH hash;
+    return hash(value_) % BUCKETS_SIZE;
+}
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 void BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Clear()
@@ -141,9 +151,8 @@ std::pair<typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator, boo
         return std::make_pair(End(), false);
 
     // 需要看看有没有存在
-    HASH hash;
-    IntType bucket_index = hash(value_) % BUCKETS_SIZE;
-    IntType index = Find(bucket_index, value_);
+    IntType bucket_index = BaseMemSet::GetBucketIndex(value_);
+    IntType index = FindIndex(bucket_index, value_);
     if (index != 0)
         return std::make_pair(Iterator(this, index), false);
     else
@@ -185,21 +194,23 @@ typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType BaseMemSet<T, M
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Find(const T & value_) const
 {
-    HASH hash;
-    IntType bucket_index = hash(value_) % BUCKETS_SIZE;
-    return Iterator(this, Find(bucket_index, value_));
+    return Iterator(this, FindIndex(value_));
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Find(const T & value_)
 {
-    HASH hash;
-    IntType bucket_index = hash(value_) % BUCKETS_SIZE;
-    return Iterator(this, Find(bucket_index, value_));
+    return Iterator(this, FindIndex(value_));
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Find(
+typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::FindIndex(const T & value_) const
+{
+    return FindIndex(BaseMemSet::GetBucketIndex(value_), value_);
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::FindIndex(
         typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType bucket_index_,
         const T & value_) const
 {
@@ -221,25 +232,25 @@ bool BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IsExist(const T & value_) c
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-void BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Erase(const Iterator & it_)
+typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Erase(const Iterator & it_)
 {
     assert(it_.m_set == this);
     if (it_.m_index > 0)
-        Erase(m_value[it_.m_index - 1]);
+        return Erase(m_value[it_.m_index - 1]);
+    return 0;
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-void BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Erase(const T & value_)
+typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Erase(const T & value_)
 {
     if (m_used == 0)
-        return;
+        return 0;
 
-    HASH hash;
-    IntType bucket_index = hash(value_) % BUCKETS_SIZE;
+    IntType bucket_index = BaseMemSet::GetBucketIndex(value_);
     assert(bucket_index >= 0);
     assert(bucket_index < BUCKETS_SIZE);
     if (m_buckets[bucket_index] == 0)
-        return;
+        return 0;
 
     IS_EQUAL is_equal;
     IntType * pre = &(m_buckets[bucket_index]);
@@ -252,23 +263,25 @@ void BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Erase(const T & value_)
             m_next[index - 1] = m_free_index;
             m_free_index = index;
             --m_used;
-            return;
+            return index;
         }
     }
+
+    return 0;
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-const typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::MakeIterator(
+const T & BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Deref(
         typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType index_) const
 {
-    return Iterator(this, index_);
+    return m_value[index_ - 1];
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::MakeIterator(
+T & BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Deref(
         typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType index_)
 {
-    return Iterator(this, index_);
+    return m_value[index_ - 1];
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
@@ -343,8 +356,7 @@ typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator & BaseMemSet<T
     if (next_index == 0)
     {
         // 该链上的最后一个节点，找下一个hash
-        HASH hash;
-        IntType next_bucket = hash(m_set->m_value[m_index - 1]) % BUCKETS_SIZE + 1;
+        IntType next_bucket = BaseMemSet::GetBucketIndex(m_set->m_value[m_index - 1]) + 1;
         while (next_bucket < BUCKETS_SIZE)
         {
             if (m_set->m_buckets[next_bucket] != 0)
@@ -370,14 +382,12 @@ typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator BaseMemSet<T, 
 
 //小数据特化类型，数据长度太小直接退化成数组
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-class BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>
+struct BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>
 {
-public:
     typedef typename FixIntType<MAX_SIZE>::IntType IntType;
     typedef T ValueType;
     typedef T* Iterator;
 
-public:
     /// 清空列表
     void Clear();
     /// 列表是否空
