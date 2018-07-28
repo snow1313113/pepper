@@ -301,6 +301,78 @@ typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator BaseMemLRUS
     return temp;
 }
 
+// todo 还没实现
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+struct BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, true>
+{
+public:
+    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true> BaseType;
+    // 不能直接用basetype的inttype，因为我们的大小是不一样的
+    typedef typename FixIntType<MAX_SIZE + 1>::IntType IntType;
+    typedef T ValueType;
+
+    class Iterator
+    {
+        friend class BaseMemLRUSet;
+        const BaseMemLRUSet * m_set;
+        IntType m_index;
+        Iterator(const BaseMemLRUSet * set_, IntType index_) : m_set(set_), m_index(index_){}
+    public:
+        Iterator() = default;
+        const T & operator*() const;
+        T & operator*();
+        T * operator->() const;
+        bool operator==(const Iterator & right_) const;
+        bool operator!=(const Iterator & right_) const;
+        Iterator & operator++();
+        Iterator operator++(int);
+        // 不提供operator--函数了，为了省空间用了单向链表，没法做性能很好的前向迭代
+    };
+
+public:
+    /// 清空列表
+    void Clear();
+    /// 列表是否空
+    bool IsEmpty() const;
+    /// 列表是否满了
+    bool IsFull() const;
+    /// 当前已经用的个数
+    size_t Size() const;
+    /// 列表最大容量
+    size_t Capacity() const;
+    /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
+    std::pair<Iterator, bool> Insert(const T & value_);
+    /// 找到节点的迭代器
+    const Iterator Find(const T & value_) const;
+    Iterator Find(const T & value_);
+    /// 是否存在
+    bool IsExist(const T & value_) const;
+    /// 删除一个，根据迭代器
+    void Erase(const Iterator & it_);
+    /// 删除一个，根据值
+    void Erase(const T & value_);
+    /// 找到激活一下节点
+    Iterator Active(const T & value_);
+    /// 淘汰掉几个
+    size_t Disuse(size_t num_);
+
+    /// 迭代器
+    const Iterator Begin() const;
+    const Iterator End() const;
+    Iterator Begin();
+    Iterator End();
+
+private:
+    const T & Deref(IntType index_) const;
+    T & Deref(IntType index_);
+
+private:
+    typedef Link<IntType> LinkNode;
+    /// 第一个节点作为flag 活跃双向链表，最近被访问的放在最前面，和每一个value数组一一对应
+    LinkNode m_active_link[MAX_SIZE + 1];
+    BaseType m_base;
+};
+
 
 }
 

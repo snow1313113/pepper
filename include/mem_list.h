@@ -8,9 +8,7 @@
 #ifndef MEM_LIST_H
 #define MEM_LIST_H
 
-#include "inner/head.h"
-#include "utils/traits_utils.h"
-#include "base_struct.h"
+#include "inner/base_mem_list.h"
 
 namespace Pepper
 {
@@ -19,81 +17,10 @@ template<typename T, size_t MAX_SIZE>
 class MemList
 {
 public:
-    typedef typename FixIntType<MAX_SIZE + 1>::IntType IntType;
-
-    class Iterator
-    {
-        const MemList * m_list;
-        IntType m_index;
-        Iterator(const MemList * list_, IntType index_) : m_list(list_), m_index(index_)
-        {
-        }
-
-    public:
-        friend class MemList;
-        Iterator() = default;
-
-        const T & operator*() const
-        {
-            return m_list->m_value[m_index - 1];
-        }
-
-        T & operator*()
-        {
-            return const_cast<MemList*>(m_list)->m_value[m_index - 1];
-        }
-
-        const T * operator->() const
-        {
-            return &(operator*());
-        }
-
-        T * operator->()
-        {
-            return &(operator*());
-        }
-
-        bool operator==(const Iterator & right_) const
-        {
-            return (m_list == right_.m_list) && (m_index == right_.m_index);
-        }
-
-        bool operator!=(const Iterator & right_) const
-        {
-            return (m_list != right_.m_list) || (m_index != right_.m_index);
-        }
-
-        Iterator & operator++()
-        {
-            m_index = m_list->m_link[m_index].next;
-            return (*this);
-        }
-
-        Iterator operator++(int)
-        {
-            Iterator temp = (*this);
-            ++(*this);
-            return temp;
-        }
-
-        Iterator & operator--()
-        {
-            m_index = m_list->m_link[m_index].prev;
-            return (*this);
-        }
-
-        Iterator operator--(int)
-        {
-            Iterator temp = (*this);
-            --(*this);
-            return temp;
-        }
-
-        IntType ToInt() const
-        {
-            return m_index;
-        }
-    };
+    typedef BaseMemList<T, MAX_SIZE> BaseType;
+    typedef typename BaseType::IntType IntType;
+    typedef typename BaseType::ValueType ValueType;
+    typedef typename BaseType::Iterator Iterator;
 
 public:
     /// 清空列表
@@ -130,251 +57,126 @@ public:
 
     const Iterator Begin() const;
     const Iterator End() const;
-
     Iterator Begin();
     Iterator End();
 
 private:
-    typedef Link<IntType> LinkNode;
-
-private:
-    IntType m_used;
-    // 这个是空闲连头下标，m_link的下标
-    IntType m_free_index;
-    // 使用的节点下标，m_link的下标
-    IntType m_raw_used;
-    // 第一个节点作为flag
-    LinkNode m_link[MAX_SIZE + 1];
-    T m_value[MAX_SIZE];
+    BaseType m_base;
 };
 
 template<typename T, size_t MAX_SIZE>
 void MemList<T, MAX_SIZE>::Clear()
 {
-    m_used = 0;
-    m_link[0].prev = 0;
-    m_link[0].next = 0;
-    m_free_index = 0;
-    m_raw_used = 0;
+    m_base.Clear();
 }
 
 template<typename T, size_t MAX_SIZE>
 bool MemList<T, MAX_SIZE>::IsEmpty() const
 {
-    return m_used == 0;
+    return m_base.IsEmpty();
 }
 
 template<typename T, size_t MAX_SIZE>
 bool MemList<T, MAX_SIZE>::IsFull() const
 {
-    return m_used >= MAX_SIZE;
+    return m_base.IsFull();
 }
 
 template<typename T, size_t MAX_SIZE>
 size_t MemList<T, MAX_SIZE>::Size() const
 {
-    return m_used;
+    return m_base.Size();
 }
 
 template<typename T, size_t MAX_SIZE>
 size_t MemList<T, MAX_SIZE>::Capacity() const
 {
-    return MAX_SIZE;
+    return m_base.Capacity();
 }
 
 template<typename T, size_t MAX_SIZE>
 typename MemList<T, MAX_SIZE>::Iterator  MemList<T, MAX_SIZE>::PushFront(const T & value_)
 {
-    if (IsFull())
-        return End();
-
-    IntType empty_index = 0;
-    if (m_free_index == 0)
-    {
-        assert(m_raw_used < MAX_SIZE);
-        ++m_raw_used;
-        empty_index = m_raw_used;
-    }
-    else
-    {
-        empty_index = m_free_index;
-        m_free_index = m_link[m_free_index].next;
-    }
-
-    assert(empty_index > 0);
-    m_value[empty_index - 1] = value_;
-
-    LinkNode & head = m_link[0];
-    m_link[head.next].prev = empty_index;
-    m_link[empty_index].prev = 0;
-    m_link[empty_index].next = head.next;
-    head.next = empty_index; 
-
-    ++m_used;
-
-    return Iterator(this, empty_index);
+    return m_base.PushFront(value_);
 }
 
 template<typename T, size_t MAX_SIZE>
 typename MemList<T, MAX_SIZE>::Iterator  MemList<T, MAX_SIZE>::PushBack(const T & value_)
 {
-    if (IsFull())
-        return End();
-
-    IntType empty_index = 0;
-    if (m_free_index == 0)
-    {
-        assert(m_raw_used < MAX_SIZE);
-        ++m_raw_used;
-        empty_index = m_raw_used;
-    }
-    else
-    {
-        empty_index = m_free_index;
-        m_free_index = m_link[m_free_index].next;
-    }
-
-    assert(empty_index > 0);
-    m_value[empty_index - 1] = value_;
-
-    LinkNode & head = m_link[0];
-    m_link[head.prev].next = empty_index;
-    m_link[empty_index].prev = head.prev;
-    m_link[empty_index].next = 0;
-    head.prev = empty_index; 
-
-    ++m_used;
-
-    return Iterator(this, empty_index);
+    return m_base.PushBack(value_);
 }
 
 template<typename T, size_t MAX_SIZE>
 void MemList<T, MAX_SIZE>::PopFront()
 {
-    if (IsEmpty() == false)
-    {
-        LinkNode & head = m_link[0];
-        IntType del_index = head.next;
-        LinkNode & del_link = m_link[del_index];
-
-        head.next = del_link.next;
-        m_link[del_link.next].prev = 0;
-
-        // 挂到空闲链上
-        del_link.next = m_free_index;
-        m_free_index = del_index;
-
-        assert(m_used > 0);
-        --m_used;
-    }
+    m_base.PopFront();
 }
 
 template<typename T, size_t MAX_SIZE>
 void MemList<T, MAX_SIZE>::PopBack()
 {
-    if (IsEmpty() == false)
-    {
-        LinkNode & head = m_link[0];
-        IntType del_index = head.prev;
-        LinkNode & del_link = m_link[del_index];
-
-        head.prev = del_link.prev;
-        m_link[del_link.prev].next = 0;
-
-        // 挂到空闲链上
-        del_link.next = m_free_index;
-        m_free_index = del_index;
-
-        assert(m_used > 0);
-        --m_used;
-    }
+    m_base.PopBack();
 }
 
 template<typename T, size_t MAX_SIZE>
 void MemList<T, MAX_SIZE>::Erase(const Iterator & it_)
 {
-    assert(it_.m_list == this);
-    assert(m_used > 0);
-    LinkNode & del_link = m_link[it_.m_index];
-    LinkNode & prev_link = m_link[del_link.prev];
-    LinkNode & next_link = m_link[del_link.next];
-    prev_link.next = del_link.next;
-    next_link.prev = del_link.prev;
-
-    // 挂到空闲链上
-    del_link.next = m_free_index;
-    m_free_index = it_.m_index;
-
-    --m_used;
+    m_base.Erase(it_);
 }
 
 template<typename T, size_t MAX_SIZE>
 void MemList<T, MAX_SIZE>::Erase(const T & value_)
 {
-    Iterator del = Find(value_);
-    if (del != End())
-        Erase(del);
+    m_base.Erase(value_);
 }
 
 template<typename T, size_t MAX_SIZE>
 void MemList<T, MAX_SIZE>::Erase(IntType pos_)
 {
-    Erase(Iterator(this, pos_));
+    m_base.Erase(pos_);
 }
 
 template<typename T, size_t MAX_SIZE>
 typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::Find(const T & value_) const
 {
-    for (IntType i = m_link[0].next; i != 0; i = m_link[i].next)
-    {
-        if (m_value[i - 1] == value_)
-            return Iterator(this, i);
-    }
-
-    return End();
+    return m_base.Find(value_);
 }
 
 template<typename T, size_t MAX_SIZE>
 template<typename Predicate>
 typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::FindIf(const Predicate & p_) const
 {
-    for (IntType i = m_link[0].next; i != 0; i = m_link[i].next)
-    {
-        if (p_(m_value[i - 1]))
-            return Iterator(this, i);
-    }
-
-    return End();
+    return m_base.FindIf(p_);
 }
 
 template<typename T, size_t MAX_SIZE>
 const T & MemList<T, MAX_SIZE>::Get(IntType pos_) const
 {
-    return m_value[pos_ - 1];
+    return m_base.Get(pos_);
 }
 
 template<typename T, size_t MAX_SIZE>
 const typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::Begin() const
 {
-    return Iterator(this, m_link[0].next);
+    return m_base.Begin();
 }
 
 template<typename T, size_t MAX_SIZE>
 const typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::End() const
 {
-    return Iterator(this, 0);
+    return m_base.End();
 }
 
 template<typename T, size_t MAX_SIZE>
 typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::Begin()
 {
-    return Iterator(this, m_link[0].next);
+    return m_base.Begin();
 }
 
 template<typename T, size_t MAX_SIZE>
 typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::End()
 {
-    return Iterator(this, 0);
+    return m_base.End();
 }
 
 }
