@@ -66,9 +66,10 @@ public:
     void Erase(const Iterator & it_);
     /// 删除一个，根据值
     void Erase(const T & value_);
-    /// 激活一下节点
+    /// 找到激活一下节点
     Iterator Active(const T & value_);
-    /// todo 增加淘汰接口
+    /// 淘汰掉几个
+    size_t Disuse(size_t num_);
 
     /// 迭代器
     const Iterator Begin() const;
@@ -205,6 +206,18 @@ typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator BaseMemLRUS
     }
 
     return Iterator(this, index);
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Disuse(size_t num_)
+{
+    for (size_t i = 0; i < num_; ++i)
+    {
+        if (m_base.IsEmpty())
+            return i;
+        Erase(Deref(m_active_link[0].prev));
+    }
+    return num_;
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>

@@ -59,7 +59,7 @@ int main()
     {
         cout << (*beg) << " ";
         ++count;
-        if (count % 5 == 0)
+        if (count % 10 == 0)
             cout << endl;
     }
 
@@ -76,8 +76,31 @@ int main()
     {
         cout << (*beg) << " ";
         ++count;
-        if (count % 5 == 0)
+        if (count % 10 == 0)
             cout << endl;
+    }
+
+    // 测试淘汰
+    size_t disuse_num = s.Disuse(MAX_SIZE / 2);
+    cout << "-------------after disuse-------------" << endl;
+    if (disuse_num != MAX_SIZE / 2)
+        cout << "disuse num : " << disuse_num << endl;
+    else
+    {
+        count = 0;
+        for (auto beg = s.Begin(), end = s.End();
+                beg != end; ++beg)
+        {
+            cout << (*beg) << " ";
+            ++count;
+            if (count % 10 == 0)
+                cout << endl;
+        }
+    }
+
+    for (size_t i = 0; i < MAX_SIZE / 2; ++i)
+    {
+        s.Erase(temp[i]);
     }
 
     // 测试删除
