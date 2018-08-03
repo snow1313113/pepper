@@ -132,7 +132,7 @@ struct RealIsPrime<NUM, 1, true>
 template<size_t NUM>
 struct IsPrime
 {
-    enum {RESULT = RealIsPrime<NUM, (NUM + 1) / 2, (NUM % 2 != 0) && (NUM % 3 != 0) && true>::RESULT};
+    enum {RESULT = RealIsPrime<NUM, (NUM + 1) / 2, (NUM % 2 != 0) && (NUM % 3 != 0)>::RESULT};
 };
 
 template<>
@@ -177,7 +177,7 @@ struct CalcPrime<1>
 
 //////////////////////////////////////////////////////////////////////////////
 
-template <class keytpe>
+template <typename T>
 struct SimpleHash;
 
 template<>
@@ -254,7 +254,7 @@ struct SimpleHash<uint64_t>
 
 //////////////////////////////////////////////////////////////////////////////
 
-template <class T>
+template <typename T>
 struct IsEqual
 {
     typedef T KeyType;
@@ -267,7 +267,7 @@ struct IsEqual
 //////////////////////////////////////////////////////////////////////////////
 
 /// 获取Key
-template <class T>
+template <typename T>
 struct ExtractKey
 {
     typedef T KeyType;

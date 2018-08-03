@@ -40,7 +40,8 @@ struct BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>
         Iterator() = default;
         const T & operator*() const;
         T & operator*();
-        T * operator->() const;
+        const T * operator->() const;
+        T * operator->();
         bool operator==(const Iterator & right_) const;
         bool operator!=(const Iterator & right_) const;
         Iterator & operator++();
@@ -332,7 +333,13 @@ T & BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator::operator*()
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-T * BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator::operator->() const
+const T * BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator::operator->() const
+{
+    return &(operator*());
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+T * BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator::operator->()
 {
     return &(operator*());
 }

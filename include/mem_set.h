@@ -92,7 +92,7 @@ std::pair<typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool> MemSet<T
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Find(const T & value_) const
 {
-    return m_base.Insert(value_);
+    return m_base.Find(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
