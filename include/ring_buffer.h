@@ -177,7 +177,7 @@ private:
     struct ItemHeader
     {
         /// 0 表示数据节点，1 表示填充用的
-        IntType m_flag;
+        uint8_t m_flag;
         /// 后面的数据长度
         IntType m_len;
     };
