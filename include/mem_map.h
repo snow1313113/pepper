@@ -8,29 +8,11 @@
 #ifndef MEM_MAP_H
 #define MEM_MAP_H
 
+#include "inner/base_specialization.h"
 #include "inner/base_mem_set.h"
 
 namespace Pepper
 {
-
-template<typename T1, typename T2>
-struct SimpleHash<std::pair<T1, T2> >
-{
-    size_t operator()(const std::pair<T1, T2> & t_) const
-    {
-        return SimpleHash<T1>()(t_.first);
-    }
-};
-
-template <typename T1, typename T2>
-struct IsEqual<std::pair<T1, T2> >
-{
-    typedef std::pair<T1, T2> T;
-    bool operator()(const T & x_, const T & y_) const
-    {
-        return IsEqual<T1>()(x_.first, y_.first);
-    }
-};
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 class MemMap
