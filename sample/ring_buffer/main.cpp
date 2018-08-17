@@ -12,11 +12,12 @@ struct Test
 int main()
 {
     FixedRingBuffer<Test, 5> queue;
-    Test test;
-    queue.Clear();
-
+//    static_assert(std::is_trivial<FixedRingBuffer<Test, 5> >::value, "must be trivial");
+    static_assert(std::is_trivially_copyable<FixedRingBuffer<Test, 5> >::value, "must be trivial");
+//    queue.Clear();
     cout << "queue capacity: " << queue.Capacity() << " , size: " << queue.Size() << endl;
 
+    Test test;
     test.a = 'a';
     test.b = 1;
     queue.Push(test);

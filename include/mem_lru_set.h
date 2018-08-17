@@ -33,7 +33,7 @@ public:
     /// 列表最大容量
     size_t Capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
-    std::pair<Iterator, bool> Insert(const T & value_);
+    std::pair<Iterator, bool> Insert(const T & value_, bool force_ = false);
     /// 找到节点的迭代器
     const Iterator Find(const T & value_) const;
     Iterator Find(const T & value_);
@@ -89,15 +89,15 @@ size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Capacity() const
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-std::pair<typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool> MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Insert(const T & value_)
+std::pair<typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool> MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Insert(const T & value_, bool force_)
 {
-    return m_base.Insert(value_);
+    return m_base.Insert(value_, force_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Find(const T & value_) const
 {
-    return m_base.Insert(value_);
+    return m_base.Find(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>

@@ -56,7 +56,7 @@ public:
     /// 列表最大容量
     size_t Capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
-    std::pair<Iterator, bool> Insert(const T & value_);
+    std::pair<Iterator, bool> Insert(const T & value_, bool force_);
     /// 找到节点的迭代器
     const Iterator Find(const T & value_) const;
     Iterator Find(const T & value_);
@@ -121,10 +121,13 @@ size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Capacity() const
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-std::pair<typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator, bool> BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Insert(const T & value_)
+std::pair<typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator, bool> BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Insert(const T & value_, bool force_)
 {
     if (m_base.IsFull())
-        return std::make_pair(End(), false);
+    {
+        if (!force_ || Disuse(1) == 0)
+            return std::make_pair(End(), false);
+    }
 
     // 需要看看有没有存在
     IntType bucket_index = BaseType::GetBucketIndex(value_);
@@ -341,7 +344,7 @@ public:
     /// 列表最大容量
     size_t Capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
-    std::pair<Iterator, bool> Insert(const T & value_);
+    std::pair<Iterator, bool> Insert(const T & value_, bool force_);
     /// 找到节点的迭代器
     const Iterator Find(const T & value_) const;
     Iterator Find(const T & value_);
