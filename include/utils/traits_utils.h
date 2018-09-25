@@ -49,6 +49,7 @@ struct SizeTraits<4>
     typedef uint32_t IntType;
 };
 
+//////////////////////////////////////////////////////////////////////////////////////
 template <size_t Size, bool IsZero>
 struct CalcBit;
 
@@ -64,6 +65,7 @@ struct CalcBit<Size, false>
     static const size_t BIT_NUM = 0;
 };
 
+//////////////////////////////////////////////////////////////////////////////////////
 template <size_t Power, size_t N>
 struct PowerOfN
 {
@@ -101,6 +103,38 @@ inline CLASS_T * contaner_of(const MEMBER_T * ptr, MEMBER_T CLASS_T::*member)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+template<bool COND, typename T1, typename T2>
+struct IfThenElse;
+
+template<typename T1, typename T2>
+struct IfThenElse<true, T1, T2>
+{
+    typedef T1 T;
+};
+
+template<typename T1, typename T2>
+struct IfThenElse<false, T1, T2>
+{
+    typedef T2 T;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+template<size_t VALUE>
+struct Value2Type
+{
+    enum { RESULT = VALUE};
+};
+
+//////////////////////////////////////////////////////////////////////////////
+template<size_t X, size_t G = X / 2 + 1>
+struct IntSqrt
+{
+    typedef IntSqrt<X, (G * G + X) / (G * 2)> InnerSqrt;
+    typedef typename IfThenElse<(G * G > X), InnerSqrt, Value2Type<G>>::T ResultType;
+    static const size_t RESULT = ResultType::RESULT;
+};
+
+//////////////////////////////////////////////////////////////////////////////
 template<size_t NUM, size_t MOD, bool IS_PRIME>
 struct RealIsPrime;
 
@@ -118,12 +152,6 @@ struct RealIsPrime<NUM, MOD, false>
 };
 
 template<size_t NUM>
-struct RealIsPrime<NUM, 2, true>
-{
-    enum {RESULT = true};
-};
-
-template<size_t NUM>
 struct RealIsPrime<NUM, 1, true>
 {
     enum {RESULT = true};
@@ -132,7 +160,7 @@ struct RealIsPrime<NUM, 1, true>
 template<size_t NUM>
 struct IsPrime
 {
-    enum {RESULT = RealIsPrime<NUM, (NUM + 1) / 2, (NUM % 2 != 0) && (NUM % 3 != 0)>::RESULT};
+    enum {RESULT = RealIsPrime<NUM, IntSqrt<NUM>::RESULT, (NUM % 2 != 0) && (NUM % 3 != 0)>::RESULT};
 };
 
 template<>
@@ -147,33 +175,43 @@ struct IsPrime<3>
     enum {RESULT = true};
 };
 
+//////////////////////////////////////////////////////////////////////////////
 template<size_t NUM, bool IS_PRIME>
+struct NearByPrimeImpl;
+
+template<size_t NUM>
+struct NearByPrimeImpl<NUM, true>
+{
+    static const size_t RESULT = NUM;
+};
+
+template<size_t NUM>
+struct NearByPrimeImpl<NUM, false>
+{
+    static const size_t RESULT = NearByPrimeImpl<NUM - 1, IsPrime<NUM - 1>::RESULT>::RESULT;
+};
+
+template<size_t NUM, bool IS_BIG_NUM = (NUM > 800001)>
 struct NearByPrime;
 
 template<size_t NUM>
 struct NearByPrime<NUM, true>
 {
+    // 新的标准编译器只能做1024次递归，所以对于太大的数就直接返回
     static const size_t PRIME = NUM;
 };
 
 template<size_t NUM>
 struct NearByPrime<NUM, false>
 {
-    static const size_t PRIME = NearByPrime<NUM - 1, IsPrime<NUM - 1>::RESULT>::PRIME;
-};
-
-template<size_t NUM>
-struct CalcPrime
-{
-    static const size_t PRIME = NearByPrime<NUM, IsPrime<NUM>::RESULT>::PRIME;
+    static const size_t PRIME = NearByPrimeImpl<NUM, IsPrime<NUM>::RESULT>::RESULT;
 };
 
 template<>
-struct CalcPrime<1>
+struct NearByPrime<1, false>
 {
     static const size_t PRIME = 1;
 };
-
 
 //////////////////////////////////////////////////////////////////////////////
 

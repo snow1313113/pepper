@@ -97,7 +97,7 @@ private:
     // 使用的节点下标，m_next的下标，加入这个是为了clear的时候不用做多余的操作
     IntType m_raw_used;
     // 找一个比max_size小素数会好一点
-    static const size_t BUCKETS_SIZE = CalcPrime<MAX_SIZE>::PRIME;
+    static const size_t BUCKETS_SIZE = NearByPrime<MAX_SIZE>::PRIME;
     IntType m_buckets[BUCKETS_SIZE];
     /// 存储链表下标，每一个和value数组一一对应，为了字节对齐
     IntType m_next[MAX_SIZE];
