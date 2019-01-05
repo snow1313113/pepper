@@ -23,7 +23,7 @@ struct BaseMemList
 
     class Iterator
     {
-        friend class BaseMemList;
+        friend struct BaseMemList;
         const BaseMemList * m_list;
         IntType m_index;
         Iterator(const BaseMemList * list_, IntType index_) : m_list(list_), m_index(index_){}
