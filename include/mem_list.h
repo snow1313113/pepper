@@ -47,10 +47,13 @@ public:
     void Erase(const T & value_);
     void Erase(IntType pos_);
     /// 查找一个节点所在的迭代器，找不到返回End
-    Iterator Find(const T & value_) const;
+    const Iterator Find(const T & value_) const;
+    Iterator Find(const T & value_);
     /// 通过谓词查找一个节点所在的迭代器，找不到返回End
     template<typename Predicate>
-    Iterator FindIf(const Predicate & p_) const;
+    const Iterator FindIf(const Predicate & p_) const;
+    template<typename Predicate>
+    Iterator FindIf(const Predicate & p_);
 
     /// 根据pos找到节点，如果pos是非法的，结果未定义
     const T & Get(IntType pos_) const;
@@ -137,14 +140,27 @@ void MemList<T, MAX_SIZE>::Erase(IntType pos_)
 }
 
 template<typename T, size_t MAX_SIZE>
-typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::Find(const T & value_) const
+const typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::Find(const T & value_) const
+{
+    return m_base.Find(value_);
+}
+
+template<typename T, size_t MAX_SIZE>
+typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::Find(const T & value_)
 {
     return m_base.Find(value_);
 }
 
 template<typename T, size_t MAX_SIZE>
 template<typename Predicate>
-typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::FindIf(const Predicate & p_) const
+const typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::FindIf(const Predicate & p_) const
+{
+    return m_base.FindIf(p_);
+}
+
+template<typename T, size_t MAX_SIZE>
+template<typename Predicate>
+typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::FindIf(const Predicate & p_)
 {
     return m_base.FindIf(p_);
 }

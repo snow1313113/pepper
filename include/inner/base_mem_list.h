@@ -67,11 +67,18 @@ public:
     void Erase(const T & value_);
     void Erase(IntType pos_);
     /// 查找一个节点所在的迭代器，找不到返回End
-    Iterator Find(const T & value_) const;
+    const Iterator Find(const T & value_) const;
+    Iterator Find(const T & value_);
     /// 通过谓词查找一个节点所在的迭代器，找不到返回End
     template<typename Predicate>
-    Iterator FindIf(const Predicate & p_) const;
+    const Iterator FindIf(const Predicate & p_) const;
+    template<typename Predicate>
+    Iterator FindIf(const Predicate & p_);
 
+    /// 找到节点的pos值，找不到返回0
+    IntType FindPos(const T & value_) const;
+    template<typename Predicate>
+    IntType FindPosIf(const Predicate & p_) const;
     /// 根据pos找到节点，如果pos是非法的，结果未定义
     const T & Get(IntType pos_) const;
 
@@ -267,28 +274,52 @@ void BaseMemList<T, MAX_SIZE>::Erase(IntType pos_)
 }
 
 template<typename T, size_t MAX_SIZE>
-typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::Find(const T & value_) const
+const typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::Find(const T & value_) const
 {
-    for (IntType i = m_link[0].next; i != 0; i = m_link[i].next)
-    {
-        if (m_value[i - 1] == value_)
-            return Iterator(this, i);
-    }
+    return Iterator(this, FindPos(value_));
+}
 
-    return End();
+template<typename T, size_t MAX_SIZE>
+typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::Find(const T & value_)
+{
+    return Iterator(this, FindPos(value_));
 }
 
 template<typename T, size_t MAX_SIZE>
 template<typename Predicate>
-typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::FindIf(const Predicate & p_) const
+const typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::FindIf(const Predicate & p_) const
+{
+    return Iterator(this, FindPosIf(p_));
+}
+
+template<typename T, size_t MAX_SIZE>
+template<typename Predicate>
+typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::FindIf(const Predicate & p_)
+{
+    return Iterator(this, FindPosIf(p_));
+}
+
+template<typename T, size_t MAX_SIZE>
+typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::FindPos(const T & value_) const
+{
+    for (IntType i = m_link[0].next; i != 0; i = m_link[i].next)
+    {
+        if (m_value[i - 1] == value_)
+            return i;
+    }
+    return 0;
+}
+
+template<typename T, size_t MAX_SIZE>
+template<typename Predicate>
+typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::FindPosIf(const Predicate & p_) const
 {
     for (IntType i = m_link[0].next; i != 0; i = m_link[i].next)
     {
         if (p_(m_value[i - 1]))
-            return Iterator(this, i);
+            return i;
     }
-
-    return End();
+    return 0;
 }
 
 template<typename T, size_t MAX_SIZE>
