@@ -5,17 +5,17 @@ using namespace Pepper;
 
 int main()
 {
-    FixSize<0x0>::IntType a0;
-    FixSize<0x1>::IntType a4;
-    FixSize<0x11>::IntType a8;
-    FixSize<0x111>::IntType a12;
-    FixSize<0x1111>::IntType a16;
-    FixSize<0x11111>::IntType a20;
-    FixSize<0x111111>::IntType a24;
-    FixSize<0x1111111>::IntType a28;
-    FixSize<0x11111111>::IntType a32;
-    FixSize<0x111111111>::IntType a36;
-    FixSize<0x1111111111>::IntType a40;
+    FixIntType<0x0>::IntType a0;
+    FixIntType<0x1>::IntType a4;
+    FixIntType<0x11>::IntType a8;
+    FixIntType<0x111>::IntType a12;
+    FixIntType<0x1111>::IntType a16;
+    FixIntType<0x11111>::IntType a20;
+    FixIntType<0x111111>::IntType a24;
+    FixIntType<0x1111111>::IntType a28;
+    FixIntType<0x11111111>::IntType a32;
+    FixIntType<0x111111111>::IntType a36;
+    FixIntType<0x1111111111>::IntType a40;
     cout << "a0  :" << sizeof(a0) << endl;
     cout << "a4  :" << sizeof(a4) << endl;
     cout << "a8  :" << sizeof(a8) << endl;
