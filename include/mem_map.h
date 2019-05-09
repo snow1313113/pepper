@@ -24,132 +24,132 @@ public:
     typedef typename BaseType::Iterator Iterator;
 
     /// 清空列表
-    void Clear();
+    void clear();
     /// 列表是否空
-    bool IsEmpty() const;
+    bool empty() const;
     /// 列表是否满了
-    bool IsFull() const;
+    bool full() const;
     /// 当前已经用的个数
-    size_t Size() const;
+    size_t size() const;
     /// 列表最大容量
-    size_t Capacity() const;
+    size_t capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
-    std::pair<Iterator, bool> Insert(const KEY & key_, const VALUE & value_);
+    std::pair<Iterator, bool> insert(const KEY & key_, const VALUE & value_);
     /// 找到节点的迭代器
-    const Iterator Find(const KEY & key_) const;
-    Iterator Find(const KEY & key_);
+    const Iterator find(const KEY & key_) const;
+    Iterator find(const KEY & key_);
     /// 是否存在，其实和find是类似的
-    bool IsExist(const KEY & key_) const;
+    bool exist(const KEY & key_) const;
     /// 删除一个，根据迭代器
-    void Erase(const Iterator & it_);
+    void erase(const Iterator & it_);
     /// 删除一个，根据值
-    void Erase(const KEY & key_);
+    void erase(const KEY & key_);
     /// 迭代器
-    const Iterator Begin() const;
-    const Iterator End() const;
-    Iterator Begin();
-    Iterator End();
+    const Iterator begin() const;
+    const Iterator end() const;
+    Iterator begin();
+    Iterator end();
 
 private:
     BaseType m_base;
 };
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-void MemMap<KEY, VALUE, MAX_SIZE>::Clear()
+void MemMap<KEY, VALUE, MAX_SIZE>::clear()
 {
-    return m_base.Clear();
+    return m_base.clear();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-bool MemMap<KEY, VALUE, MAX_SIZE>::IsEmpty() const
+bool MemMap<KEY, VALUE, MAX_SIZE>::empty() const
 {
-    return m_base.IsEmpty();
+    return m_base.empty();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-bool MemMap<KEY, VALUE, MAX_SIZE>::IsFull() const
+bool MemMap<KEY, VALUE, MAX_SIZE>::full() const
 {
-    return m_base.IsFull();
+    return m_base.full();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-size_t MemMap<KEY, VALUE, MAX_SIZE>::Size() const
+size_t MemMap<KEY, VALUE, MAX_SIZE>::size() const
 {
-    return m_base.Size();
+    return m_base.size();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-size_t MemMap<KEY, VALUE, MAX_SIZE>::Capacity() const
+size_t MemMap<KEY, VALUE, MAX_SIZE>::capacity() const
 {
-    return m_base.Capacity();
+    return m_base.capacity();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-std::pair<typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator, bool> MemMap<KEY, VALUE, MAX_SIZE>::Insert(const KEY & key_, const VALUE & value_)
+std::pair<typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator, bool> MemMap<KEY, VALUE, MAX_SIZE>::insert(const KEY & key_, const VALUE & value_)
 {
-    return m_base.Insert(std::make_pair(key_, value_));
+    return m_base.insert(std::make_pair(key_, value_));
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::Find(const KEY & key_) const
+const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::find(const KEY & key_) const
 {
     T temp;
     temp.first = key_;
-    return m_base.Find(temp);
+    return m_base.find(temp);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::Find(const KEY & key_)
+typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::find(const KEY & key_)
 {
     T temp;
     temp.first = key_;
-    return m_base.Find(temp);
+    return m_base.find(temp);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-bool MemMap<KEY, VALUE, MAX_SIZE>::IsExist(const KEY & key_) const
+bool MemMap<KEY, VALUE, MAX_SIZE>::exist(const KEY & key_) const
 {
     T temp;
     temp.first = key_;
-    return m_base.IsExist(temp);
+    return m_base.exist(temp);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-void MemMap<KEY, VALUE, MAX_SIZE>::Erase(const Iterator & it_)
+void MemMap<KEY, VALUE, MAX_SIZE>::erase(const Iterator & it_)
 {
-    m_base.Erase(it_);
+    m_base.erase(it_);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-void MemMap<KEY, VALUE, MAX_SIZE>::Erase(const KEY & key_)
+void MemMap<KEY, VALUE, MAX_SIZE>::erase(const KEY & key_)
 {
     T temp;
     temp.first = key_;
-    m_base.Erase(temp);
+    m_base.erase(temp);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::Begin() const
+const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::begin() const
 {
-    return m_base.Begin();
+    return m_base.begin();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::End() const
+const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::end() const
 {
-    return m_base.End();
+    return m_base.end();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::Begin()
+typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::begin()
 {
-    return m_base.Begin();
+    return m_base.begin();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::End()
+typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::end()
 {
-    return m_base.End();
+    return m_base.end();
 }
 
 

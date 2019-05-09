@@ -23,141 +23,141 @@ public:
     typedef typename BaseType::Iterator Iterator;
 
     /// 清空列表
-    void Clear();
+    void clear();
     /// 列表是否空
-    bool IsEmpty() const;
+    bool empty() const;
     /// 列表是否满了
-    bool IsFull() const;
+    bool full() const;
     /// 当前已经用的个数
-    size_t Size() const;
+    size_t size() const;
     /// 列表最大容量
-    size_t Capacity() const;
+    size_t capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
-    std::pair<Iterator, bool> Insert(const T & value_, bool force_ = false);
+    std::pair<Iterator, bool> insert(const T & value_, bool force_ = false);
     /// 找到节点的迭代器
-    const Iterator Find(const T & value_) const;
-    Iterator Find(const T & value_);
+    const Iterator find(const T & value_) const;
+    Iterator find(const T & value_);
     /// 是否存在，其实和find是类似的
-    bool IsExist(const T & value_) const;
+    bool exist(const T & value_) const;
     /// 删除一个，根据迭代器
-    void Erase(const Iterator & it_);
+    void erase(const Iterator & it_);
     /// 删除一个，根据值
-    void Erase(const T & value_);
+    void erase(const T & value_);
     /// 激活一下节点
-    Iterator Active(const T & value_);
+    Iterator active(const T & value_);
     /// 淘汰掉几个
-    size_t Disuse(size_t num_);
+    size_t disuse(size_t num_);
 
     /// 迭代器
-    const Iterator Begin() const;
-    const Iterator End() const;
-    Iterator Begin();
-    Iterator End();
+    const Iterator begin() const;
+    const Iterator end() const;
+    Iterator begin();
+    Iterator end();
 
 private:
     BaseType m_base;
 };
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Clear()
+void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::clear()
 {
-    m_base.Clear();
+    m_base.clear();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-bool MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::IsEmpty() const
+bool MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::empty() const
 {
-    return m_base.IsEmpty();
+    return m_base.empty();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-bool MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::IsFull() const
+bool MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::full() const
 {
-    return m_base.IsFull();
+    return m_base.full();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Size() const
+size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::size() const
 {
-    return m_base.Size();
+    return m_base.size();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Capacity() const
+size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::capacity() const
 {
-    return m_base.Capacity();
+    return m_base.capacity();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-std::pair<typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool> MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Insert(const T & value_, bool force_)
+std::pair<typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool> MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T & value_, bool force_)
 {
-    return m_base.Insert(value_, force_);
+    return m_base.insert(value_, force_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Find(const T & value_) const
+const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(const T & value_) const
 {
-    return m_base.Find(value_);
+    return m_base.find(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Find(const T & value_)
+typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(const T & value_)
 {
-    return m_base.Find(value_);
+    return m_base.find(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-bool MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::IsExist(const T & value_) const
+bool MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::exist(const T & value_) const
 {
-    return m_base.IsExist(value_);
+    return m_base.exist(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Erase(const Iterator & it_)
+void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const Iterator & it_)
 {
-    m_base.Erase(it_);
+    m_base.erase(it_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Erase(const T & value_)
+void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const T & value_)
 {
-    m_base.Erase(value_);
+    m_base.erase(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Active(const T & value_)
+typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::active(const T & value_)
 {
-    return m_base.Active(value_);
+    return m_base.active(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Disuse(size_t num_)
+size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::disuse(size_t num_)
 {
-    return m_base.Disuse(num_);
+    return m_base.disuse(num_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Begin() const
+const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::begin() const
 {
-    return m_base.Begin();
+    return m_base.begin();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Begin()
+typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::begin()
 {
-    return m_base.Begin();
+    return m_base.begin();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::End() const
+const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::end() const
 {
-    return m_base.End();
+    return m_base.end();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::End()
+typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::end()
 {
-    return m_base.End();
+    return m_base.end();
 }
 
 }

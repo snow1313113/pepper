@@ -24,7 +24,7 @@ int main()
     static const size_t node_size = sizeof(Test) + 10;
     static const size_t mem_size = FixedMemPool<Test>::CalcNeedSize(MAX_NUM, node_size);
     uint8_t * mem = new uint8_t[mem_size];
-    if (pool.Init(mem, mem_size, node_size, true) == false)
+    if (pool.init(mem, mem_size, node_size, true) == false)
     {
         cout << "init error" << endl;
         return 0;
@@ -32,7 +32,7 @@ int main()
 
     for (size_t i = 0; i < MAX_NUM; ++i)
     {
-        Test * p = pool.Alloc();
+        Test * p = pool.alloc();
         if (p == NULL)
         {
             cout << "alloc null" << endl;
@@ -43,32 +43,32 @@ int main()
         p->c = i * i;
     }
 
-    if (pool.Size() != MAX_NUM)
+    if (pool.size() != MAX_NUM)
     {
-        cout << "size error " << pool.Size() << endl;
+        cout << "size error " << pool.size() << endl;
         return 0;
     }
 
-    if (pool.Size() != pool.Capacity())
+    if (pool.size() != pool.capacity())
     {
-        cout << "size " << pool.Size() << " != capacity " << pool.Capacity() << endl;
+        cout << "size " << pool.size() << " != capacity " << pool.capacity() << endl;
         return 0;
     }
 
-    if (pool.Alloc() != NULL)
+    if (pool.alloc() != NULL)
     {
         cout << "is full but alloc succe" << endl;
         return 0;
     }
 
     cout << "************ after alloc *************" << endl;
-    cout << "size " << pool.Size() << " capacity " << pool.Capacity() << endl;
+    cout << "size " << pool.size() << " capacity " << pool.capacity() << endl;
     vector<const Test*> vec;
     size_t count = 0;
-    for (auto beg = pool.Begin(), end = pool.End(); beg != end; ++beg)
+    for (auto beg = pool.begin(), end = pool.end(); beg != end; ++beg)
     {
-        size_t index = pool.Ptr2Int(&(*beg));
-        auto p = pool.Int2Ptr(index);
+        size_t index = pool.ptr_2_int(&(*beg));
+        auto p = pool.int_2_ptr(index);
         cout << "(a = " << p->a << " b = " << p->b << " c = " << p->c << "), ";
         ++count;
         if (count % 2 == 0)
@@ -79,7 +79,7 @@ int main()
 
     for (auto beg = vec.begin(), end = vec.end(); beg != end; ++beg)
     {
-        bool result = pool.Free(*beg);
+        bool result = pool.free(*beg);
         if (!result)
         {
             cout << "free error" << endl;
@@ -90,7 +90,7 @@ int main()
     // 重复删除，应该都不能成功才对
     for (auto beg = vec.begin(), end = vec.end(); beg != end; ++beg)
     {
-        bool result = pool.Free(*beg);
+        bool result = pool.free(*beg);
         if (result)
         {
             cout << "free again succe, it war error" << endl;
@@ -99,26 +99,26 @@ int main()
     }
 
     cout << "************ after free 1/2 *************" << endl;
-    cout << "size " << pool.Size() << " capacity " << pool.Capacity() << endl;
+    cout << "size " << pool.size() << " capacity " << pool.capacity() << endl;
     count = 0;
-    for (auto beg = pool.Begin(), end = pool.End(); beg != end; ++beg)
+    for (auto beg = pool.begin(), end = pool.end(); beg != end; ++beg)
     {
-        size_t index = pool.Ptr2Int(&(*beg));
-        auto p = pool.Int2Ptr(index);
+        size_t index = pool.ptr_2_int(&(*beg));
+        auto p = pool.int_2_ptr(index);
         cout << "(a = " << p->a << " b = " << p->b << " c = " << p->c << "), ";
         ++count;
         if (count % 5 == 0)
             cout << endl;
      }
     
-    pool.Clear();
+    pool.clear();
     cout << "************ after clear *************" << endl;
-    cout << "size " << pool.Size() << " capacity " << pool.Capacity() << endl;
+    cout << "size " << pool.size() << " capacity " << pool.capacity() << endl;
     count = 0;
-    for (auto beg = pool.Begin(), end = pool.End(); beg != end; ++beg)
+    for (auto beg = pool.begin(), end = pool.end(); beg != end; ++beg)
     {
-        size_t index = pool.Ptr2Int(&(*beg));
-        auto p = pool.Int2Ptr(index);
+        size_t index = pool.ptr_2_int(&(*beg));
+        auto p = pool.int_2_ptr(index);
         cout << "(a = " << p->a << " b = " << p->b << " c = " << p->c << "), ";
         ++count;
         if (count % 5 == 0)

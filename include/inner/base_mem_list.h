@@ -39,53 +39,53 @@ struct BaseMemList
         Iterator operator++(int);
         Iterator & operator--();
         Iterator operator--(int);
-        IntType ToInt() const;
+        IntType to_int() const;
     };
 
 public:
     /// 清空列表
-    void Clear();
+    void clear();
     /// 列表是否空
-    bool IsEmpty() const;
+    bool empty() const;
     /// 列表是否满了
-    bool IsFull() const;
+    bool full() const;
     /// 当前已经用的个数
-    size_t Size() const;
+    size_t size() const;
     /// 列表最大容量
-    size_t Capacity() const;
+    size_t capacity() const;
     /// 从头部插入
-    Iterator PushFront(const T & value_);
+    Iterator push_front(const T & value_);
     /// 从尾部插入
-    Iterator PushBack(const T & value_);
+    Iterator push_back(const T & value_);
     /// 头部弹出一个
-    void PopFront();
+    void pop_front();
     /// 尾部弹出一个
-    void PopBack();
+    void pop_back();
     /// 删除一个，根据迭代器
-    void Erase(const Iterator & it_);
+    void erase(const Iterator & it_);
     /// 删除一个，根据值
-    void Erase(const T & value_);
-    void Erase(IntType pos_);
+    void erase(const T & value_);
+    void erase(IntType pos_);
     /// 查找一个节点所在的迭代器，找不到返回End
-    const Iterator Find(const T & value_) const;
-    Iterator Find(const T & value_);
+    const Iterator find(const T & value_) const;
+    Iterator find(const T & value_);
     /// 通过谓词查找一个节点所在的迭代器，找不到返回End
     template<typename Predicate>
-    const Iterator FindIf(const Predicate & p_) const;
+    const Iterator find_if(const Predicate & p_) const;
     template<typename Predicate>
-    Iterator FindIf(const Predicate & p_);
+    Iterator find_if(const Predicate & p_);
 
     /// 找到节点的pos值，找不到返回0
-    IntType FindPos(const T & value_) const;
+    IntType find_pos(const T & value_) const;
     template<typename Predicate>
-    IntType FindPosIf(const Predicate & p_) const;
+    IntType find_pos_if(const Predicate & p_) const;
     /// 根据pos找到节点，如果pos是非法的，结果未定义
-    const T & Get(IntType pos_) const;
+    const T & get(IntType pos_) const;
 
-    const Iterator Begin() const;
-    const Iterator End() const;
-    Iterator Begin();
-    Iterator End();
+    const Iterator begin() const;
+    const Iterator end() const;
+    Iterator begin();
+    Iterator end();
 
 private:
     typedef Link<IntType> LinkNode;
@@ -100,7 +100,7 @@ private:
 };
 
 template<typename T, size_t MAX_SIZE>
-void BaseMemList<T, MAX_SIZE>::Clear()
+void BaseMemList<T, MAX_SIZE>::clear()
 {
     m_used = 0;
     m_link[0].prev = 0;
@@ -110,34 +110,34 @@ void BaseMemList<T, MAX_SIZE>::Clear()
 }
 
 template<typename T, size_t MAX_SIZE>
-bool BaseMemList<T, MAX_SIZE>::IsEmpty() const
+bool BaseMemList<T, MAX_SIZE>::empty() const
 {
     return m_used == 0;
 }
 
 template<typename T, size_t MAX_SIZE>
-bool BaseMemList<T, MAX_SIZE>::IsFull() const
+bool BaseMemList<T, MAX_SIZE>::full() const
 {
     return m_used >= MAX_SIZE;
 }
 
 template<typename T, size_t MAX_SIZE>
-size_t BaseMemList<T, MAX_SIZE>::Size() const
+size_t BaseMemList<T, MAX_SIZE>::size() const
 {
     return m_used;
 }
 
 template<typename T, size_t MAX_SIZE>
-size_t BaseMemList<T, MAX_SIZE>::Capacity() const
+size_t BaseMemList<T, MAX_SIZE>::capacity() const
 {
     return MAX_SIZE;
 }
 
 template<typename T, size_t MAX_SIZE>
-typename BaseMemList<T, MAX_SIZE>::Iterator  BaseMemList<T, MAX_SIZE>::PushFront(const T & value_)
+typename BaseMemList<T, MAX_SIZE>::Iterator  BaseMemList<T, MAX_SIZE>::push_front(const T & value_)
 {
-    if (IsFull())
-        return End();
+    if (full())
+        return end();
 
     IntType empty_index = 0;
     if (m_free_index == 0)
@@ -167,10 +167,10 @@ typename BaseMemList<T, MAX_SIZE>::Iterator  BaseMemList<T, MAX_SIZE>::PushFront
 }
 
 template<typename T, size_t MAX_SIZE>
-typename BaseMemList<T, MAX_SIZE>::Iterator  BaseMemList<T, MAX_SIZE>::PushBack(const T & value_)
+typename BaseMemList<T, MAX_SIZE>::Iterator  BaseMemList<T, MAX_SIZE>::push_back(const T & value_)
 {
-    if (IsFull())
-        return End();
+    if (full())
+        return end();
 
     IntType empty_index = 0;
     if (m_free_index == 0)
@@ -200,9 +200,9 @@ typename BaseMemList<T, MAX_SIZE>::Iterator  BaseMemList<T, MAX_SIZE>::PushBack(
 }
 
 template<typename T, size_t MAX_SIZE>
-void BaseMemList<T, MAX_SIZE>::PopFront()
+void BaseMemList<T, MAX_SIZE>::pop_front()
 {
-    if (IsEmpty() == false)
+    if (empty() == false)
     {
         LinkNode & head = m_link[0];
         IntType del_index = head.next;
@@ -221,9 +221,9 @@ void BaseMemList<T, MAX_SIZE>::PopFront()
 }
 
 template<typename T, size_t MAX_SIZE>
-void BaseMemList<T, MAX_SIZE>::PopBack()
+void BaseMemList<T, MAX_SIZE>::pop_back()
 {
-    if (IsEmpty() == false)
+    if (empty() == false)
     {
         LinkNode & head = m_link[0];
         IntType del_index = head.prev;
@@ -242,7 +242,7 @@ void BaseMemList<T, MAX_SIZE>::PopBack()
 }
 
 template<typename T, size_t MAX_SIZE>
-void BaseMemList<T, MAX_SIZE>::Erase(const Iterator & it_)
+void BaseMemList<T, MAX_SIZE>::erase(const Iterator & it_)
 {
     assert(it_.m_list == this);
     assert(m_used > 0);
@@ -260,47 +260,47 @@ void BaseMemList<T, MAX_SIZE>::Erase(const Iterator & it_)
 }
 
 template<typename T, size_t MAX_SIZE>
-void BaseMemList<T, MAX_SIZE>::Erase(const T & value_)
+void BaseMemList<T, MAX_SIZE>::erase(const T & value_)
 {
-    Iterator del = Find(value_);
-    if (del != End())
-        Erase(del);
+    Iterator del = find(value_);
+    if (del != end())
+        erase(del);
 }
 
 template<typename T, size_t MAX_SIZE>
-void BaseMemList<T, MAX_SIZE>::Erase(IntType pos_)
+void BaseMemList<T, MAX_SIZE>::erase(IntType pos_)
 {
-    Erase(Iterator(this, pos_));
+    erase(Iterator(this, pos_));
 }
 
 template<typename T, size_t MAX_SIZE>
-const typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::Find(const T & value_) const
+const typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::find(const T & value_) const
 {
-    return Iterator(this, FindPos(value_));
+    return Iterator(this, find_pos(value_));
 }
 
 template<typename T, size_t MAX_SIZE>
-typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::Find(const T & value_)
+typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::find(const T & value_)
 {
-    return Iterator(this, FindPos(value_));
-}
-
-template<typename T, size_t MAX_SIZE>
-template<typename Predicate>
-const typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::FindIf(const Predicate & p_) const
-{
-    return Iterator(this, FindPosIf(p_));
+    return Iterator(this, find_pos(value_));
 }
 
 template<typename T, size_t MAX_SIZE>
 template<typename Predicate>
-typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::FindIf(const Predicate & p_)
+const typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::find_if(const Predicate & p_) const
 {
-    return Iterator(this, FindPosIf(p_));
+    return Iterator(this, find_pos_if(p_));
 }
 
 template<typename T, size_t MAX_SIZE>
-typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::FindPos(const T & value_) const
+template<typename Predicate>
+typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::find_if(const Predicate & p_)
+{
+    return Iterator(this, find_pos_if(p_));
+}
+
+template<typename T, size_t MAX_SIZE>
+typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::find_pos(const T & value_) const
 {
     for (IntType i = m_link[0].next; i != 0; i = m_link[i].next)
     {
@@ -312,7 +312,7 @@ typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::FindPos(con
 
 template<typename T, size_t MAX_SIZE>
 template<typename Predicate>
-typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::FindPosIf(const Predicate & p_) const
+typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::find_pos_if(const Predicate & p_) const
 {
     for (IntType i = m_link[0].next; i != 0; i = m_link[i].next)
     {
@@ -323,31 +323,31 @@ typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::FindPosIf(c
 }
 
 template<typename T, size_t MAX_SIZE>
-const T & BaseMemList<T, MAX_SIZE>::Get(IntType pos_) const
+const T & BaseMemList<T, MAX_SIZE>::get(IntType pos_) const
 {
     return m_value[pos_ - 1];
 }
 
 template<typename T, size_t MAX_SIZE>
-const typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::Begin() const
+const typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::begin() const
 {
     return Iterator(this, m_link[0].next);
 }
 
 template<typename T, size_t MAX_SIZE>
-const typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::End() const
+const typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::end() const
 {
     return Iterator(this, 0);
 }
 
 template<typename T, size_t MAX_SIZE>
-typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::Begin()
+typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::begin()
 {
     return Iterator(this, m_link[0].next);
 }
 
 template<typename T, size_t MAX_SIZE>
-typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::End()
+typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::end()
 {
     return Iterator(this, 0);
 }
@@ -419,7 +419,7 @@ typename BaseMemList<T, MAX_SIZE>::Iterator BaseMemList<T, MAX_SIZE>::Iterator::
 }
 
 template<typename T, size_t MAX_SIZE>
-typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::Iterator::ToInt() const
+typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::Iterator::to_int() const
 {
     return m_index;
 }

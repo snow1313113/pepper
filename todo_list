@@ -1,0 +1,8 @@
+1、ring_buff增加init指定size的版本
+2、把gtest替换现在的测试用例
+3、增加hash_mem_pool
+4、增加c++11的特性
+5、完善cmake，增加lib target
+6、增加字节对齐处理
+7、BaseMemLRUSet的特化实现
+8、增加一个UnFixedMemPool的实现

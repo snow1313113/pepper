@@ -19,7 +19,6 @@ namespace Pepper
 template<typename T>
 class FixedMemPool
 {
-
 public:
     struct Iterator
     {
@@ -56,39 +55,41 @@ public:
 
     FixedMemPool():m_header(NULL){}
     /// 初始化内存池，内存由调用者提供，is_raw_指明mem_指向的内存是否已经初始化过的
-    bool Init(void * mem_, size_t size_, bool is_raw_ = true);
+    bool init(void * mem_, size_t size_, bool is_raw_ = true);
     /// 初始化内存池，内存由调用者提供，指出节点大小（有可能大于或等于sizeof(T)），is_raw_指明mem_指向的内存是否已经初始化过的
-    bool Init(void * mem_, size_t size_, size_t node_size_, bool is_raw_ = true);
+    bool init(void * mem_, size_t size_, size_t node_size_, bool is_raw_ = true);
     /// 申请一个节点
-    T * Alloc(bool zero = true);
+    T * alloc(bool zero = true);
     /// 回收一个节点
-    bool Free(const T * p_);
+    bool free(const T * p_);
     /// 清空内存池
-    void Clear();
+    void clear();
     /// 是否满了
-    bool IsFull() const;
+    bool full() const;
     /// 是否空了
-    bool IsEmpty() const;
+    bool empty() const;
     /// 获得内存池中的第一个已经使用的元素的迭代器
-    const Iterator Begin() const;
-    Iterator Begin();
+    const Iterator begin() const;
+    Iterator begin();
     /// 获取内存池的结尾迭代器
-    const Iterator End() const;
-    Iterator End();
+    const Iterator end() const;
+    Iterator end();
     /// 计算内存的使用率,百分比
-    size_t GetMemUtilization() const;
+    size_t mem_utilization() const;
     /// 获取最大节点个数
-    size_t Capacity() const;
+    size_t capacity() const;
     /// 获取已经分配的节点个数
-    size_t Size() const;
+    size_t size() const;
 
     // 返回整数，为什么要做这个，是为了兼容KR以前版本的那个MemPool的坑
     // 等哪天把那个坑改了，就可以把这几个接口删了
     // 实际中，在共享内存应用中，迭代器在进程重启后会无效，而整数不会，
     // 只不过整数不能做其它操作而已
-    size_t Ptr2Int(const T * p_) const;
-    const T * Int2Ptr(size_t index_) const;
-    T * Int2Ptr(size_t index_);
+
+    // 根据value指针计算出是第几个节点，返回值[1, max_num]，0 则表示失败
+    size_t ptr_2_int(const T * p_) const;
+    const T * int_2_ptr(size_t index_) const;
+    T * int_2_ptr(size_t index_);
 
 private:
     typedef Link<size_t> LinkNode;
@@ -119,17 +120,15 @@ private:
 
 private:
     // 初始化头部
-    void InitHeader(size_t size_, size_t node_size_);
+    void init_header(size_t size_, size_t node_size_);
     // 根据一个下标值获取LinkNode，下标[0, max_num]
-    const LinkNode * GetLink(size_t index_) const;
-    LinkNode * GetLink(size_t index_);
+    const LinkNode * get_link(size_t index_) const;
+    LinkNode * get_link(size_t index_);
     // 根据一个下标值获取T，下标[1, max_num]
-    const T * GetValue(size_t index_) const;
-    T * GetValue(size_t index_);
-    // 根据value指针计算出是第几个节点，返回值[1, max_num]，0 则表示失败
-    size_t Ptr2Index(const T * p_) const;
+    const T * get_value(size_t index_) const;
+    T * get_value(size_t index_);
     // 根据内存大小计算能存的最大节点数
-    static size_t CalcMaxNum(size_t size_, size_t node_size_)
+    static size_t calc_max_num(size_t size_, size_t node_size_)
     {
         if (size_ < sizeof(MemHeader) + sizeof(LinkNode))
             return 0;
@@ -146,20 +145,20 @@ private:
 };
 
 template<typename T>
-bool FixedMemPool<T>::Init(void * mem_, size_t size_, bool is_raw_)
+bool FixedMemPool<T>::init(void * mem_, size_t size_, bool is_raw_)
 {
-    return Init(mem_, size_, sizeof(T), is_raw_);
+    return init(mem_, size_, sizeof(T), is_raw_);
 }
 
 template<typename T>
-bool FixedMemPool<T>::Init(void * mem_, size_t size_, size_t node_size_, bool is_raw_)
+bool FixedMemPool<T>::init(void * mem_, size_t size_, size_t node_size_, bool is_raw_)
 {
     if (NULL == mem_)
         return false;
 
     m_header = reinterpret_cast<MemHeader*>(mem_);
     if (is_raw_)
-        InitHeader(size_, node_size_);
+        init_header(size_, node_size_);
 
     if (m_header->magic_num != HEADER_MAGIC_NUM ||
             m_header->version != VERSION ||
@@ -171,9 +170,9 @@ bool FixedMemPool<T>::Init(void * mem_, size_t size_, size_t node_size_, bool is
 }
 
 template<typename T>
-T * FixedMemPool<T>::Alloc(bool zero)
+T * FixedMemPool<T>::alloc(bool zero)
 {
-    if (IsFull())
+    if (full())
         return NULL;
 
     size_t index = 0;
@@ -182,13 +181,13 @@ T * FixedMemPool<T>::Alloc(bool zero)
     if (m_header->reclaim_list != 0)
     {
         index = m_header->reclaim_list;
-        empty_node = GetLink(index);
+        empty_node = get_link(index);
         m_header->reclaim_list = empty_node->next;
     }
     else
     {
         assert(m_header->raw_used_num < m_header->max_num);
-        empty_node = GetLink(m_header->raw_used_num + 1);
+        empty_node = get_link(m_header->raw_used_num + 1);
         index = m_header->raw_used_num + 1;
         ++(m_header->raw_used_num);
     }
@@ -197,8 +196,8 @@ T * FixedMemPool<T>::Alloc(bool zero)
     assert(empty_node);
 
     // 插入到used链中
-    LinkNode * head_node = GetLink(0);
-    LinkNode * next_node = GetLink(head_node->next);
+    LinkNode * head_node = get_link(0);
+    LinkNode * next_node = get_link(head_node->next);
     empty_node->next = head_node->next;
     empty_node->prev = 0;
     next_node->prev = index;
@@ -206,7 +205,7 @@ T * FixedMemPool<T>::Alloc(bool zero)
 
     ++(m_header->used_num);
 
-    T * p = GetValue(index);
+    T * p = get_value(index);
     // 这里可以不用memset，这样就可以在这里放入C++对象了
     if (zero)
         memset(p, 0, m_header->t_size);
@@ -214,12 +213,12 @@ T * FixedMemPool<T>::Alloc(bool zero)
 }
 
 template<typename T>
-bool FixedMemPool<T>::Free(const T * p_)
+bool FixedMemPool<T>::free(const T * p_)
 {
-    if (IsEmpty())
+    if (empty())
         return false;
 
-    size_t index = Ptr2Index(p_);
+    size_t index = ptr_2_int(p_);
     if (index == 0 || index > m_header->max_num)
         return false;
 
@@ -227,13 +226,13 @@ bool FixedMemPool<T>::Free(const T * p_)
     if (index > m_header->raw_used_num)
         return false;
     // 可以判断prev是否是大于max_num
-    LinkNode * del_node = GetLink(index);
+    LinkNode * del_node = get_link(index);
     if (del_node->prev > m_header->max_num)
         return false;
 
     // 从used链表上摘掉该节点
-    LinkNode * prev_node = GetLink(del_node->prev);
-    LinkNode * next_node = GetLink(del_node->next);
+    LinkNode * prev_node = get_link(del_node->prev);
+    LinkNode * next_node = get_link(del_node->next);
     prev_node->next = del_node->next;
     next_node->prev = del_node->prev;
 
@@ -246,106 +245,112 @@ bool FixedMemPool<T>::Free(const T * p_)
 }
 
 template<typename T>
-void FixedMemPool<T>::Clear()
+void FixedMemPool<T>::clear()
 {
-    Init(m_header, m_header->mem_size, m_header->t_size, true);
+    init(m_header, m_header->mem_size, m_header->t_size, true);
 }
 
 template<typename T>
-bool FixedMemPool<T>::IsFull() const
+bool FixedMemPool<T>::full() const
 {
     return m_header->used_num >= m_header->max_num;
 }
 
 template<typename T>
-bool FixedMemPool<T>::IsEmpty() const
+bool FixedMemPool<T>::empty() const
 {
     return m_header->used_num == 0;
 }
 
 template<typename T>
-const typename FixedMemPool<T>::Iterator FixedMemPool<T>::Begin() const
+const typename FixedMemPool<T>::Iterator FixedMemPool<T>::begin() const
 {
-    const LinkNode * head_node = GetLink(0);
+    const LinkNode * head_node = get_link(0);
     return Iterator(this, head_node->next);
 }
 
 template<typename T>
-typename FixedMemPool<T>::Iterator FixedMemPool<T>::Begin()
+typename FixedMemPool<T>::Iterator FixedMemPool<T>::begin()
 {
-    const LinkNode * head_node = GetLink(0);
+    const LinkNode * head_node = get_link(0);
     return Iterator(this, head_node->next);
 }
 
 template<typename T>
-const typename FixedMemPool<T>::Iterator FixedMemPool<T>::End() const
+const typename FixedMemPool<T>::Iterator FixedMemPool<T>::end() const
 {
     return Iterator(this, 0);
 }
 
 template<typename T>
-typename FixedMemPool<T>::Iterator FixedMemPool<T>::End()
+typename FixedMemPool<T>::Iterator FixedMemPool<T>::end()
 {
     return Iterator(this, 0);
 }
 
 template<typename T>
-size_t FixedMemPool<T>::GetMemUtilization() const
+size_t FixedMemPool<T>::mem_utilization() const
 {
     return m_header->used_num * (m_header->t_size + sizeof(LinkNode)) * 100 / m_header->mem_size;
 }
 
 template<typename T>
-size_t FixedMemPool<T>::Capacity() const
+size_t FixedMemPool<T>::capacity() const
 {
     return m_header->max_num;
 }
 
 template<typename T>
-size_t FixedMemPool<T>::Size() const
+size_t FixedMemPool<T>::size() const
 {
     return m_header->used_num;
 }
 
 template<typename T>
-inline size_t FixedMemPool<T>::Ptr2Int(const T * p_) const
+size_t FixedMemPool<T>::ptr_2_int(const T * p_) const
 {
-    return Ptr2Index(p_);
+    const uint8_t * start_mem = reinterpret_cast<const uint8_t *>(m_header);
+    if (reinterpret_cast<const uint8_t * >(p_) < start_mem + m_header->value_offset)
+        return 0;
+    size_t offset = reinterpret_cast<const uint8_t *>(p_) - start_mem - m_header->value_offset;
+    if (offset % m_header->t_size != 0)
+        return 0;
+    return (offset / m_header->t_size) + 1;
 }
 
 template<typename T>
-const T * FixedMemPool<T>::Int2Ptr(size_t index_) const
+const T * FixedMemPool<T>::int_2_ptr(size_t index_) const
 {
-    return GetValue(index_);
+    return get_value(index_);
 }
 
 template<typename T>
-T * FixedMemPool<T>::Int2Ptr(size_t index_)
+T * FixedMemPool<T>::int_2_ptr(size_t index_)
 {
-    return GetValue(index_);
+    return get_value(index_);
 }
 
 template<typename T>
-void FixedMemPool<T>::InitHeader(size_t size_, size_t node_size_)
+void FixedMemPool<T>::init_header(size_t size_, size_t node_size_)
 {
     assert(m_header != NULL);
     m_header->version = VERSION;
     m_header->mem_size = size_;
     m_header->t_size = node_size_;
-    m_header->max_num = FixedMemPool::CalcMaxNum(size_, node_size_);
+    m_header->max_num = FixedMemPool::calc_max_num(size_, node_size_);
     m_header->used_num = 0;
     m_header->raw_used_num = 0;
     m_header->link_head_offset = sizeof(MemHeader);
     m_header->value_offset = sizeof(MemHeader) + (m_header->max_num + 1) * sizeof(LinkNode);
     m_header->reclaim_list = 0;
     m_header->magic_num = HEADER_MAGIC_NUM;
-    LinkNode * head_node = GetLink(0);
+    LinkNode * head_node = get_link(0);
     head_node->prev = 0;
     head_node->next = 0;
 }
 
 template<typename T>
-const typename FixedMemPool<T>::LinkNode * FixedMemPool<T>::GetLink(size_t index_) const
+const typename FixedMemPool<T>::LinkNode * FixedMemPool<T>::get_link(size_t index_) const
 {
     assert(index_ <= m_header->max_num);
     size_t offset = m_header->link_head_offset + index_ * sizeof(LinkNode);
@@ -353,7 +358,7 @@ const typename FixedMemPool<T>::LinkNode * FixedMemPool<T>::GetLink(size_t index
 }
 
 template<typename T>
-typename FixedMemPool<T>::LinkNode * FixedMemPool<T>::GetLink(size_t index_)
+typename FixedMemPool<T>::LinkNode * FixedMemPool<T>::get_link(size_t index_)
 {
     assert(index_ <= m_header->max_num);
     size_t offset = m_header->link_head_offset + index_ * sizeof(LinkNode);
@@ -361,7 +366,7 @@ typename FixedMemPool<T>::LinkNode * FixedMemPool<T>::GetLink(size_t index_)
 }
 
 template<typename T>
-const T * FixedMemPool<T>::GetValue(size_t index_) const
+const T * FixedMemPool<T>::get_value(size_t index_) const
 {
     assert(index_ > 0);
     assert(index_ <= m_header->max_num);
@@ -370,25 +375,12 @@ const T * FixedMemPool<T>::GetValue(size_t index_) const
 }
 
 template<typename T>
-T * FixedMemPool<T>::GetValue(size_t index_)
+T * FixedMemPool<T>::get_value(size_t index_)
 {
     assert(index_ > 0);
     assert(index_ <= m_header->max_num);
     size_t offset = m_header->value_offset + (index_ - 1) * m_header->t_size;
     return reinterpret_cast<T *>(reinterpret_cast<uint8_t *>(m_header) + offset);
-}
-
-template<typename T>
-size_t FixedMemPool<T>::Ptr2Index(const T * p_) const
-{
-    const uint8_t * start_mem = reinterpret_cast<const uint8_t *>(m_header);
-    if (reinterpret_cast<const uint8_t * >(p_) < start_mem + m_header->value_offset)
-        return 0;
-    size_t offset = reinterpret_cast<const uint8_t *>(p_) - start_mem - m_header->value_offset;
-    if (offset % m_header->t_size != 0)
-        return 0;
-
-    return (offset / m_header->t_size) + 1;
 }
 
 template<typename T>
@@ -406,13 +398,13 @@ T & FixedMemPool<T>::Iterator::operator*()
 template<typename T>
 const T * FixedMemPool<T>::Iterator::operator->() const
 {
-    return m_pool->GetValue(m_index);
+    return m_pool->get_value(m_index);
 }
 
 template<typename T>
 T * FixedMemPool<T>::Iterator::operator->()
 {
-    return const_cast<FixedMemPool*>(m_pool)->GetValue(m_index);
+    return const_cast<FixedMemPool*>(m_pool)->get_value(m_index);
 }
 
 template<typename T>
@@ -430,7 +422,7 @@ bool FixedMemPool<T>::Iterator::operator!=(const Iterator & right_) const
 template<typename T>
 typename FixedMemPool<T>::Iterator & FixedMemPool<T>::Iterator::operator++()
 {
-    const LinkNode * node = m_pool->GetLink(m_index);
+    const LinkNode * node = m_pool->get_link(m_index);
     assert(node->prev <= m_pool->m_header->max_num);
     m_index = node->next;
     return (*this);
@@ -447,7 +439,7 @@ typename FixedMemPool<T>::Iterator FixedMemPool<T>::Iterator::operator++(int)
 template<typename T>
 typename FixedMemPool<T>::Iterator & FixedMemPool<T>::Iterator::operator--()
 {
-    const LinkNode * node = m_pool->GetLink(m_index);
+    const LinkNode * node = m_pool->get_link(m_index);
     assert(node->prev <= m_pool->m_header->max_num);
     m_index = node->prev;
     return (*this);

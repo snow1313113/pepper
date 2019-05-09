@@ -54,13 +54,13 @@ template <size_t Size, bool IsZero>
 struct CalcBit;
 
 template <size_t Size>
-struct CalcBit<Size, true>
+struct CalcBit<Size, false>
 {
-    static const size_t BIT_NUM = CalcBit<(Size >> 1), (Size >> 1) != 0>::BIT_NUM + 1;
+    static const size_t BIT_NUM = CalcBit<(Size >> 1), (Size >> 1) == 0>::BIT_NUM + 1;
 };
 
 template <size_t Size>
-struct CalcBit<Size, false>
+struct CalcBit<Size, true>
 {
     static const size_t BIT_NUM = 0;
 };
@@ -82,7 +82,7 @@ struct PowerOfN<Power, 0>
 template <size_t Size>
 struct FixIntType
 {
-    typedef typename SizeTraits< (CalcBit<Size, (Size != 0)>::BIT_NUM + 7) / 8 >::IntType IntType;
+    typedef typename SizeTraits< (CalcBit<Size, (Size == 0)>::BIT_NUM + 7) / 8 >::IntType IntType;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////

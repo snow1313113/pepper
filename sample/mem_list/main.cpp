@@ -9,60 +9,61 @@ int main()
 {
     cout << "-------------test MemList---------" << endl;
     MemList<uint32_t, 5> list;
-    cout << "size : " << list.Size() << endl;
-    list.Clear();
+    cout << "size : " << list.size() << endl;
+    list.clear();
 
     // 测试插入
-    list.PushFront(3);
-    list.PushFront(2);
-    list.PushFront(4);
-    list.PushBack(6);
-    list.PushBack(8);
-    list.PushBack(7);
+    list.push_front(3);
+    list.push_front(2);
+    list.push_front(4);
+    list.push_back(6);
+    list.push_back(8);
+    list.push_back(7);
 
     // 测试迭代器
-    cout << "size : " << list.Size() << endl;
-    for (auto beg = list.Begin(), end = list.End(); beg != end; ++beg)
+    cout << "size : " << list.size() << endl;
+    for (auto beg = list.begin(), end = list.end(); beg != end; ++beg)
     {
         cout << (*beg) << " ";
     }
     cout << endl;
 
     // 测试头部和尾部弹出
-    list.PopFront();
-    list.PopBack();
+    list.pop_front();
+    list.pop_back();
 
     cout << "---------------------" << endl;
-    cout << "size : " << list.Size() << endl;
-    for (auto beg = list.Begin(), end = list.End(); beg != end; ++beg)
+    cout << "size : " << list.size() << endl;
+    for (auto beg = list.begin(), end = list.end(); beg != end; ++beg)
     {
         cout << (*beg) << " ";
     }
     cout << endl;
 
-    list.PopFront();
-    list.PopFront();
-    list.PopFront();
+    list.pop_front();
+    list.pop_front();
+    list.pop_front();
 
     cout << "---------------------" << endl;
-    cout << "size : " << list.Size() << endl;
-    for (auto beg = list.Begin(), end = list.End(); beg != end; ++beg)
+    cout << "size : " << list.size() << endl;
+    for (auto beg = list.begin(), end = list.end(); beg != end; ++beg)
     {
         cout << (*beg) << " ";
     }
     cout << endl;
 
-    list.PushFront(3);
-    list.PushFront(2);
-    list.PushFront(4);
-    list.PushFront(6);
-    list.PushFront(8);
-    list.PushFront(7);
+    list.push_front(3);
+    list.push_front(2);
+    list.push_front(4);
+    list.push_front(6);
+    list.push_front(8);
+    list.push_front(7);
 
-    cout << list.Size() << endl;
-    for (auto beg = list.Begin(), end = list.End(); beg != end; ++beg)
+    cout << list.size() << endl;
+    for (auto beg : list)
+//    for (auto beg = list.begin(), end = list.end(); beg != end; ++beg)
     {
-        cout << (*beg) << " ";
+        cout << beg << " ";
     }
     cout << endl;
     return 0;

@@ -14,51 +14,51 @@ int main()
     FixedRingBuffer<Test, 5> queue;
 //    static_assert(std::is_trivial<FixedRingBuffer<Test, 5> >::value, "must be trivial");
     static_assert(std::is_trivially_copyable<FixedRingBuffer<Test, 5> >::value, "must be trivial");
-//    queue.Clear();
-    cout << "queue capacity: " << queue.Capacity() << " , size: " << queue.Size() << endl;
+//    queue.clear();
+    cout << "queue capacity: " << queue.capacity() << " , size: " << queue.size() << endl;
 
     Test test;
     test.a = 'a';
     test.b = 1;
-    queue.Push(test);
-    cout << "queue begin: " << queue.Front().b << " end: " << queue.Back().b << endl;
+    queue.push(test);
+    cout << "queue begin: " << queue.front().b << " end: " << queue.back().b << endl;
     test.a = 'a';
     test.b = 2;
-    queue.Push(test);
-    cout << "queue begin: " << queue.Front().b << " end: " << queue.Back().b << endl;
+    queue.push(test);
+    cout << "queue begin: " << queue.front().b << " end: " << queue.back().b << endl;
     test.a = 'a';
     test.b = 3;
-    queue.Push(test);
-    cout << "queue begin: " << queue.Front().b << " end: " << queue.Back().b << endl;
+    queue.push(test);
+    cout << "queue begin: " << queue.front().b << " end: " << queue.back().b << endl;
     test.a = 'a';
     test.b = 4;
-    queue.Push(test);
-    cout << "queue begin: " << queue.Front().b << " end: " << queue.Back().b << endl;
+    queue.push(test);
+    cout << "queue begin: " << queue.front().b << " end: " << queue.back().b << endl;
     test.a = 'a';
     test.b = 5;
-    queue.Push(test);
-    cout << "queue begin: " << queue.Front().b << " end: " << queue.Back().b << endl;
+    queue.push(test);
+    cout << "queue begin: " << queue.front().b << " end: " << queue.back().b << endl;
 
-    if (queue.IsFull())
-        cout << "queue is full, size: " << queue.Size() << endl;
+    if (queue.full())
+        cout << "queue is full, size: " << queue.size() << endl;
     else
-        cout << "queue is not full, size: " << queue.Size() << endl;
+        cout << "queue is not full, size: " << queue.size() << endl;
 
-    cout << "queue begin: " << queue.Front().b << " end: " << queue.Back().b << endl;
-    queue.Pop();
-    cout << "queue begin: " << queue.Front().b << " end: " << queue.Back().b << endl;
-    queue.Pop();
-    cout << "queue begin: " << queue.Front().b << " end: " << queue.Back().b << endl;
-    queue.Pop();
-    cout << "queue begin: " << queue.Front().b << " end: " << queue.Back().b << endl;
-    queue.Pop();
-    cout << "queue begin: " << queue.Front().b << " end: " << queue.Back().b << endl;
-    queue.Pop();
+    cout << "queue begin: " << queue.front().b << " end: " << queue.back().b << endl;
+    queue.pop();
+    cout << "queue begin: " << queue.front().b << " end: " << queue.back().b << endl;
+    queue.pop();
+    cout << "queue begin: " << queue.front().b << " end: " << queue.back().b << endl;
+    queue.pop();
+    cout << "queue begin: " << queue.front().b << " end: " << queue.back().b << endl;
+    queue.pop();
+    cout << "queue begin: " << queue.front().b << " end: " << queue.back().b << endl;
+    queue.pop();
 
-    if (queue.IsEmpty())
-        cout << "queue is empty, size: " << queue.Size() << endl;
+    if (queue.empty())
+        cout << "queue is empty, size: " << queue.size() << endl;
     else
-        cout << "queue is not empty, size: " << queue.Size() << endl;
+        cout << "queue is not empty, size: " << queue.size() << endl;
     return 0;
 }
 

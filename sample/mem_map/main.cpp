@@ -13,10 +13,10 @@ int main()
     size_t max_num = 1000000000;
     MyMap s;
     cout << "MemMap size " << sizeof(s)
-        << " need ValueSize " << sizeof(MyMap::T) * s.Capacity()
-        << " use " << sizeof(MyMap::T) * s.Capacity() * 100 / static_cast<double>(sizeof(s)) << "%"
+        << " need ValueSize " << sizeof(MyMap::T) * s.capacity()
+        << " use " << sizeof(MyMap::T) * s.capacity() * 100 / static_cast<double>(sizeof(s)) << "%"
         << endl;
-    s.Clear();
+    s.clear();
 
     // 产生一个随机数组
     uint64_t temp[MAX_SIZE] = {0};
@@ -34,29 +34,29 @@ int main()
     // 测试插入
     for (size_t i = 0; i < MAX_SIZE; ++i)
     {
-        s.Insert(temp[i], VALUE - i);
+        s.insert(temp[i], VALUE - i);
     }
-    cout << "after insert : size " << s.Size() << endl;
+    cout << "after insert : size " << s.size() << endl;
 
     // 测试是否满了能否插入
-    auto result_it = s.Insert(max_num + 1, VALUE);
+    auto result_it = s.insert(max_num + 1, VALUE);
     if (result_it.second)
     {
         cout << "insert full succe, key : " << max_num + 1
             << " value : " << VALUE
-            << " sizeof " << s.Size() << endl;
+            << " sizeof " << s.size() << endl;
     }
 
     for (size_t i = 0; i < MAX_SIZE; ++i)
     {
-        auto it = s.Find(temp[i]);
-        if (s.End() == it)
+        auto it = s.find(temp[i]);
+        if (s.end() == it)
             cout << "find err " << temp[i] << endl;
     }
 
     // 测试迭代器访问
     size_t count = 0;
-    for (auto beg = s.Begin(), end = s.End();
+    for (auto beg = s.begin(), end = s.end();
             beg != end; ++beg)
     {
         bool is_exist = false;
@@ -82,40 +82,40 @@ int main()
     // 测试删除
     for (size_t i = 0; i < MAX_SIZE; ++i)
     {
-        s.Erase(temp[i]);
+        s.erase(temp[i]);
     }
-    cout << "after erase : size " << s.Size() << endl;
+    cout << "after erase : size " << s.size() << endl;
 
-    auto it = s.Begin();
-    if (it == s.End())
+    auto it = s.begin();
+    if (it == s.end())
         cout << "beg == end when set is empty " << endl;
 
     // 测试是否能插入重复的数据
     for (size_t i = 0; i < MAX_SIZE / 2; ++i)
     {
-        auto result_it = s.Insert(temp[i], VALUE - i);
+        auto result_it = s.insert(temp[i], VALUE - i);
         if (!result_it.second)
         {
             cout << "insert, key : " << temp[i]
                 << " value : " << VALUE - i
-                << " error, size " << s.Size() << endl;
+                << " error, size " << s.size() << endl;
         }
     }
     for (size_t i = 0; i < MAX_SIZE / 2; ++i)
     {
-        auto result_it = s.Insert(temp[i], VALUE - i);
+        auto result_it = s.insert(temp[i], VALUE - i);
         if (result_it.second)
         {
             cout << "insert the same, key :  " << temp[i]
                 << " value : " << VALUE - i
-                << " sizeof " << s.Size() << endl;
+                << " sizeof " << s.size() << endl;
         }
     }
-    cout << "after insert: size " << s.Size() << endl;
+    cout << "after insert: size " << s.size() << endl;
 
     // 测试清除
-    s.Clear();
-    cout << "after clear: size " << s.Size() << endl;
+    s.clear();
+    cout << "after clear: size " << s.size() << endl;
     return 0;
 }
 

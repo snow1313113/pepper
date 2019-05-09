@@ -1,0 +1,6 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+add_compile_options(-std=c++14 -Wall)
+set(CMAKE_C_COMPILER "/usr/local/bin/gcc")
+set(CMAKE_CXX_COMPILER "/usr/local/bin/g++")
+project(pepper)
+add_subdirectory(sample)

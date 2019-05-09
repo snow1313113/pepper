@@ -24,151 +24,151 @@ public:
     typedef typename BaseType::Iterator Iterator;
 
     /// 清空列表
-    void Clear();
+    void clear();
     /// 列表是否空
-    bool IsEmpty() const;
+    bool empty() const;
     /// 列表是否满了
-    bool IsFull() const;
+    bool full() const;
     /// 当前已经用的个数
-    size_t Size() const;
+    size_t size() const;
     /// 列表最大容量
-    size_t Capacity() const;
+    size_t capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
-    std::pair<Iterator, bool> Insert(const KEY & key_, const VALUE & value_, bool force_ = false);
+    std::pair<Iterator, bool> insert(const KEY & key_, const VALUE & value_, bool force_ = false);
     /// 找到节点的迭代器
-    const Iterator Find(const KEY & key_) const;
-    Iterator Find(const KEY & key_);
+    const Iterator find(const KEY & key_) const;
+    Iterator find(const KEY & key_);
     /// 是否存在，其实和find是类似的
-    bool IsExist(const KEY & key_) const;
+    bool exist(const KEY & key_) const;
     /// 删除一个，根据迭代器
-    void Erase(const Iterator & it_);
+    void erase(const Iterator & it_);
     /// 删除一个，根据值
-    void Erase(const KEY & key_);
+    void erase(const KEY & key_);
     /// 激活一下节点
-    Iterator Active(const KEY & key_);
+    Iterator active(const KEY & key_);
     /// 淘汰掉几个
-    size_t Disuse(size_t num_);
+    size_t disuse(size_t num_);
 
     /// 迭代器
-    const Iterator Begin() const;
-    const Iterator End() const;
-    Iterator Begin();
-    Iterator End();
+    const Iterator begin() const;
+    const Iterator end() const;
+    Iterator begin();
+    Iterator end();
 
 private:
     BaseType m_base;
 };
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-void MemLRUMap<KEY, VALUE, MAX_SIZE>::Clear()
+void MemLRUMap<KEY, VALUE, MAX_SIZE>::clear()
 {
-    m_base.Clear();
+    m_base.clear();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-bool MemLRUMap<KEY, VALUE, MAX_SIZE>::IsEmpty() const
+bool MemLRUMap<KEY, VALUE, MAX_SIZE>::empty() const
 {
-    return m_base.IsEmpty();
+    return m_base.empty();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-bool MemLRUMap<KEY, VALUE, MAX_SIZE>::IsFull() const
+bool MemLRUMap<KEY, VALUE, MAX_SIZE>::full() const
 {
-    return m_base.IsFull();
+    return m_base.full();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-size_t MemLRUMap<KEY, VALUE, MAX_SIZE>::Size() const
+size_t MemLRUMap<KEY, VALUE, MAX_SIZE>::size() const
 {
-    return m_base.Size();
+    return m_base.size();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-size_t MemLRUMap<KEY, VALUE, MAX_SIZE>::Capacity() const
+size_t MemLRUMap<KEY, VALUE, MAX_SIZE>::capacity() const
 {
-    return m_base.Capacity();
+    return m_base.capacity();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-std::pair<typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator, bool> MemLRUMap<KEY, VALUE, MAX_SIZE>::Insert(const KEY & key_, const VALUE & value_, bool force_)
+std::pair<typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator, bool> MemLRUMap<KEY, VALUE, MAX_SIZE>::insert(const KEY & key_, const VALUE & value_, bool force_)
 {
-    return m_base.Insert(SET_VALUE(key_, value_), force_);
+    return m_base.insert(SET_VALUE(key_, value_), force_);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-const typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::Find(const KEY & key_) const
+const typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::find(const KEY & key_) const
 {
     SET_VALUE set_value;
     set_value.first = key_;
-    return m_base.Find(set_value);
+    return m_base.find(set_value);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::Find(const KEY & key_)
+typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::find(const KEY & key_)
 {
     SET_VALUE set_value;
     set_value.first = key_;
-    return m_base.Find(set_value);
+    return m_base.find(set_value);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-bool MemLRUMap<KEY, VALUE, MAX_SIZE>::IsExist(const KEY & key_) const
+bool MemLRUMap<KEY, VALUE, MAX_SIZE>::exist(const KEY & key_) const
 {
     SET_VALUE set_value;
     set_value.first = key_;
-    return m_base.IsExist(set_value);
+    return m_base.exist(set_value);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-void MemLRUMap<KEY, VALUE, MAX_SIZE>::Erase(const Iterator & it_)
+void MemLRUMap<KEY, VALUE, MAX_SIZE>::erase(const Iterator & it_)
 {
-    m_base.Erase(it_);
+    m_base.erase(it_);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-void MemLRUMap<KEY, VALUE, MAX_SIZE>::Erase(const KEY & key_)
-{
-    SET_VALUE set_value;
-    set_value.first = key_;
-    m_base.Erase(set_value);
-}
-
-template<typename KEY, typename VALUE, size_t MAX_SIZE>
-typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::Active(const KEY & key_)
+void MemLRUMap<KEY, VALUE, MAX_SIZE>::erase(const KEY & key_)
 {
     SET_VALUE set_value;
     set_value.first = key_;
-    return m_base.Active(set_value);
+    m_base.erase(set_value);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-size_t MemLRUMap<KEY, VALUE, MAX_SIZE>::Disuse(size_t num_)
+typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::active(const KEY & key_)
 {
-    return m_base.Disuse(num_);
+    SET_VALUE set_value;
+    set_value.first = key_;
+    return m_base.active(set_value);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-const typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::Begin() const
+size_t MemLRUMap<KEY, VALUE, MAX_SIZE>::disuse(size_t num_)
 {
-    return m_base.Begin();
+    return m_base.disuse(num_);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::Begin()
+const typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::begin() const
 {
-    return m_base.Begin();
+    return m_base.begin();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-const typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::End() const
+typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::begin()
 {
-    return m_base.End();
+    return m_base.begin();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::End()
+const typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::end() const
 {
-    return m_base.End();
+    return m_base.end();
+}
+
+template<typename KEY, typename VALUE, size_t MAX_SIZE>
+typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::end()
+{
+    return m_base.end();
 }
 
 }
