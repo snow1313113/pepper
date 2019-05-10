@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../include/ring_buffer.h"
+#include "../../include/fixed_ring_buf.h"
 using namespace std;
 using namespace Pepper;
 
@@ -11,9 +11,9 @@ struct Test
 
 int main()
 {
-    FixedRingBuffer<Test, 5> queue;
-//    static_assert(std::is_trivial<FixedRingBuffer<Test, 5> >::value, "must be trivial");
-    static_assert(std::is_trivially_copyable<FixedRingBuffer<Test, 5> >::value, "must be trivial");
+    FixedRingBuf<Test, 5> queue;
+//    static_assert(std::is_trivial<FixedRingBuf<Test, 5> >::value, "must be trivial");
+    static_assert(std::is_trivially_copyable<FixedRingBuf<Test, 5> >::value, "must be trivial");
 //    queue.clear();
     cout << "queue capacity: " << queue.capacity() << " , size: " << queue.size() << endl;
 

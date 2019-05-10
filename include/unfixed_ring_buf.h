@@ -1,12 +1,12 @@
 /*
- * * file name: ring_buffer.h
+ * * file name: unfixed_ring_buf.h
  * * description: ...
- * * author: lemonxu
- * * create time:2018  7 02
+ * * author: snow
+ * * create time:2019  5 11
  * */
 
-#ifndef RING_BUFFER_H
-#define RING_BUFFER_H
+#ifndef _UNFIXED_RING_BUF_H_
+#define _UNFIXED_RING_BUF_H_
 
 #include <algorithm>
 #include "inner/head.h"
@@ -15,47 +15,11 @@
 namespace Pepper
 {
 
-template<typename T, size_t MAX_SIZE>
-class FixedRingBuffer
-{
-public:
-    constexpr FixedRingBuffer() noexcept = default;
-    /// 清空队列
-    void clear();
-    /// 队列是否空
-    bool empty() const;
-    /// 队列是否满了
-    bool full() const;
-    /// 当前已经用的个数
-    size_t size() const;
-    /// 队列最大容量
-    size_t capacity() const;
-    /// 队尾入队
-    bool push(const T & value_, bool over_write_ = false);
-    /// 队头弹出一个
-    void pop();
-    /// 获取队头第一个元素
-    T & front(size_t index_ = 0);
-    /// 获取队头第一个元素
-    const T & front(size_t index_ = 0) const;
-    /// 获取队尾第一个元素
-    T & back();
-    /// 获取队尾第一个元素
-    const T & back() const;
-
-private:
-    typedef typename FixIntType<MAX_SIZE>::IntType IntType;
-    IntType m_start = 0;
-    IntType m_end = 0;
-    IntType m_used_len = 0;
-    T m_buf[MAX_SIZE];
-};
-
 template<size_t MAX_SIZE>
-class UnfixedRingBuffer
+class UnfixedRingBuf
 {
 public:
-    constexpr UnfixedRingBuffer() noexcept = default;
+    constexpr UnfixedRingBuf() noexcept = default;
     /// 清空队列
     void clear();
     /// 队列是否空
@@ -105,101 +69,8 @@ private:
     uint8_t m_buf[MAX_SIZE];
 };
 
-//////////////////////////////////////////////////////////
-
-template<typename T, size_t MAX_SIZE>
-void FixedRingBuffer<T, MAX_SIZE>::clear()
-{
-    m_start = 0;
-    m_end = 0;
-    m_used_len = 0;
-}
-
-template<typename T, size_t MAX_SIZE>
-bool FixedRingBuffer<T, MAX_SIZE>::empty() const
-{
-    return m_used_len == 0;
-}
-
-template<typename T, size_t MAX_SIZE>
-bool FixedRingBuffer<T, MAX_SIZE>::full() const
-{
-    return m_used_len == MAX_SIZE;
-}
-
-template<typename T, size_t MAX_SIZE>
-size_t FixedRingBuffer<T, MAX_SIZE>::size() const
-{
-    return m_used_len;
-}
-
-template<typename T, size_t MAX_SIZE>
-size_t FixedRingBuffer<T, MAX_SIZE>::capacity() const
-{
-    return MAX_SIZE;
-}
-
-template<typename T, size_t MAX_SIZE>
-bool FixedRingBuffer<T, MAX_SIZE>::push(const T & value_, bool over_write_)
-{
-    if (over_write_)
-    {
-        if (full())
-            pop();
-    }
-    else
-    {
-        if (full())
-            return false;
-    }
-
-    m_buf[m_end] = value_;
-    m_end = ((m_end + 1) % MAX_SIZE);
-    ++m_used_len;
-
-    return true;
-}
-
-template<typename T, size_t MAX_SIZE>
-void FixedRingBuffer<T, MAX_SIZE>::pop()
-{
-    if (empty() == false)
-    {
-        m_start = ((m_start + 1) % MAX_SIZE);
-        --m_used_len;
-    }
-}
-
-template<typename T, size_t MAX_SIZE>
-T & FixedRingBuffer<T, MAX_SIZE>::front(size_t index_)
-{
-    assert(index_ < m_used_len);
-    return m_buf[(m_start + index_) % MAX_SIZE];
-}
-
-template<typename T, size_t MAX_SIZE>
-const T & FixedRingBuffer<T, MAX_SIZE>::front(size_t index_) const
-{
-    assert(index_ < m_used_len);
-    return m_buf[(m_start + index_) % MAX_SIZE];
-}
-
-template<typename T, size_t MAX_SIZE>
-T & FixedRingBuffer<T, MAX_SIZE>::back()
-{
-    return m_buf[(m_end + MAX_SIZE - 1) % MAX_SIZE];
-}
-
-template<typename T, size_t MAX_SIZE>
-const T & FixedRingBuffer<T, MAX_SIZE>::back() const
-{
-    return m_buf[(m_end + MAX_SIZE - 1) % MAX_SIZE];
-}
- 
-//////////////////////////////////////////////////////////
-
 template<size_t MAX_SIZE>
-void UnfixedRingBuffer<MAX_SIZE>::clear()
+void UnfixedRingBuf<MAX_SIZE>::clear()
 {
     m_start = 0;
     m_end = 0;
@@ -208,37 +79,37 @@ void UnfixedRingBuffer<MAX_SIZE>::clear()
 }
 
 template<size_t MAX_SIZE>
-bool UnfixedRingBuffer<MAX_SIZE>::empty() const
+bool UnfixedRingBuf<MAX_SIZE>::empty() const
 {
     return m_used_size == 0;
 }
 
 template<size_t MAX_SIZE>
-bool UnfixedRingBuffer<MAX_SIZE>::full() const
+bool UnfixedRingBuf<MAX_SIZE>::full() const
 {
     return m_used_size >= MAX_SIZE;
 }
 
 template<size_t MAX_SIZE>
-size_t UnfixedRingBuffer<MAX_SIZE>::size() const
+size_t UnfixedRingBuf<MAX_SIZE>::size() const
 {
     return m_used_size;
 }
 
 template<size_t MAX_SIZE>
-size_t UnfixedRingBuffer<MAX_SIZE>::capacity() const
+size_t UnfixedRingBuf<MAX_SIZE>::capacity() const
 {
     return MAX_SIZE;
 }
 
 template<size_t MAX_SIZE>
-size_t UnfixedRingBuffer<MAX_SIZE>::GetNum() const
+size_t UnfixedRingBuf<MAX_SIZE>::GetNum() const
 {
     return m_item_num;
 }
 
 template<size_t MAX_SIZE>
-bool UnfixedRingBuffer<MAX_SIZE>::push(const uint8_t * data_, size_t len_, bool over_write_)
+bool UnfixedRingBuf<MAX_SIZE>::push(const uint8_t * data_, size_t len_, bool over_write_)
 {
     size_t need_len = len_ + sizeof(ItemHeader);
     if (need_len > MAX_SIZE)
@@ -247,7 +118,7 @@ bool UnfixedRingBuffer<MAX_SIZE>::push(const uint8_t * data_, size_t len_, bool 
 }
 
 template<size_t MAX_SIZE>
-void UnfixedRingBuffer<MAX_SIZE>::pop()
+void UnfixedRingBuf<MAX_SIZE>::pop()
 {
     if (empty())
         return;
@@ -291,7 +162,7 @@ void UnfixedRingBuffer<MAX_SIZE>::pop()
 }
 
 template<size_t MAX_SIZE>
-const uint8_t * UnfixedRingBuffer<MAX_SIZE>::front(size_t & len_, size_t index_) const
+const uint8_t * UnfixedRingBuf<MAX_SIZE>::front(size_t & len_, size_t index_) const
 {
     if (empty())
         return NULL;
@@ -306,7 +177,7 @@ const uint8_t * UnfixedRingBuffer<MAX_SIZE>::front(size_t & len_, size_t index_)
 }
 
 template<size_t MAX_SIZE>
-uint8_t * UnfixedRingBuffer<MAX_SIZE>::front(size_t & len_, size_t index_)
+uint8_t * UnfixedRingBuf<MAX_SIZE>::front(size_t & len_, size_t index_)
 {
     if (empty())
         return NULL;
@@ -321,7 +192,7 @@ uint8_t * UnfixedRingBuffer<MAX_SIZE>::front(size_t & len_, size_t index_)
 }
 
 template<size_t MAX_SIZE>
-typename UnfixedRingBuffer<MAX_SIZE>::IntType UnfixedRingBuffer<MAX_SIZE>::FindStartOffset(size_t index_) const
+typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::FindStartOffset(size_t index_) const
 {
     IntType item_start = m_start;
     for (size_t i = 0; i < index_; ++i)
@@ -351,7 +222,7 @@ typename UnfixedRingBuffer<MAX_SIZE>::IntType UnfixedRingBuffer<MAX_SIZE>::FindS
 }
 
 template<size_t MAX_SIZE>
-bool UnfixedRingBuffer<MAX_SIZE>::PushImpl(const uint8_t * data_, size_t len_, size_t need_len_, bool over_write_)
+bool UnfixedRingBuf<MAX_SIZE>::PushImpl(const uint8_t * data_, size_t len_, size_t need_len_, bool over_write_)
 {
     if (full())
     {
@@ -439,7 +310,7 @@ bool UnfixedRingBuffer<MAX_SIZE>::PushImpl(const uint8_t * data_, size_t len_, s
 }
 
 template<size_t MAX_SIZE>
-void UnfixedRingBuffer<MAX_SIZE>::PushPaddingItem()
+void UnfixedRingBuf<MAX_SIZE>::PushPaddingItem()
 {
     // 如果，一个ItemHeader都放不下呢，在push和pop的时候
     // 都会跳过尾部不足一个ItemHeader大小的字节
@@ -452,7 +323,7 @@ void UnfixedRingBuffer<MAX_SIZE>::PushPaddingItem()
 }
 
 template<size_t MAX_SIZE>
-void UnfixedRingBuffer<MAX_SIZE>::PopPaddingItem()
+void UnfixedRingBuf<MAX_SIZE>::PopPaddingItem()
 {
     // 如果，一个ItemHeader都放不下呢，在push和pop的时候
     // 都会跳过尾部不足一个ItemHeader大小的字节
@@ -467,15 +338,13 @@ void UnfixedRingBuffer<MAX_SIZE>::PopPaddingItem()
 }
 
 template<size_t MAX_SIZE>
-typename UnfixedRingBuffer<MAX_SIZE>::IntType UnfixedRingBuffer<MAX_SIZE>::NeedSkipBytes(UnfixedRingBuffer<MAX_SIZE>::IntType cur_pos_) const
+typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::NeedSkipBytes(UnfixedRingBuf<MAX_SIZE>::IntType cur_pos_) const
 {
     assert(cur_pos_ <= MAX_SIZE);
     if (cur_pos_ + sizeof(ItemHeader) > MAX_SIZE)
         return MAX_SIZE - cur_pos_;
     else
         return 0;
-}
-
 }
 
 #endif
