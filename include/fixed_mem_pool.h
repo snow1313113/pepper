@@ -5,8 +5,8 @@
  * * create time:2017  4 07
  * */
 
-#ifndef FIXED_MEM_POOL_H
-#define FIXED_MEM_POOL_H
+#ifndef _FIXED_MEM_POOL_H_
+#define _FIXED_MEM_POOL_H_
 
 #include <cstring>
 #include <type_traits>
@@ -42,15 +42,15 @@ public:
     };
 
 public:
-    static size_t CalcNeedSize(size_t max_node_num_, size_t node_size_)
+    static size_t calc_need_size(size_t max_node_num_, size_t node_size_)
     {
         // LinkNode需要额外申请多一个节点作为头节点
         return sizeof(MemHeader) + max_node_num_ * node_size_ + (max_node_num_ + 1) * sizeof(LinkNode);
     }
 
-    static size_t CalcNeedSize(size_t max_node_num_)
+    static size_t calc_need_size(size_t max_node_num_)
     {
-        return CalcNeedSize(max_node_num_, sizeof(T));
+        return calc_need_size(max_node_num_, sizeof(T));
     }
 
     FixedMemPool():m_header(NULL){}
@@ -80,16 +80,12 @@ public:
     size_t capacity() const;
     /// 获取已经分配的节点个数
     size_t size() const;
-
-    // 返回整数，为什么要做这个，是为了兼容KR以前版本的那个MemPool的坑
-    // 等哪天把那个坑改了，就可以把这几个接口删了
-    // 实际中，在共享内存应用中，迭代器在进程重启后会无效，而整数不会，
-    // 只不过整数不能做其它操作而已
-
-    // 根据value指针计算出是第几个节点，返回值[1, max_num]，0 则表示失败
+    /// 根据value指针计算出是第几个节点，返回值[1, max_num]，0 则表示失败
     size_t ptr_2_int(const T * p_) const;
     const T * int_2_ptr(size_t index_) const;
     T * int_2_ptr(size_t index_);
+    const Iterator int_2_iter(size_t index_) const;
+    Iterator int_2_iter(size_t index_);
 
 private:
     typedef Link<size_t> LinkNode;
@@ -328,6 +324,18 @@ template<typename T>
 T * FixedMemPool<T>::int_2_ptr(size_t index_)
 {
     return get_value(index_);
+}
+
+template<typename T>
+const typename FixedMemPool<T>::Iterator FixedMemPool<T>::int_2_iter(size_t index_) const
+{
+    return Iterator(this, index_);
+}
+
+template<typename T>
+typename FixedMemPool<T>::Iterator FixedMemPool<T>::int_2_iter(size_t index_)
+{
+    return Iterator(this, index_);
 }
 
 template<typename T>

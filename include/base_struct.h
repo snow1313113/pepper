@@ -21,19 +21,6 @@ protected:
 };
 
 template<typename T>
-struct AutoMem
-{
-    AutoMem(T * p_):m_p(p_){}
-    ~AutoMem(){ delete[] m_p; }
-    T * it(){ return m_p; }
-private:
-    AutoMem(const AutoMem &) = delete;
-    AutoMem & operator=(const AutoMem &) = delete;
-    T * m_p;
-};
-
-
-template<typename T>
 class AutoRes
 {
 public:
