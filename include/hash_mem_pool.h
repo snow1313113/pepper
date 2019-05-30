@@ -96,8 +96,8 @@ private:
         size_t next;
     };
 
-    HashHeader* m_header;
-    size_t* m_buckets;
+    HashHeader* m_header = nullptr;
+    size_t* m_buckets = nullptr;
     FixedMemPool<Node> m_pool;
 };
 

@@ -36,8 +36,8 @@ public:
         Iterator operator--(int);
     private:
         friend class FixedMemPool;
-        size_t m_index;
-        const FixedMemPool * m_pool;
+        size_t m_index = 0;
+        const FixedMemPool * m_pool = nullptr;
         Iterator(const FixedMemPool * pool_, size_t index_):m_index(index_),m_pool(pool_){}
     };
 
@@ -53,7 +53,7 @@ public:
         return calc_need_size(max_node_num_, sizeof(T));
     }
 
-    FixedMemPool():m_header(NULL){}
+    FixedMemPool() = default;
     /// 初始化内存池，内存由调用者提供，is_raw_指明mem_指向的内存是否已经初始化过的
     bool init(void * mem_, size_t size_, bool is_raw_ = true);
     /// 初始化内存池，内存由调用者提供，指出节点大小（有可能大于或等于sizeof(T)），is_raw_指明mem_指向的内存是否已经初始化过的
@@ -137,7 +137,7 @@ private:
     static const size_t HEADER_MAGIC_NUM = 0x9E370001;
     static const size_t VERSION = 1;
 private:
-    MemHeader * m_header;
+    MemHeader * m_header = nullptr;
 };
 
 template<typename T>

@@ -33,8 +33,8 @@ struct BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>
     class Iterator
     {
         friend class BaseMemSet;
-        const BaseMemSet * m_set;
-        IntType m_index;
+        const BaseMemSet * m_set = nullptr;
+        IntType m_index = 0;
         Iterator(const BaseMemSet * set_, IntType index_) : m_set(set_), m_index(index_){}
     public:
         Iterator() = default;
@@ -91,16 +91,16 @@ private:
 
 private:
     /// 使用了多少个节点
-    IntType m_used;
+    IntType m_used = 0;
     /// 空闲链头个节点，m_next的下标，从1开始，0 表示没有
-    IntType m_free_index;
+    IntType m_free_index = 0;
     // 使用的节点下标，m_next的下标，加入这个是为了clear的时候不用做多余的操作
-    IntType m_raw_used;
+    IntType m_raw_used = 0;
     // 找一个比max_size小素数会好一点
     static const size_t BUCKETS_SIZE = NearByPrime<MAX_SIZE>::PRIME;
-    IntType m_buckets[BUCKETS_SIZE];
+    IntType m_buckets[BUCKETS_SIZE] = {0};
     /// 存储链表下标，每一个和value数组一一对应，为了字节对齐
-    IntType m_next[MAX_SIZE];
+    IntType m_next[MAX_SIZE] = {0};
     T m_value[MAX_SIZE];
 };
 
@@ -141,7 +141,7 @@ struct BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>
 
 private:
     /// 使用了多少个节点
-    IntType m_used;
+    IntType m_used = 0;
     T m_value[MAX_SIZE];
 };
 

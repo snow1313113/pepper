@@ -19,7 +19,6 @@ template<size_t MAX_SIZE = 0>
 class UnfixedRingBuf
 {
 public:
-    constexpr UnfixedRingBuf() noexcept = default;
     /// 清空队列
     void clear();
     /// 队列是否空
@@ -75,7 +74,6 @@ template <>
 class UnfixedRingBuf<0>
 {
 public:
-    constexpr UnfixedRingBuf() noexcept = default;
     /// 调用者提供队列的内存
     bool init(void *mem_, size_t mem_size_, bool check_ = false);
     /// 清空队列

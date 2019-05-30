@@ -19,7 +19,6 @@ template<typename T, size_t MAX_SIZE = 0>
 class FixedRingBuf
 {
 public:
-    constexpr FixedRingBuf() noexcept = default;
     /// 清空队列
     void clear();
     /// 队列是否空
@@ -61,7 +60,6 @@ public:
     /// 调用者提供队列的内存
     bool init(void * mem_, size_t mem_size_, bool check_ = false);
 
-    constexpr FixedRingBuf() noexcept = default;
     /// 清空队列
     void clear();
     /// 队列是否空

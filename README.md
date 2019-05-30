@@ -1,2 +1,2 @@
 # pepper
-some memory util
+some container that can be used for shared memory

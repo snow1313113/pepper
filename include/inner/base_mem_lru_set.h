@@ -29,8 +29,8 @@ public:
     class Iterator
     {
         friend class BaseMemLRUSet;
-        const BaseMemLRUSet * m_set;
-        IntType m_index;
+        const BaseMemLRUSet * m_set = nullptr;
+        IntType m_index = 0;
         Iterator(const BaseMemLRUSet * set_, IntType index_) : m_set(set_), m_index(index_){}
     public:
         Iterator() = default;
@@ -101,8 +101,8 @@ public:
     class Iterator
     {
         friend class BaseMemLRUSet;
-        const BaseMemLRUSet * m_set;
-        IntType m_index;
+        const BaseMemLRUSet * m_set = nullptr;
+        IntType m_index = 0;
         Iterator(const BaseMemLRUSet * set_, IntType index_) : m_set(set_), m_index(index_){}
     public:
         Iterator() = default;

@@ -44,8 +44,8 @@ private:
 template<typename T>
 struct Link
 {
-    T prev;
-    T next;
+    T prev = 0;
+    T next = 0;
 };
 
 

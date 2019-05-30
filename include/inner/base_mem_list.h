@@ -89,11 +89,11 @@ public:
 
 private:
     typedef Link<IntType> LinkNode;
-    IntType m_used;
+    IntType m_used = 0;
     // 这个是空闲连头下标，m_link的下标
-    IntType m_free_index;
+    IntType m_free_index = 0;
     // 使用的节点下标，m_link的下标
-    IntType m_raw_used;
+    IntType m_raw_used = 0;
     // 第一个节点作为flag
     LinkNode m_link[MAX_SIZE + 1];
     T m_value[MAX_SIZE];
