@@ -8,19 +8,24 @@
 #ifndef BASE_SPECIALIZATION_H
 #define BASE_SPECIALIZATION_H
 
+#include <functional>
 #include "../utils/traits_utils.h"
-
-namespace Pepper
+namespace std
 {
 
 template<typename T1, typename T2>
-struct SimpleHash<std::pair<T1, T2> >
+struct hash<std::pair<T1, T2>>
 {
     size_t operator()(const std::pair<T1, T2> & t_) const
     {
-        return SimpleHash<T1>()(t_.first);
+        return hash<T1>()(t_.first);
     }
 };
+
+}
+
+namespace Pepper
+{
 
 template <typename T1, typename T2>
 struct IsEqual<std::pair<T1, T2> >

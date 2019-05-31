@@ -13,7 +13,7 @@
 namespace Pepper
 {
 
-template<typename T, size_t MAX_SIZE, typename HASH = SimpleHash<T>, typename IS_EQUAL = IsEqual<T> >
+template<typename T, size_t MAX_SIZE, typename HASH = std::hash<T>, typename IS_EQUAL = IsEqual<T> >
 class MemSet
 {
 public:

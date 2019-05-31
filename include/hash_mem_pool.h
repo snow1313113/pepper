@@ -15,7 +15,7 @@
 
 namespace Pepper
 {
-template <typename KEY, typename VALUE, typename HASH = SimpleHash<KEY> >
+template <typename KEY, typename VALUE, typename HASH = std::hash<KEY> >
 class HashMemPool
 {
 public:

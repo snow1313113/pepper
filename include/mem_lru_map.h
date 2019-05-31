@@ -18,7 +18,7 @@ class MemLRUMap
 {
 public:
     typedef std::pair<KEY, VALUE> SET_VALUE;
-    typedef BaseMemLRUSet<SET_VALUE, MAX_SIZE, SimpleHash<SET_VALUE>, IsEqual<SET_VALUE>, false> BaseType;
+    typedef BaseMemLRUSet<SET_VALUE, MAX_SIZE, std::hash<SET_VALUE>, IsEqual<SET_VALUE>, false> BaseType;
     typedef typename BaseType::IntType IntType;
     typedef typename BaseType::ValueType SetValue;
     typedef typename BaseType::Iterator Iterator;

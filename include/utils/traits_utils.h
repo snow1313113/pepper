@@ -9,6 +9,7 @@
 #define TRAITS_UTILS_H
 
 #include "../inner/head.h"
+#include <type_traits>
 
 namespace Pepper
 {
@@ -103,22 +104,6 @@ inline CLASS_T * contaner_of(const MEMBER_T * ptr, MEMBER_T CLASS_T::*member)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-template<bool COND, typename T1, typename T2>
-struct IfThenElse;
-
-template<typename T1, typename T2>
-struct IfThenElse<true, T1, T2>
-{
-    typedef T1 T;
-};
-
-template<typename T1, typename T2>
-struct IfThenElse<false, T1, T2>
-{
-    typedef T2 T;
-};
-
-//////////////////////////////////////////////////////////////////////////////
 template<size_t VALUE>
 struct Value2Type
 {
@@ -130,7 +115,7 @@ template<size_t X, size_t G = X / 2 + 1>
 struct IntSqrt
 {
     typedef IntSqrt<X, (G * G + X) / (G * 2)> InnerSqrt;
-    typedef typename IfThenElse<(G * G > X), InnerSqrt, Value2Type<G>>::T ResultType;
+    typedef typename std::conditional<(G * G > X), InnerSqrt, Value2Type<G>>::type ResultType;
     static const size_t RESULT = ResultType::RESULT;
 };
 
@@ -216,83 +201,6 @@ struct NearByPrime<1, false>
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-struct SimpleHash;
-
-template<>
-struct SimpleHash<int8_t>
-{
-    size_t operator()(int8_t x) const
-    {
-        return static_cast<size_t>(x);
-    }
-};
-
-template<>
-struct SimpleHash<uint8_t>
-{
-    size_t operator()(uint8_t x) const
-    {
-        return static_cast<size_t>(x);
-    }
-};
-
-template<>
-struct SimpleHash<int16_t>
-{
-    size_t operator()(int16_t x) const
-    {
-        return static_cast<size_t>(x);
-    }
-};
-
-template<>
-struct SimpleHash<uint16_t>
-{
-    size_t operator()(uint16_t x) const
-    {
-        return static_cast<size_t>(x);
-    }
-};
-
-template<>
-struct SimpleHash<int32_t>
-{
-    size_t operator()(int32_t x) const
-    {
-        return static_cast<size_t>(x);
-    }
-};
-
-template<>
-struct SimpleHash<uint32_t>
-{
-    size_t operator()(uint32_t x) const
-    {
-        return static_cast<size_t>(x);
-    }
-};
-
-template<>
-struct SimpleHash<int64_t>
-{
-    size_t operator()(int64_t x) const
-    {
-        return static_cast<size_t>(x);
-    }
-};
-
-template<>
-struct SimpleHash<uint64_t>
-{
-    size_t operator()(uint64_t x) const
-    {
-        return static_cast<size_t>(x);
-    }
-};
-
-//////////////////////////////////////////////////////////////////////////////
-
-template <typename T>
 struct IsEqual
 {
     typedef T KeyType;
@@ -314,7 +222,6 @@ struct ExtractKey
         return x;
     }
 };
-
 
 }
 
