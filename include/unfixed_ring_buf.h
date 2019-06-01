@@ -8,6 +8,7 @@
 #ifndef _UNFIXED_RING_BUF_H_
 #define _UNFIXED_RING_BUF_H_
 
+#include <sys/uio.h>
 #include <algorithm>
 #include "inner/head.h"
 #include "utils/traits_utils.h"
@@ -437,7 +438,7 @@ typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::need_skip_b
 }
 
 ////////////////////////////////////////////////////
-bool UnfixedRingBuf<0>::Init(void *mem_, size_t mem_size_, bool check_)
+bool UnfixedRingBuf<0>::init(void *mem_, size_t mem_size_, bool check_)
 {
     if (!mem_ || mem_size_ < sizeof(BuffHead))
         return false;

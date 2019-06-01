@@ -21,10 +21,14 @@ if(NOT WIN32)
   set(BoldWhite   "${Esc}[1;37m")
 endif()
 
-project(pepper)
+SET(MY_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(CMAKE_C_COMPILER "/usr/local/bin/gcc")
-set(CMAKE_CXX_COMPILER "/usr/local/bin/g++")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -fPIC -std=c++14 -Wno-literal-suffix -Wno-error=literal-suffix -Wno-deprecated -Wno-unused-variable -Wno-sign-compare -Wno-strict-aliasing -fno-strict-aliasing")
+# can use your own googletest directory here
+SET(GTEST_ROOT ${MY_ROOT}/third_party/googletest)
+SET(GTEST_INCLUDE ${GTEST_ROOT}/googletest/include)
+SET(GTEST_LIB ${GTEST_ROOT}/build/lib)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -fPIC -std=c++14")
 
 add_subdirectory(sample)
+add_subdirectory(test)

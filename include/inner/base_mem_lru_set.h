@@ -15,7 +15,7 @@ namespace Pepper
 {
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-class BaseMemLRUSet;
+struct BaseMemLRUSet;
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 struct BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>
@@ -28,7 +28,7 @@ public:
 
     class Iterator
     {
-        friend class BaseMemLRUSet;
+        friend struct BaseMemLRUSet;
         const BaseMemLRUSet * m_set = nullptr;
         IntType m_index = 0;
         Iterator(const BaseMemLRUSet * set_, IntType index_) : m_set(set_), m_index(index_){}
@@ -100,7 +100,7 @@ public:
 
     class Iterator
     {
-        friend class BaseMemLRUSet;
+        friend struct BaseMemLRUSet;
         const BaseMemLRUSet * m_set = nullptr;
         IntType m_index = 0;
         Iterator(const BaseMemLRUSet * set_, IntType index_) : m_set(set_), m_index(index_){}

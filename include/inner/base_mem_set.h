@@ -32,7 +32,7 @@ struct BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>
 
     class Iterator
     {
-        friend class BaseMemSet;
+        friend struct BaseMemSet;
         const BaseMemSet * m_set = nullptr;
         IntType m_index = 0;
         Iterator(const BaseMemSet * set_, IntType index_) : m_set(set_), m_index(index_){}

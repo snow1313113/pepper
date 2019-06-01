@@ -80,6 +80,8 @@ public:
     size_t capacity() const;
     /// 获取已经分配的节点个数
     size_t size() const;
+    /// 节点大小
+    size_t node_size() const;
     /// 根据value指针计算出是第几个节点，返回值[1, max_num]，0 则表示失败
     size_t ptr_2_int(const T * p_) const;
     const T * int_2_ptr(size_t index_) const;
@@ -300,6 +302,12 @@ template<typename T>
 size_t FixedMemPool<T>::size() const
 {
     return m_header->used_num;
+}
+
+template<typename T>
+size_t FixedMemPool<T>::node_size() const
+{
+    return m_header->t_size;
 }
 
 template<typename T>
