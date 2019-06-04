@@ -54,10 +54,10 @@ public:
     }
 
     FixedMemPool() = default;
-    /// 初始化内存池，内存由调用者提供，is_raw_指明mem_指向的内存是否已经初始化过的
-    bool init(void * mem_, size_t size_, bool is_raw_ = true);
-    /// 初始化内存池，内存由调用者提供，指出节点大小（有可能大于或等于sizeof(T)），is_raw_指明mem_指向的内存是否已经初始化过的
-    bool init(void * mem_, size_t size_, size_t node_size_, bool is_raw_ = true);
+    /// 初始化内存池，内存由调用者提供，check_ == true表示mem_指向的内存已经初始化过的，校验一下
+    bool init(void * mem_, size_t size_, bool check_ = false);
+    /// 初始化内存池，内存由调用者提供，指出节点大小（有可能大于或等于sizeof(T)），check_ == true表示mem_指向的内存已经初始化过的，校验一下
+    bool init(void * mem_, size_t size_, size_t node_size_, bool check_ = false);
     /// 申请一个节点
     T * alloc(bool zero = true);
     /// 回收一个节点
@@ -143,19 +143,19 @@ private:
 };
 
 template<typename T>
-bool FixedMemPool<T>::init(void * mem_, size_t size_, bool is_raw_)
+bool FixedMemPool<T>::init(void * mem_, size_t size_, bool check_)
 {
-    return init(mem_, size_, sizeof(T), is_raw_);
+    return init(mem_, size_, sizeof(T), check_);
 }
 
 template<typename T>
-bool FixedMemPool<T>::init(void * mem_, size_t size_, size_t node_size_, bool is_raw_)
+bool FixedMemPool<T>::init(void * mem_, size_t size_, size_t node_size_, bool check_)
 {
     if (NULL == mem_)
         return false;
 
     m_header = reinterpret_cast<MemHeader*>(mem_);
-    if (is_raw_)
+    if (!check_)
         init_header(size_, node_size_);
 
     if (m_header->magic_num != HEADER_MAGIC_NUM ||
@@ -245,7 +245,7 @@ bool FixedMemPool<T>::free(const T * p_)
 template<typename T>
 void FixedMemPool<T>::clear()
 {
-    init(m_header, m_header->mem_size, m_header->t_size, true);
+    init(m_header, m_header->mem_size, m_header->t_size, false);
 }
 
 template<typename T>

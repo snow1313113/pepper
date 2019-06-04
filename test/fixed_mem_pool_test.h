@@ -10,7 +10,7 @@
 
 #include <map>
 #include <set>
-#include <stdlib.h>
+#include <cstdlib>
 #include <algorithm>
 #include <iostream>
 #include "fixed_mem_pool.h"
@@ -119,8 +119,8 @@ TEST(FixedMemPoolTest, know_node_size)
     }
     EXPECT_EQ(mem_pool.size(), count);
 
-    // 测试init的check_header参数
-    result = mem_pool.init(mem, mem_size, false);
+    // 测试init的check_参数
+    result = mem_pool.init(mem, mem_size, true);
     ASSERT_TRUE(result);
 
     ASSERT_FALSE(mem_pool.full());
@@ -251,8 +251,8 @@ TEST(FixedMemPoolTest, unknow_node_size)
     }
     EXPECT_EQ(mem_pool.size(), count);
 
-    // 测试init的check_header参数
-    result = mem_pool.init(mem, mem_size, sizeof(TestNode), false);
+    // 测试init的check_参数
+    result = mem_pool.init(mem, mem_size, sizeof(TestNode), true);
     ASSERT_TRUE(result);
 
     ASSERT_FALSE(mem_pool.full());

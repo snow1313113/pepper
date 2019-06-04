@@ -1,6 +1,7 @@
 #include <iostream>
 #include "fixed_mem_pool_test.h"
 #include "ring_buffer_test.h"
+#include "hash_mem_pool_test.h"
 
 int main(int argc, char* argv[])
 {

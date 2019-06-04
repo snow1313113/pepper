@@ -55,7 +55,7 @@ public:
     /// 是否满了
     bool full() const;
     /// 根据一段内存初始化
-    bool init(void* mem_, uint32_t max_node_, uint32_t bucket_num_, uint32_t mem_size_, bool check_header_ = false);
+    bool init(void* mem_, uint32_t max_node_, uint32_t bucket_num_, uint32_t mem_size_, bool check_ = false);
     /// 清空
     void clear();
     // 插入一个节点
@@ -153,9 +153,9 @@ typename HashMemPool<KEY, VALUE, HASH>::Node* HashMemPool<KEY, VALUE, HASH>::der
 
 template <typename KEY, typename VALUE, typename HASH>
 bool HashMemPool<KEY, VALUE, HASH>::init(void* mem_, uint32_t max_node_, uint32_t bucket_num_, uint32_t mem_size_,
-                                         bool check_header_)
+                                         bool check_)
 {
-    assert((HashMemPool<KEY, VALUE, HASH>::calc_mem_size(max_node_, bucket_num) <= mem_size_));
+    assert((HashMemPool<KEY, VALUE, HASH>::calc_mem_size(max_node_, bucket_num_) <= mem_size_));
 
     char* p = reinterpret_cast<char*>(mem_);
     m_header = reinterpret_cast<HashHeader*>(p);
@@ -163,19 +163,19 @@ bool HashMemPool<KEY, VALUE, HASH>::init(void* mem_, uint32_t max_node_, uint32_
     m_buckets = reinterpret_cast<size_t*>(p);
     p += sizeof(m_buckets[0]) * bucket_num_;
 
-    if (check_header_)
+    if (check_)
     {
         if (m_header->bucket_num != bucket_num_ || m_header->max_node != max_node_)
             return false;
 
-        size_t mem_pool_size = FixedMemPool<HashNode>::CalcNeedSize(max_node_, sizeof(HashNode));
-        if (!m_pool.init(p, mem_pool_size, sizeof(HashNode), check_header_))
+        size_t mem_pool_size = FixedMemPool<HashNode>::calc_need_size(max_node_, sizeof(HashNode));
+        if (!m_pool.init(p, mem_pool_size, sizeof(HashNode), check_))
             return false;
     }
     else
     {
-        size_t mem_pool_size = FixedMemPool<HashNode>::CalcNeedSize(max_node_, sizeof(HashNode));
-        if (!m_pool.init(p, mem_pool_size, sizeof(HashNode), check_header_))
+        size_t mem_pool_size = FixedMemPool<HashNode>::calc_need_size(max_node_, sizeof(HashNode));
+        if (!m_pool.init(p, mem_pool_size, sizeof(HashNode), check_))
             return false;
 
         m_header->bucket_num = bucket_num_;
@@ -213,11 +213,11 @@ std::pair<typename HashMemPool<KEY, VALUE, HASH>::Iterator, bool> HashMemPool<KE
 
     node->first = key_;
     // 挂到链上
-    size_t bucket_index = bucket_index(key_);
-    node->next = m_buckets[bucket_index];
-    m_buckets[bucket_index] = m_pool.ptr_2_int(node);
+    size_t index = bucket_index(key_);
+    node->next = m_buckets[index];
+    m_buckets[index] = m_pool.ptr_2_int(node);
 
-    return std::make_pair(Iterator(m_pool.int_2_iter(m_buckets[bucket_index])), true);
+    return std::make_pair(Iterator(m_pool.int_2_iter(m_buckets[index])), true);
 }
 
 template <typename KEY, typename VALUE, typename HASH>
@@ -265,8 +265,8 @@ size_t HashMemPool<KEY, VALUE, HASH>::bucket_index(const KEY& key_) const
 template <typename KEY, typename VALUE, typename HASH>
 size_t HashMemPool<KEY, VALUE, HASH>::find_ref(const KEY& key_) const
 {
-    size_t bucket_index = bucket_index(key_);
-    for (size_t ref = m_buckets[bucket_index]; ref != 0;)
+    size_t index = bucket_index(key_);
+    for (size_t ref = m_buckets[index]; ref != 0;)
     {
         auto node = static_cast<const HashNode*>(m_pool.int_2_ptr(ref));
         if (node->first == key_)
@@ -279,9 +279,9 @@ size_t HashMemPool<KEY, VALUE, HASH>::find_ref(const KEY& key_) const
 template <typename KEY, typename VALUE, typename HASH>
 bool HashMemPool<KEY, VALUE, HASH>::erase(const KEY& key_)
 {
-    size_t bucket_index = bucket_index(key_);
-    size_t ref = m_buckets[bucket_index];
-    size_t* pre = &(m_buckets[bucket_index]);
+    size_t index = bucket_index(key_);
+    size_t ref = m_buckets[index];
+    size_t* pre = &(m_buckets[index]);
     while (ref != 0)
     {
         auto node = static_cast<HashNode*>(m_pool.int_2_ptr(ref));
