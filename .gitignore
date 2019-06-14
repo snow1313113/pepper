@@ -30,7 +30,6 @@
 *.exe
 *.out
 *.app
-sample
 
 # Editor swap file
 *.swp

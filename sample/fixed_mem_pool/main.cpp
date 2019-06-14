@@ -24,7 +24,7 @@ int main()
     static const size_t node_size = sizeof(Test) + 10;
     static const size_t mem_size = FixedMemPool<Test>::calc_need_size(MAX_NUM, node_size);
     uint8_t * mem = new uint8_t[mem_size];
-    if (pool.init(mem, mem_size, node_size, true) == false)
+    if (pool.init(mem, mem_size, node_size) == false)
     {
         cout << "init error" << endl;
         return 0;

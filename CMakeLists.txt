@@ -22,6 +22,7 @@ if(NOT WIN32)
 endif()
 
 SET(MY_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+SET(MY_LIB_DIR ${MY_ROOT}/lib)
 
 # can use your own googletest directory here
 SET(GTEST_ROOT ${MY_ROOT}/third_party/googletest)
@@ -30,5 +31,6 @@ SET(GTEST_LIB ${GTEST_ROOT}/build/lib)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -fPIC -std=c++14")
 
+add_subdirectory(src)
 add_subdirectory(sample)
 add_subdirectory(test)
