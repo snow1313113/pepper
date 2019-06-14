@@ -71,21 +71,14 @@ private:
     };
 
     static const size_t MAGIC_NUM = 0x12345678;
-    MRHeader * m_header;
-    MRNode * m_hash;
-    MRNode * m_level;
-    MRNode * m_free;
+    MRHeader * m_header = nullptr;
+    MRNode * m_hash = nullptr;
+    MRNode * m_level = nullptr;
+    MRNode * m_free = nullptr;
 
 public:
-    class Iterator
+    struct Iterator
     {
-        size_t m_node_ref;
-        const MemRank * m_rank;
-        Iterator(const MemRank * rank_, size_t ref_):m_node_ref(ref_), m_rank(rank_)
-        {
-        }
-
-    public:
         friend class MemRank;
         Iterator() = default;
 
@@ -93,6 +86,12 @@ public:
         {
             return m_rank->ref_2_node(m_node_ref)->info;
         }
+
+        T & operator*()
+        {
+            return const_cast<MemRank*>(m_rank)->ref_2_node(m_node_ref)->info;
+        }
+
         bool operator==(const Iterator & right_) const
         {
             return (m_rank == right_.m_rank) && (m_node_ref == right_.m_node_ref);
@@ -126,6 +125,13 @@ public:
             Iterator temp = (*this);
             m_node_ref = m_rank->ref_2_node(m_node_ref)->forward;
             return temp;
+        }
+
+    private:
+        size_t m_node_ref = 0;
+        const MemRank * m_rank = nullptr;
+        Iterator(const MemRank * rank_, size_t ref_):m_node_ref(ref_), m_rank(rank_)
+        {
         }
     };
 
@@ -176,32 +182,43 @@ public:
     bool delete_back_list(const vector<T> & black_list_);
 
 private:
-    inline size_t ptr_2_ref(void * ptr_) const
+    size_t ptr_2_ref(void * ptr_) const
     {
         return reinterpret_cast<uint8_t *>(ptr_) - reinterpret_cast<uint8_t *>(m_header);
     }
 
-    inline uint8_t * ref_2_ptr(size_t ref_) const
+    uint8_t * ref_2_ptr(size_t ref_) const
     {
         return reinterpret_cast<uint8_t *>(m_header) + ref_;
     }
 
-    inline MRNode * ref_2_node(size_t ref_) const
+    const MRNode * ref_2_node(size_t ref_) const
+    {
+        return reinterpret_cast<const MRNode *>(reinterpret_cast<const uint8_t *>(m_header) + ref_);
+    }
+
+    MRNode * ref_2_node(size_t ref_)
     {
         return reinterpret_cast<MRNode *>(reinterpret_cast<uint8_t *>(m_header) + ref_);
     }
 
-    inline size_t * ref_2_uint(size_t ref_) const
+    const size_t * ref_2_uint(size_t ref_) const
+    {
+        return reinterpret_cast<const size_t *>(reinterpret_cast<const uint8_t *>(m_header) + ref_);
+    }
+
+    size_t * ref_2_uint(size_t ref_)
     {
         return reinterpret_cast<size_t *>(reinterpret_cast<uint8_t *>(m_header) + ref_);
     }
+ 
     size_t align(size_t byte_size_) const
     {
         // todo
         return byte_size_;
     }
 
-    inline size_t random_max_level() const
+    size_t random_max_level() const
     {
         size_t level = 1;
         while ((random() & 0xFFFF) < (1.0 / SKIPTABLE_P * 0xFFFF))
@@ -218,10 +235,10 @@ private:
 
 template<typename T, typename T_Key, typename T_Compare>
 bool MemRank<T, T_Key, T_Compare>::init(void * mem_,
-            size_t size_,
-            bool is_raw_,
-            size_t level_num_,
-            size_t bucket_num_)
+        size_t size_,
+        bool is_raw_,
+        size_t level_num_,
+        size_t bucket_num_)
 {
     if(NULL == mem_)
         return false;
@@ -293,7 +310,7 @@ bool MemRank<T, T_Key, T_Compare>::init(void * mem_,
     return true;
 }
 
-template<typename T, typename T_Key, typename T_Compare>
+    template<typename T, typename T_Key, typename T_Compare>
 bool MemRank<T, T_Key, T_Compare>::update_node(const T & info_)
 {
     MRNode * p = find(T_Key()(info_));
@@ -302,7 +319,7 @@ bool MemRank<T, T_Key, T_Compare>::update_node(const T & info_)
     return insert_node(info_);
 }
 
-template<typename T, typename T_Key, typename T_Compare>
+    template<typename T, typename T_Key, typename T_Compare>
 bool MemRank<T, T_Key, T_Compare>::insert_node(const T & info_)
 {
     T_Compare compare;
@@ -395,7 +412,7 @@ bool MemRank<T, T_Key, T_Compare>::insert_node(const T & info_)
     return true;
 }
 
-template<typename T, typename T_Key, typename T_Compare>
+    template<typename T, typename T_Key, typename T_Compare>
 bool MemRank<T, T_Key, T_Compare>::delete_node(const KeyType & key_)
 {
     MRNode * p = find(key_);
@@ -404,7 +421,7 @@ bool MemRank<T, T_Key, T_Compare>::delete_node(const KeyType & key_)
     return true;
 }
 
-template<typename T, typename T_Key, typename T_Compare>
+    template<typename T, typename T_Key, typename T_Compare>
 bool MemRank<T, T_Key, T_Compare>::delete_node(const T & info_)
 {
     return delete_node(T_Key()(info_));
@@ -579,7 +596,7 @@ typename MemRank<T, T_Key, T_Compare>::MRNode * MemRank<T, T_Key, T_Compare>::fi
     return NULL;
 }
 
-template<typename T, typename T_Key, typename T_Compare>
+    template<typename T, typename T_Key, typename T_Compare>
 bool MemRank<T, T_Key, T_Compare>::delete_node(MemRank<T, T_Key, T_Compare>::MRNode * node_)
 {
     // 一定是从最顶层往下删
@@ -657,7 +674,7 @@ bool MemRank<T, T_Key, T_Compare>::delete_node(MemRank<T, T_Key, T_Compare>::MRN
     return true;
 }
 
-template<typename T, typename T_Key, typename T_Compare>
+    template<typename T, typename T_Key, typename T_Compare>
 typename MemRank<T, T_Key, T_Compare>::MRNode * MemRank<T, T_Key, T_Compare>::alloc_node()
 {
     if(m_header->free_list == 0)
@@ -670,7 +687,7 @@ typename MemRank<T, T_Key, T_Compare>::MRNode * MemRank<T, T_Key, T_Compare>::al
     return p;
 }
 
-template<typename T, typename T_Key, typename T_Compare>
+    template<typename T, typename T_Key, typename T_Compare>
 void MemRank<T, T_Key, T_Compare>::free_node(MRNode * node_)
 {
     node_->next = m_header->free_list;

@@ -204,21 +204,18 @@ std::pair<typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::Iterator, 
     }
 
     // 需要看看有没有存在
-    IntType bucket_index = BaseType::get_bucket_index(value_);
-    IntType index = m_base.find_index(bucket_index, value_);
-    if (index != 0)
-        return std::make_pair(Iterator(this, index), false);
-
-    index = m_base.insert(bucket_index, value_);
-
-    // 新插入的挂到active链头
-    LinkNode & head = m_active_link[0];
-    m_active_link[head.next].prev = index;
-    m_active_link[index].prev = 0;
-    m_active_link[index].next = head.next;
-    head.next = index; 
-
-    return std::make_pair(Iterator(this, index), true);
+    auto result_pair = m_base.insert2(value_);
+    if (result_pair.second)
+    {
+        IntType index = result_pair.first;
+        // 新插入的挂到active链头
+        LinkNode & head = m_active_link[0];
+        m_active_link[head.next].prev = index;
+        m_active_link[index].prev = 0;
+        m_active_link[index].next = head.next;
+        head.next = index; 
+    }
+    return std::make_pair(Iterator(this, result_pair.first), result_pair.second);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>

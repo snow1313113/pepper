@@ -24,8 +24,8 @@ struct BaseMemList
     class Iterator
     {
         friend struct BaseMemList;
-        const BaseMemList * m_list;
-        IntType m_index;
+        const BaseMemList * m_list = nullptr;
+        IntType m_index = 0;
         Iterator(const BaseMemList * list_, IntType index_) : m_list(list_), m_index(index_){}
     public:
         Iterator() = default;
@@ -98,6 +98,9 @@ private:
     LinkNode m_link[MAX_SIZE + 1];
     T m_value[MAX_SIZE];
 };
+
+template<typename T>
+struct BaseMemList<T, 0>;
 
 template<typename T, size_t MAX_SIZE>
 void BaseMemList<T, MAX_SIZE>::clear()
