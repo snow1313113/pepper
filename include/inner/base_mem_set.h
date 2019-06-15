@@ -83,26 +83,26 @@ struct BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>
     const T & deref(IntType index_) const;
     T & deref(IntType index_);
 
+private:
     static IntType get_bucket_index(const T & value_);
 
-private:
     IntType find_first_used_bucket() const;
     IntType find_index(IntType bucket_index_, const T & value_) const;
     IntType insert(IntType bucket_index_, const T & value_);
 
 private:
+    T m_value[MAX_SIZE];
+    /// 存储链表下标，每一个和value数组一一对应，为了字节对齐
+    IntType m_next[MAX_SIZE] = {0};
     /// 使用了多少个节点
     IntType m_used = 0;
-    /// 空闲链头个节点，m_next的下标，从1开始，0 表示没有
-    IntType m_free_index = 0;
     // 使用的节点下标，m_next的下标，加入这个是为了clear的时候不用做多余的操作
     IntType m_raw_used = 0;
+    /// 空闲链头个节点，m_next的下标，从1开始，0 表示没有
+    IntType m_free_index = 0;
     // 找一个比max_size小素数会好一点
     static const size_t BUCKETS_SIZE = NearByPrime<MAX_SIZE>::PRIME;
     IntType m_buckets[BUCKETS_SIZE] = {0};
-    /// 存储链表下标，每一个和value数组一一对应，为了字节对齐
-    IntType m_next[MAX_SIZE] = {0};
-    T m_value[MAX_SIZE];
 };
 
 //小数据特化类型，数据长度太小直接退化成数组
@@ -111,7 +111,25 @@ struct BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>
 {
     typedef typename FixIntType<MAX_SIZE>::IntType IntType;
     typedef T ValueType;
-    typedef T* Iterator;
+
+    class Iterator
+    {
+        friend struct BaseMemSet;
+        const BaseMemSet * m_set = nullptr;
+        IntType m_index = 0;
+        Iterator(const BaseMemSet * set_, IntType index_) : m_set(set_), m_index(index_){}
+    public:
+        Iterator() = default;
+        const T & operator*() const;
+        T & operator*();
+        const T * operator->() const;
+        T * operator->();
+        bool operator==(const Iterator & right_) const;
+        bool operator!=(const Iterator & right_) const;
+        Iterator & operator++();
+        Iterator operator++(int);
+        // 不提供operator--函数了，为了省空间用了单向链表，没法做性能很好的前向迭代
+    };
 
     /// 清空列表
     void clear();
@@ -142,10 +160,24 @@ struct BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>
     Iterator begin();
     Iterator end();
 
+    const T & deref(IntType index_) const;
+    T & deref(IntType index_);
+
 private:
+    IntType insert_impl(const T & value_);
+
+private:
+    T m_value[MAX_SIZE];
+    /// 存储链表下标，每一个和value数组一一对应，为了字节对齐
+    IntType m_next[MAX_SIZE] = {0};
     /// 使用了多少个节点
     IntType m_used = 0;
-    T m_value[MAX_SIZE];
+    // 使用的节点下标，m_next的下标，加入这个是为了clear的时候不用做多余的操作
+    IntType m_raw_used = 0;
+    /// 空闲链头个节点，m_next的下标，从1开始，0 表示没有
+    IntType m_free_index = 0;
+    /// 使用的节点链表，m_next的下标，从1开始，0 表示没有
+    IntType m_used_index = 0;
 };
 
 ////////////////////////////////////////////////////////////
@@ -161,8 +193,8 @@ template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 void BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::clear()
 {
     m_used = 0;
-    m_free_index = 0;
     m_raw_used = 0;
+    m_free_index = 0;
     memset(m_buckets, 0, sizeof(m_buckets));
     memset(m_next, 0, sizeof(m_next));
 }
@@ -242,13 +274,13 @@ typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, false>::IntType BaseMemSet<T, M
     assert(empty_index > 0);
     m_value[empty_index - 1] = value_;
 
+    ++m_used;
+
     // 挂到桶链上，如果m_next的值是LAST_INDEX，则表示是该桶链的最后一个节点
     // 其实可以把m_buckets初始化成LAST_INDEX，这样这里就不用判断了
     // 但是那样defalut的构造函数不能用了，所以还是减轻调用者的负担
     m_next[empty_index - 1] = m_buckets[bucket_index_];
     m_buckets[bucket_index_] = empty_index;
-
-    ++m_used;
 
     return empty_index;
 }
@@ -453,6 +485,10 @@ template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 void BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::clear()
 {
     m_used = 0;
+    m_raw_used = 0;
+    m_free_index = 0;
+    m_used_index = 0;
+    memset(m_next, 0, sizeof(m_next));
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
@@ -485,16 +521,11 @@ std::pair<typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator, bool
     if (full())
         return std::make_pair(end(), false);
 
-    IS_EQUAL is_equal;
-    for (IntType index = 0; index < m_used; ++index)
-    {
-        if (is_equal(m_value[index], value_))
-            return std::make_pair(&(m_value[index]), false);
-    }
-
-    m_value[m_used] = value_;
-    ++m_used;
-    return std::make_pair(&(m_value[m_used - 1]), true);
+    IntType index = find_index(value_);
+    if (index != 0)
+        return std::make_pair(Iterator(this, index), false);
+    else
+        return std::make_pair(Iterator(this, insert_impl(value_)), true);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
@@ -503,44 +534,60 @@ std::pair<typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::IntType, bool>
     if (full())
         return std::make_pair(0, false);
 
-    IS_EQUAL is_equal;
-    for (IntType index = 0; index < m_used; ++index)
+    IntType index = find_index(value_);
+    if (index != 0)
+        return std::make_pair(index, false);
+    else
+        return std::make_pair(insert_impl(value_), true);
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::IntType BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::insert_impl(const T & value_)
+{
+    IntType empty_index = 0;
+    if (m_free_index == 0)
     {
-        if (is_equal(m_value[index], value_))
-            return std::make_pair(index + 1, false);
+        assert(m_raw_used < MAX_SIZE);
+        ++m_raw_used;
+        empty_index = m_raw_used;
+    }
+    else
+    {
+        empty_index = m_free_index;
+        m_free_index = m_next[empty_index - 1];
     }
 
-    m_value[m_used] = value_;
+    assert(empty_index > 0);
+    m_value[empty_index - 1] = value_;
+
+    m_next[empty_index - 1] = m_used_index;
+    m_used_index = empty_index;
+
     ++m_used;
-    return std::make_pair(m_used, true);
+
+    return empty_index;
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::find(const T & value_) const
 {
-    IntType index = find_index(value_);
-    if (index > 0)
-        return &(m_value[index - 1]);
-    return end();
+    return Iterator(this, find_index(value_));
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::find(const T & value_)
 {
-    IntType index = find_index(value_);
-    if (index > 0)
-        return &(m_value[index - 1]);
-    return end();
+    return Iterator(this, find_index(value_));
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::IntType BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::find_index(const T & value_) const
 {
     IS_EQUAL is_equal;
-    for (IntType index = 0; index < m_used; ++index)
+    for (IntType index = m_used_index; index != 0; index = m_next[index - 1])
     {
-        if (is_equal(m_value[index], value_))
-            return index + 1;
+        if (is_equal(m_value[index - 1], value_))
+            return index;
     }
     return 0;
 }
@@ -554,7 +601,10 @@ bool BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::exist(const T & value_) cons
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::IntType BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::erase(const Iterator & it_)
 {
-    return erase(*it_);
+    assert(it_.m_set == this);
+    if (it_.m_index > 0)
+        return erase(m_value[it_.m_index - 1]);
+    return 0;
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
@@ -564,41 +614,110 @@ typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::IntType BaseMemSet<T, MA
         return 0;
 
     IS_EQUAL is_equal;
-    for (IntType index = 0; index < m_used; ++index)
+    IntType * pre = &(m_used_index);
+    for (IntType index = m_used_index; index != 0; pre = &(m_next[index - 1]), index = m_next[index - 1])
     {
-        if (is_equal(m_value[index], value_))
+        if (is_equal(m_value[index - 1], value_))
         {
-            if (m_used > 1 && index < m_used - 1)
-                // todo 这里这样实现不妥，删除一个对象时候，竟然会导致所有对象的index都变化了
-                std::swap(m_value[index], m_value[m_used - 1]);
+            assert(m_used > 0);
+            *pre = m_next[index - 1];
+            m_next[index - 1] = m_free_index;
+            m_free_index = index;
             --m_used;
-            return index + 1;
+            return index;
         }
     }
+    return 0;
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+const T & BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::deref(
+        typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::IntType index_) const
+{
+    return m_value[index_ - 1];
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+T & BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::deref(
+        typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::IntType index_)
+{
+    return m_value[index_ - 1];
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::begin() const
 {
-    return &(m_value[0]);
+    return Iterator(this, m_used_index);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::begin()
 {
-    return &(m_value[0]);
+    return Iterator(this, m_used_index);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::end() const
 {
-    return &(m_value[m_used]);
+    return Iterator(this, 0);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::end()
 {
-    return &(m_value[m_used]);
+    return Iterator(this, 0);
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+const T & BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator::operator*() const
+{
+    return m_set->m_value[m_index - 1];
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+T & BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator::operator*()
+{
+    return const_cast<BaseMemSet*>(m_set)->m_value[m_index - 1];
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+const T * BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator::operator->() const
+{
+    return &(operator*());
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+T * BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator::operator->()
+{
+    return &(operator*());
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+bool BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator::operator==(const Iterator & right_) const
+{
+    return (m_set == right_.m_set) && (m_index == right_.m_index);
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+bool BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator::operator!=(const Iterator & right_) const
+{
+    return (m_set != right_.m_set) || (m_index != right_.m_index);
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator & BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator::operator++()
+{
+    // 这并没有对m_index的合法性做校验，和stl的迭代器一样的表现即可
+    m_index = m_set->m_next[m_index - 1];
+    return (*this);
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, true>::Iterator::operator++(int)
+{
+    Iterator temp = (*this);
+    ++(*this);
+    return temp;
 }
 
 }
