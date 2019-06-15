@@ -1,12 +1,14 @@
 /*
  * * file name: base_mem_set.h
- * * description: ...
+ * * description: 
+ * *     所有set 或者map类型的容器类的基础实现，用哈希桶实现，在少量数据的时候退化
+ * *     在数据量少的话退化成数组
  * * author: lemonxu
  * * create time:2018  7 19
  * */
 
-#ifndef BASE_MEM_SET_H
-#define BASE_MEM_SET_H
+#ifndef _BASE_MEM_SET_H_
+#define _BASE_MEM_SET_H_
 
 #include <utility>
 #include "head.h"

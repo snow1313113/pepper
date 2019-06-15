@@ -17,7 +17,7 @@ template<typename T, size_t MAX_SIZE, typename HASH = std::hash<T>, typename IS_
 class MemLRUSet
 {
 public:
-    typedef BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, false> BaseType;
+    typedef BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL> BaseType;
     typedef typename BaseType::IntType IntType;
     typedef typename BaseType::ValueType ValueType;
     typedef typename BaseType::Iterator Iterator;

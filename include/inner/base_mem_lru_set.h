@@ -14,11 +14,11 @@
 namespace Pepper
 {
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 struct BaseMemLRUSet
 {
 public:
-    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE> BaseType;
+    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, IsMinSizeMemSet<T, MAX_SIZE>::IS_MIN> BaseType;
     // 不能直接用basetype的inttype，因为我们的大小是不一样的
     typedef typename FixIntType<MAX_SIZE + 1>::IntType IntType;
     typedef T ValueType;
@@ -87,40 +87,40 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-void BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::clear()
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+void BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::clear()
 {
     m_base.clear();
     m_active_link[0].prev = 0;
     m_active_link[0].next = 0;
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-bool BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::empty() const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+bool BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::empty() const
 {
     return m_base.empty();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-bool BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::full() const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+bool BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::full() const
 {
     return m_base.full();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::size() const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::size() const
 {
     return m_base.size();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::capacity() const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::capacity() const
 {
     return m_base.capacity();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-std::pair<typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator, bool> BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::insert(const T & value_, bool force_)
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+std::pair<typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool> BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T & value_, bool force_)
 {
     if (m_base.full())
     {
@@ -143,33 +143,33 @@ std::pair<typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iter
     return std::make_pair(Iterator(this, result_pair.first), result_pair.second);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-const typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::find(const T & value_) const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+const typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(const T & value_) const
 {
     return Iterator(this, m_base.find_index(value_));
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::find(const T & value_)
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(const T & value_)
 {
     return Iterator(this, m_base.find_index(value_));
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-bool BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::exist(const T & value_) const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+bool BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::exist(const T & value_) const
 {
     return m_base.exist(value_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-void BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::erase(const Iterator & it_)
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+void BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const Iterator & it_)
 {
     assert(it_.m_set == this);
     erase(*it_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-void BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::erase(const T & value_)
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+void BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const T & value_)
 {
     IntType index = m_base.erase(value_);
     if (index > 0)
@@ -184,8 +184,8 @@ void BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::erase(const T & va
     }
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::active(const T & value_)
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::active(const T & value_)
 {
     IntType index = m_base.find_index(value_);
     if (index != 0)
@@ -207,8 +207,8 @@ typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator BaseM
     return Iterator(this, index);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::disuse(size_t num_)
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::disuse(size_t num_)
 {
     for (size_t i = 0; i < num_; ++i)
     {
@@ -219,81 +219,81 @@ size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::disuse(size_t nu
     return num_;
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-const typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::begin() const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+const typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::begin() const
 {
     return Iterator(this, m_active_link[0].next);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::begin()
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::begin()
 {
     return Iterator(this, m_active_link[0].next);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-const typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::end() const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+const typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::end() const
 {
     return Iterator(this, 0);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::end()
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::end()
 {
     return Iterator(this, 0);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-const T & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::deref(IntType index_) const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+const T & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::deref(IntType index_) const
 {
     return m_base.deref(index_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-T & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::deref(IntType index_)
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+T & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::deref(IntType index_)
 {
     return m_base.deref(index_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-const T & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator::operator*() const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+const T & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator*() const
 {
     return m_set->deref(m_index);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-T & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator::operator*()
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+T & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator*()
 {
     return const_cast<BaseMemLRUSet*>(m_set)->deref(m_index);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-T * BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator::operator->() const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+T * BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator->() const
 {
     return &(operator*());
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-bool BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator::operator==(const Iterator & right_) const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+bool BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator==(const Iterator & right_) const
 {
     return (m_set == right_.m_set) && (m_index == right_.m_index);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-bool BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator::operator!=(const Iterator & right_) const
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+bool BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator!=(const Iterator & right_) const
 {
     return (m_set != right_.m_set) || (m_index != right_.m_index);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator::operator++()
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator++()
 {
     m_index = m_set->m_active_link[m_index].next;
     return (*this);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL, bool IS_MIN_SIZE>
-typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL, IS_MIN_SIZE>::Iterator::operator++(int)
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator++(int)
 {
     Iterator temp = (*this);
     ++(*this);
