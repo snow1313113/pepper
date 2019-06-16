@@ -17,7 +17,7 @@ template<typename T, size_t MAX_SIZE, typename HASH = std::hash<T>, typename IS_
 class MemSet
 {
 public:
-    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, IsMinSizeMemSet<T, MAX_SIZE>::IS_MIN > BaseType;
+    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL> BaseType;
     typedef typename BaseType::IntType IntType;
     typedef typename BaseType::ValueType ValueType;
     typedef typename BaseType::Iterator Iterator;

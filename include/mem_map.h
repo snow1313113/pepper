@@ -19,7 +19,7 @@ class MemMap
 {
 public:
     typedef std::pair<KEY, VALUE> T;
-    typedef BaseMemSet<T, MAX_SIZE, std::hash<T>, IsEqual<T>, IsMinSizeMemSet<T, MAX_SIZE>::IS_MIN > BaseType;
+    typedef BaseMemSet<T, MAX_SIZE, std::hash<T>, IsEqual<T>> BaseType;
     typedef typename BaseType::IntType IntType;
     typedef typename BaseType::Iterator Iterator;
 

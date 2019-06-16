@@ -18,7 +18,7 @@ template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 struct BaseMemLRUSet
 {
 public:
-    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL, IsMinSizeMemSet<T, MAX_SIZE>::IS_MIN> BaseType;
+    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL> BaseType;
     // 不能直接用basetype的inttype，因为我们的大小是不一样的
     typedef typename FixIntType<MAX_SIZE + 1>::IntType IntType;
     typedef T ValueType;
