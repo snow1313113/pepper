@@ -13,8 +13,6 @@
 #include <utility>
 #include "head.h"
 #include "../utils/traits_utils.h"
-#include <iostream>
-using namespace std;
 
 namespace Pepper
 {
