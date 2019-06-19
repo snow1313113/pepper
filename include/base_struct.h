@@ -4,6 +4,8 @@
  * * author: lemonxu
  * * create time:2018  1 12
  * */
+#ifndef _BASE_STRUCT_H_
+#define _BASE_STRUCT_H_
 
 namespace Pepper
 {
@@ -48,5 +50,6 @@ struct Link
     T next = 0;
 };
 
-
 }
+
+#endif

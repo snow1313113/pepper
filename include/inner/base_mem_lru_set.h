@@ -33,7 +33,8 @@ public:
         Iterator() = default;
         const T & operator*() const;
         T & operator*();
-        T * operator->() const;
+        const T * operator->() const;
+        T * operator->();
         bool operator==(const Iterator & right_) const;
         bool operator!=(const Iterator & right_) const;
         Iterator & operator++();
@@ -268,7 +269,13 @@ T & BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator*()
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-T * BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator->() const
+const T * BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator->() const
+{
+    return &(operator*());
+}
+
+template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+T * BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::operator->()
 {
     return &(operator*());
 }

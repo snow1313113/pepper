@@ -90,8 +90,8 @@ private:
     template<size_t SIZE_OF_BUCKETS>
     static IntType get_bucket_index_impl(const T & value_, SizeIdentity<SIZE_OF_BUCKETS>)
     {
-        HASH hash;
-        return hash(value_) % SIZE_OF_BUCKETS;
+        HASH hash_fun;
+        return hash_fun(value_) % SIZE_OF_BUCKETS;
     }
 
     static IntType get_bucket_index_impl(const T & value_, SizeIdentity<1>)

@@ -14,7 +14,7 @@ namespace Pepper
 {
 
 template<typename T, size_t MAX_SIZE, typename HASH = std::hash<T>, typename IS_EQUAL = IsEqual<T> >
-class MemSet
+class MemSet : private BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL> 
 {
 public:
     typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL> BaseType;
@@ -48,99 +48,96 @@ public:
     const Iterator end() const;
     Iterator begin();
     Iterator end();
-
-private:
-    BaseType m_base;
 };
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 void MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::clear()
 {
-    m_base.clear();
+    BaseType::clear();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 bool MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::empty() const
 {
-    return m_base.empty();
+    return BaseType::empty();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 bool MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::full() const
 {
-    return m_base.full();
+    return BaseType::full();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 size_t MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::size() const
 {
-    return m_base.size();
+    return BaseType::size();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 size_t MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::capacity() const
 {
-    return m_base.capacity();
+    return BaseType::capacity();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 std::pair<typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool> MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T & value_)
 {
-    return m_base.insert(value_);
+    return BaseType::insert(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(const T & value_) const
 {
-    return m_base.find(value_);
+    return BaseType::find(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(const T & value_)
 {
-    return m_base.find(value_);
+    return BaseType::find(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 bool MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::exist(const T & value_) const
 {
-    return m_base.exist(value_);
+    return BaseType::exist(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 void MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const Iterator & it_)
 {
-    m_base.erase(it_);
+    BaseType::erase(it_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 void MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const T & value_)
 {
-    m_base.erase(value_);
+    BaseType::erase(value_);
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::begin() const
 {
-    return m_base.begin();
+    return BaseType::begin();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::begin()
 {
-    return m_base.begin();
+    return BaseType::begin();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::end() const
 {
-    return m_base.end();
+    return BaseType::end();
 }
 
 template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::end()
 {
-    return m_base.end();
+    return BaseType::end();
 }
 
 }

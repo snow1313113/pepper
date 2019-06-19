@@ -15,7 +15,7 @@ namespace Pepper
 {
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
-class MemMap
+class MemMap : private BaseMemSet<std::pair<KEY, VALUE>, MAX_SIZE, std::hash<std::pair<KEY, VALUE>>, IsEqual<std::pair<KEY, VALUE>>>
 {
 public:
     typedef std::pair<KEY, VALUE> T;
@@ -49,45 +49,42 @@ public:
     const Iterator end() const;
     Iterator begin();
     Iterator end();
-
-private:
-    BaseType m_base;
 };
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 void MemMap<KEY, VALUE, MAX_SIZE>::clear()
 {
-    return m_base.clear();
+    return BaseType::clear();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 bool MemMap<KEY, VALUE, MAX_SIZE>::empty() const
 {
-    return m_base.empty();
+    return BaseType::empty();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 bool MemMap<KEY, VALUE, MAX_SIZE>::full() const
 {
-    return m_base.full();
+    return BaseType::full();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 size_t MemMap<KEY, VALUE, MAX_SIZE>::size() const
 {
-    return m_base.size();
+    return BaseType::size();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 size_t MemMap<KEY, VALUE, MAX_SIZE>::capacity() const
 {
-    return m_base.capacity();
+    return BaseType::capacity();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 std::pair<typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator, bool> MemMap<KEY, VALUE, MAX_SIZE>::insert(const KEY & key_, const VALUE & value_)
 {
-    return m_base.insert(std::make_pair(key_, value_));
+    return BaseType::insert(std::make_pair(key_, value_));
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
@@ -95,7 +92,7 @@ const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZ
 {
     T temp;
     temp.first = key_;
-    return m_base.find(temp);
+    return BaseType::find(temp);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
@@ -103,7 +100,7 @@ typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::fi
 {
     T temp;
     temp.first = key_;
-    return m_base.find(temp);
+    return BaseType::find(temp);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
@@ -111,13 +108,13 @@ bool MemMap<KEY, VALUE, MAX_SIZE>::exist(const KEY & key_) const
 {
     T temp;
     temp.first = key_;
-    return m_base.exist(temp);
+    return BaseType::exist(temp);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 void MemMap<KEY, VALUE, MAX_SIZE>::erase(const Iterator & it_)
 {
-    m_base.erase(it_);
+    BaseType::erase(it_);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
@@ -125,33 +122,32 @@ void MemMap<KEY, VALUE, MAX_SIZE>::erase(const KEY & key_)
 {
     T temp;
     temp.first = key_;
-    m_base.erase(temp);
+    BaseType::erase(temp);
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::begin() const
 {
-    return m_base.begin();
+    return BaseType::begin();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::end() const
 {
-    return m_base.end();
+    return BaseType::end();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::begin()
 {
-    return m_base.begin();
+    return BaseType::begin();
 }
 
 template<typename KEY, typename VALUE, size_t MAX_SIZE>
 typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::end()
 {
-    return m_base.end();
+    return BaseType::end();
 }
-
 
 }
 

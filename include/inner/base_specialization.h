@@ -18,7 +18,7 @@ struct hash<std::pair<T1, T2>>
 {
     size_t operator()(const std::pair<T1, T2> & t_) const
     {
-        return hash<T1>()(t_.first);
+        return hash<T1>{}(t_.first);
     }
 };
 
