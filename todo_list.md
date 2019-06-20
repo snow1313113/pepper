@@ -10,3 +10,5 @@
 + ~~BaseMemLRUSet的两个实现重复代码太多~~
 + 增加一个UnFixedMemPool的实现
 + LRU disuse的时候增加callback
++ 所有容器是否都要提供ref接口
++ 所有容器是否都要提供无内存的版本
