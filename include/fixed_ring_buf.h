@@ -14,8 +14,7 @@
 
 namespace Pepper
 {
-
-template<typename T, size_t MAX_SIZE = 0>
+template <typename T, size_t MAX_SIZE = 0>
 class FixedRingBuf
 {
 public:
@@ -30,17 +29,17 @@ public:
     /// 队列最大容量
     size_t capacity() const;
     /// 队尾入队
-    bool push(const T & value_, bool over_write_ = false);
+    bool push(const T &value_, bool over_write_ = false);
     /// 队头弹出一个
     void pop();
     /// 获取队头第一个元素
-    T & front(size_t index_ = 0);
+    T &front(size_t index_ = 0);
     /// 获取队头第一个元素
-    const T & front(size_t index_ = 0) const;
+    const T &front(size_t index_ = 0) const;
     /// 获取队尾第一个元素
-    T & back(size_t index_ = 0);
+    T &back(size_t index_ = 0);
     /// 获取队尾第一个元素
-    const T & back(size_t index_ = 0) const;
+    const T &back(size_t index_ = 0) const;
 
 private:
     typedef typename FixIntType<MAX_SIZE>::IntType IntType;
@@ -51,14 +50,14 @@ private:
 };
 
 /// SIZE 如果是0，则表示大小是通过init来指定
-template<typename T>
+template <typename T>
 class FixedRingBuf<T, 0>
 {
 public:
     /// 计算需要的内存
     static size_t mem_size(size_t size_);
     /// 调用者提供队列的内存
-    bool init(void * mem_, size_t mem_size_, bool check_ = false);
+    bool init(void *mem_, size_t mem_size_, bool check_ = false);
 
     /// 清空队列
     void clear();
@@ -71,17 +70,17 @@ public:
     /// 队列最大容量
     size_t capacity() const;
     /// 队尾入队
-    bool push(const T & value_, bool over_write_ = false);
+    bool push(const T &value_, bool over_write_ = false);
     /// 队头弹出一个
     void pop();
     /// 获取队头第一个元素
-    T & front(size_t index_ = 0);
+    T &front(size_t index_ = 0);
     /// 获取队头第一个元素
-    const T & front(size_t index_ = 0) const;
+    const T &front(size_t index_ = 0) const;
     /// 获取队尾第一个元素
-    T & back(size_t index_ = 0);
+    T &back(size_t index_ = 0);
     /// 获取队尾第一个元素
-    const T & back(size_t index_ = 0) const;
+    const T &back(size_t index_ = 0) const;
 
 private:
     typedef size_t IntType;
@@ -97,7 +96,7 @@ private:
 };
 
 ////////////////////////////////////////////////////
-template<typename T, size_t MAX_SIZE>
+template <typename T, size_t MAX_SIZE>
 void FixedRingBuf<T, MAX_SIZE>::clear()
 {
     m_start = 0;
@@ -105,32 +104,32 @@ void FixedRingBuf<T, MAX_SIZE>::clear()
     m_used_num = 0;
 }
 
-template<typename T, size_t MAX_SIZE>
+template <typename T, size_t MAX_SIZE>
 bool FixedRingBuf<T, MAX_SIZE>::empty() const
 {
     return m_used_num == 0;
 }
 
-template<typename T, size_t MAX_SIZE>
+template <typename T, size_t MAX_SIZE>
 bool FixedRingBuf<T, MAX_SIZE>::full() const
 {
     return m_used_num == MAX_SIZE;
 }
 
-template<typename T, size_t MAX_SIZE>
+template <typename T, size_t MAX_SIZE>
 size_t FixedRingBuf<T, MAX_SIZE>::size() const
 {
     return m_used_num;
 }
 
-template<typename T, size_t MAX_SIZE>
+template <typename T, size_t MAX_SIZE>
 size_t FixedRingBuf<T, MAX_SIZE>::capacity() const
 {
     return MAX_SIZE;
 }
 
-template<typename T, size_t MAX_SIZE>
-bool FixedRingBuf<T, MAX_SIZE>::push(const T & value_, bool over_write_)
+template <typename T, size_t MAX_SIZE>
+bool FixedRingBuf<T, MAX_SIZE>::push(const T &value_, bool over_write_)
 {
     if (over_write_)
     {
@@ -150,7 +149,7 @@ bool FixedRingBuf<T, MAX_SIZE>::push(const T & value_, bool over_write_)
     return true;
 }
 
-template<typename T, size_t MAX_SIZE>
+template <typename T, size_t MAX_SIZE>
 void FixedRingBuf<T, MAX_SIZE>::pop()
 {
     if (empty() == false)
@@ -160,29 +159,29 @@ void FixedRingBuf<T, MAX_SIZE>::pop()
     }
 }
 
-template<typename T, size_t MAX_SIZE>
-T & FixedRingBuf<T, MAX_SIZE>::front(size_t index_)
+template <typename T, size_t MAX_SIZE>
+T &FixedRingBuf<T, MAX_SIZE>::front(size_t index_)
 {
     assert(index_ < m_used_num);
     return m_buf[(m_start + index_) % MAX_SIZE];
 }
 
-template<typename T, size_t MAX_SIZE>
-const T & FixedRingBuf<T, MAX_SIZE>::front(size_t index_) const
+template <typename T, size_t MAX_SIZE>
+const T &FixedRingBuf<T, MAX_SIZE>::front(size_t index_) const
 {
     assert(index_ < m_used_num);
     return m_buf[(m_start + index_) % MAX_SIZE];
 }
 
-template<typename T, size_t MAX_SIZE>
-T & FixedRingBuf<T, MAX_SIZE>::back(size_t index_)
+template <typename T, size_t MAX_SIZE>
+T &FixedRingBuf<T, MAX_SIZE>::back(size_t index_)
 {
     assert(index_ < m_used_num);
     return m_buf[(m_end + MAX_SIZE - 1 - index_) % MAX_SIZE];
 }
 
-template<typename T, size_t MAX_SIZE>
-const T & FixedRingBuf<T, MAX_SIZE>::back(size_t index_) const
+template <typename T, size_t MAX_SIZE>
+const T &FixedRingBuf<T, MAX_SIZE>::back(size_t index_) const
 {
     assert(index_ < m_used_num);
     return m_buf[(m_end + MAX_SIZE - 1 - index_) % MAX_SIZE];
@@ -317,7 +316,7 @@ const T &FixedRingBuf<T, 0>::back(size_t index_) const
     assert(m_head->m_max_num > 0);
     return m_buf[(m_head->m_end + m_head->m_max_num - 1 - index_) % m_head->m_max_num];
 }
- 
-}
+
+}  // namespace Pepper
 
 #endif

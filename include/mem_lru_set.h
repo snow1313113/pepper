@@ -12,8 +12,7 @@
 
 namespace Pepper
 {
-
-template<typename T, size_t MAX_SIZE, typename HASH = std::hash<T>, typename IS_EQUAL = IsEqual<T> >
+template <typename T, size_t MAX_SIZE, typename HASH = std::hash<T>, typename IS_EQUAL = IsEqual<T> >
 class MemLRUSet : private BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>
 {
 public:
@@ -33,18 +32,18 @@ public:
     /// 列表最大容量
     size_t capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
-    std::pair<Iterator, bool> insert(const T & value_, bool force_ = false);
+    std::pair<Iterator, bool> insert(const T& value_, bool force_ = false);
     /// 找到节点的迭代器
-    const Iterator find(const T & value_) const;
-    Iterator find(const T & value_);
+    const Iterator find(const T& value_) const;
+    Iterator find(const T& value_);
     /// 是否存在，其实和find是类似的
-    bool exist(const T & value_) const;
+    bool exist(const T& value_) const;
     /// 删除一个，根据迭代器
-    void erase(const Iterator & it_);
+    void erase(const Iterator& it_);
     /// 删除一个，根据值
-    void erase(const T & value_);
+    void erase(const T& value_);
     /// 激活一下节点
-    Iterator active(const T & value_);
+    Iterator active(const T& value_);
     /// 淘汰掉几个
     size_t disuse(size_t num_);
 
@@ -55,108 +54,111 @@ public:
     Iterator end();
 };
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::clear()
 {
     BaseType::clear();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 bool MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::empty() const
 {
     return BaseType::empty();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 bool MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::full() const
 {
     return BaseType::full();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::size() const
 {
     return BaseType::size();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::capacity() const
 {
     return BaseType::capacity();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-std::pair<typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool> MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T & value_, bool force_)
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+std::pair<typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool>
+MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T& value_, bool force_)
 {
     return BaseType::insert(value_, force_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(const T & value_) const
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(
+    const T& value_) const
 {
     return BaseType::find(value_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(const T & value_)
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(const T& value_)
 {
     return BaseType::find(value_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-bool MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::exist(const T & value_) const
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+bool MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::exist(const T& value_) const
 {
     return BaseType::exist(value_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const Iterator & it_)
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const Iterator& it_)
 {
     BaseType::erase(it_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const T & value_)
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+void MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const T& value_)
 {
     BaseType::erase(value_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::active(const T & value_)
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::active(
+    const T& value_)
 {
     return BaseType::active(value_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::disuse(size_t num_)
 {
     return BaseType::disuse(num_);
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::begin() const
 {
     return BaseType::begin();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::begin()
 {
     return BaseType::begin();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 const typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::end() const
 {
     return BaseType::end();
 }
 
-template<typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::end()
 {
     return BaseType::end();
 }
 
-}
+}  // namespace Pepper
 
 #endif

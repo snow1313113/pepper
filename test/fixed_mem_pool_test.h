@@ -8,14 +8,14 @@
 #ifndef _FIXED_MEM_POOL_TEST_H_
 #define _FIXED_MEM_POOL_TEST_H_
 
+#include <algorithm>
+#include <cstdlib>
+#include <iostream>
 #include <map>
 #include <set>
-#include <cstdlib>
-#include <algorithm>
-#include <iostream>
+#include "base_test_struct.h"
 #include "fixed_mem_pool.h"
 #include "gtest/gtest.h"
-#include "base_test_struct.h"
 
 using namespace Pepper;
 using std::map;
@@ -110,7 +110,7 @@ TEST(FixedMemPoolTest, know_node_size)
     EXPECT_EQ(mem_pool.size(), a_set.size());
 
     count = 0;
-    for (auto & node : mem_pool)
+    for (auto& node : mem_pool)
     {
         EXPECT_EQ(node.a + node.b, node.c);
         EXPECT_EQ(node.d, 0);
@@ -205,7 +205,7 @@ TEST(FixedMemPoolTest, unknow_node_size)
     size_t count = 0;
     for (auto beg = mem_pool.begin(), end = mem_pool.end(); beg != end; ++beg)
     {
-        const TestNode * p = static_cast<const TestNode*>(&(*beg));
+        const TestNode* p = static_cast<const TestNode*>(&(*beg));
         EXPECT_EQ(p->a + p->b, p->c);
         EXPECT_EQ(p->d, 0);
         auto ret_pair = a_set.insert(p->a);
@@ -230,7 +230,7 @@ TEST(FixedMemPoolTest, unknow_node_size)
     // 删除部分元素后再测试
     for (auto it : del_set)
     {
-        const TestNode * p = static_cast<const TestNode*>(it);
+        const TestNode* p = static_cast<const TestNode*>(it);
         a_set.erase(p->a);
         ASSERT_TRUE(mem_pool.free(it));
     }
@@ -243,7 +243,7 @@ TEST(FixedMemPoolTest, unknow_node_size)
     count = 0;
     for (auto beg = mem_pool.begin(), end = mem_pool.end(); beg != end; ++beg)
     {
-        const TestNode * p = static_cast<const TestNode*>(&(*beg));
+        const TestNode* p = static_cast<const TestNode*>(&(*beg));
         EXPECT_EQ(p->a + p->b, p->c);
         EXPECT_EQ(p->d, 0);
         EXPECT_NE(a_set.find(p->a), a_set.end());
@@ -265,7 +265,7 @@ TEST(FixedMemPoolTest, unknow_node_size)
     count = 0;
     for (auto beg = mem_pool.begin(), end = mem_pool.end(); beg != end; ++beg)
     {
-        const TestNode * p = static_cast<const TestNode*>(&(*beg));
+        const TestNode* p = static_cast<const TestNode*>(&(*beg));
         EXPECT_EQ(p->a + p->b, p->c);
         EXPECT_EQ(p->d, 0);
         EXPECT_NE(a_set.find(p->a), a_set.end());

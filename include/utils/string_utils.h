@@ -10,8 +10,7 @@ using std::string;
 
 namespace Pepper
 {
+extern string trim_str(const string& original_str_, const string& trim_str_, bool is_left_ = true);
+extern string string_to_token(const string& str_, const string& delimiter_, string& rest_);
 
-extern string trim_str(const string & original_str_, const string & trim_str_, bool is_left_ = true);
-extern string string_to_token(const string & str_, const string & delimiter_, string & rest_);
-
-}
+}  // namespace Pepper

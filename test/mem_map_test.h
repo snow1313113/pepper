@@ -8,14 +8,14 @@
 #ifndef _MEM_MAP_TEST_H_
 #define _MEM_MAP_TEST_H_
 
+#include <algorithm>
+#include <cstdlib>
+#include <iostream>
 #include <map>
 #include <set>
-#include <cstdlib>
-#include <algorithm>
-#include <iostream>
-#include "mem_map.h"
-#include "gtest/gtest.h"
 #include "base_test_struct.h"
+#include "gtest/gtest.h"
+#include "mem_map.h"
 
 using namespace Pepper;
 using std::map;
@@ -78,7 +78,7 @@ TEST(MemMapTest, mem_map_test_normal)
     // 记录下每个node的key，后面测试是否node都没错
     set<uint32_t> key_set;
     size_t count = 0;
-    for (auto & it : mem_map)
+    for (auto& it : mem_map)
     {
         EXPECT_EQ(it.first, it.second.a);
         EXPECT_EQ(it.second.a + it.second.b, it.second.c);
@@ -184,7 +184,7 @@ TEST(MemMapTest, mem_map_test_min_size)
     // 记录下每个node的key，后面测试是否node都没错
     set<uint32_t> key_set;
     size_t count = 0;
-    for (auto & it : mem_map)
+    for (auto& it : mem_map)
     {
         EXPECT_EQ(it.first, it.second.a);
         EXPECT_EQ(it.second.a + it.second.b, it.second.c);

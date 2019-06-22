@@ -8,12 +8,11 @@
 #ifndef TRAITS_UTILS_H
 #define TRAITS_UTILS_H
 
-#include "../inner/head.h"
 #include <type_traits>
+#include "../inner/head.h"
 
 namespace Pepper
 {
-
 template <size_t>
 struct SizeTraits
 {
@@ -53,7 +52,9 @@ struct SizeTraits<4>
 //////////////////////////////////////////////////////////////////////////////////////
 
 template <size_t VALUE>
-struct SizeIdentity {};
+struct SizeIdentity
+{
+};
 
 template <typename T>
 struct Identity
@@ -81,7 +82,7 @@ struct CalcBit<Size, true>
 template <size_t Power, size_t N>
 struct PowerOfN
 {
-    static const size_t RESULT = PowerOfN<Power, N-1>::RESULT * Power;
+    static const size_t RESULT = PowerOfN<Power, N - 1>::RESULT * Power;
 };
 
 template <size_t Power>
@@ -94,13 +95,13 @@ struct PowerOfN<Power, 0>
 template <size_t Size>
 struct FixIntType
 {
-    typedef typename SizeTraits< (CalcBit<Size, (Size == 0)>::BIT_NUM + 7) / 8 >::IntType IntType;
+    typedef typename SizeTraits<(CalcBit<Size, (Size == 0)>::BIT_NUM + 7) / 8>::IntType IntType;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
 
 // 类成员偏移，只针对trivial的类有效
-template<typename MEMBER_T, typename CLASS_T>
+template <typename MEMBER_T, typename CLASS_T>
 size_t offset_of(MEMBER_T CLASS_T::*member)
 {
     static CLASS_T object;
@@ -108,21 +109,24 @@ size_t offset_of(MEMBER_T CLASS_T::*member)
 }
 
 // 根据成员指针，返回类实例地址，只针对trivial的类有效
-template<typename MEMBER_T, typename CLASS_T>
-inline CLASS_T * contaner_of(const MEMBER_T * ptr, MEMBER_T CLASS_T::*member)
+template <typename MEMBER_T, typename CLASS_T>
+inline CLASS_T *contaner_of(const MEMBER_T *ptr, MEMBER_T CLASS_T::*member)
 {
     return reinterpret_cast<CLASS_T *>(reinterpret_cast<size_t>(ptr) - offset_of(member));
 }
 
 //////////////////////////////////////////////////////////////////////////////
-template<size_t VALUE>
+template <size_t VALUE>
 struct Value2Type
 {
-    enum { RESULT = VALUE};
+    enum
+    {
+        RESULT = VALUE
+    };
 };
 
 //////////////////////////////////////////////////////////////////////////////
-template<size_t X, size_t G = X / 2 + 1>
+template <size_t X, size_t G = X / 2 + 1>
 struct IntSqrt
 {
     typedef IntSqrt<X, (G * G + X) / (G * 2)> InnerSqrt;
@@ -131,79 +135,99 @@ struct IntSqrt
 };
 
 //////////////////////////////////////////////////////////////////////////////
-template<size_t NUM, size_t MOD, bool IS_PRIME>
+template <size_t NUM, size_t MOD, bool IS_PRIME>
 struct RealIsPrime;
 
 // todo 可以引入6素数算法，就是只是判断是否是 6x+1 和 6x+5的倍数
-template<size_t NUM, size_t MOD>
+template <size_t NUM, size_t MOD>
 struct RealIsPrime<NUM, MOD, true>
 {
-    enum {RESULT = RealIsPrime<NUM, MOD - 1, (NUM % MOD != 0)>::RESULT};
+    enum
+    {
+        RESULT = RealIsPrime<NUM, MOD - 1, (NUM % MOD != 0)>::RESULT
+    };
 };
 
-template<size_t NUM, size_t MOD>
+template <size_t NUM, size_t MOD>
 struct RealIsPrime<NUM, MOD, false>
 {
-    enum {RESULT = false};
+    enum
+    {
+        RESULT = false
+    };
 };
 
-template<size_t NUM>
+template <size_t NUM>
 struct RealIsPrime<NUM, 1, true>
 {
-    enum {RESULT = true};
+    enum
+    {
+        RESULT = true
+    };
 };
 
-template<size_t NUM>
+template <size_t NUM>
 struct IsPrime
 {
-    enum {RESULT = RealIsPrime<NUM, IntSqrt<NUM>::RESULT, (NUM % 2 != 0) && (NUM % 3 != 0)>::RESULT};
+    enum
+    {
+        RESULT = RealIsPrime < NUM,
+        IntSqrt<NUM>::RESULT,
+        (NUM % 2 != 0) && (NUM % 3 != 0) > ::RESULT
+    };
 };
 
-template<>
+template <>
 struct IsPrime<2>
 {
-    enum {RESULT = true};
+    enum
+    {
+        RESULT = true
+    };
 };
 
-template<>
+template <>
 struct IsPrime<3>
 {
-    enum {RESULT = true};
+    enum
+    {
+        RESULT = true
+    };
 };
 
 //////////////////////////////////////////////////////////////////////////////
-template<size_t NUM, bool IS_PRIME>
+template <size_t NUM, bool IS_PRIME>
 struct NearByPrimeImpl;
 
-template<size_t NUM>
+template <size_t NUM>
 struct NearByPrimeImpl<NUM, true>
 {
     static const size_t RESULT = NUM;
 };
 
-template<size_t NUM>
+template <size_t NUM>
 struct NearByPrimeImpl<NUM, false>
 {
     static const size_t RESULT = NearByPrimeImpl<NUM - 1, IsPrime<NUM - 1>::RESULT>::RESULT;
 };
 
-template<size_t NUM, bool IS_BIG_NUM = (NUM > 800001)>
+template <size_t NUM, bool IS_BIG_NUM = (NUM > 800001)>
 struct NearByPrime;
 
-template<size_t NUM>
+template <size_t NUM>
 struct NearByPrime<NUM, true>
 {
     // 新的标准编译器只能做1024次递归，所以对于太大的数就直接返回
     static const size_t PRIME = NUM;
 };
 
-template<size_t NUM>
+template <size_t NUM>
 struct NearByPrime<NUM, false>
 {
     static const size_t PRIME = NearByPrimeImpl<NUM, IsPrime<NUM>::RESULT>::RESULT;
 };
 
-template<>
+template <>
 struct NearByPrime<1, false>
 {
     static const size_t PRIME = 1;
@@ -215,10 +239,7 @@ template <typename T>
 struct IsEqual
 {
     typedef T KeyType;
-    bool operator()(const T & x, const T & y) const
-    {
-        return x == y;
-    }
+    bool operator()(const T &x, const T &y) const { return x == y; }
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -228,12 +249,9 @@ template <typename T>
 struct ExtractKey
 {
     typedef T KeyType;
-    const KeyType & operator()(const T & x) const
-    {
-        return x;
-    }
+    const KeyType &operator()(const T &x) const { return x; }
 };
 
-}
+}  // namespace Pepper
 
 #endif

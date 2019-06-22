@@ -8,19 +8,19 @@
 #ifndef _MEM_LRU_MAP_TEST_H_
 #define _MEM_LRU_MAP_TEST_H_
 
-#include <map>
-#include <list>
-#include <set>
-#include <cstdlib>
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
-#include "mem_lru_map.h"
-#include "gtest/gtest.h"
+#include <list>
+#include <map>
+#include <set>
 #include "base_test_struct.h"
+#include "gtest/gtest.h"
+#include "mem_lru_map.h"
 
 using namespace Pepper;
-using std::map;
 using std::list;
+using std::map;
 using std::set;
 
 TEST(MemLRUMapTest, mem_lru_map_test_normal)
@@ -80,7 +80,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_normal)
     // 记录下每个node的key，后面测试是否node都没错
     set<uint32_t> key_set;
     size_t count = 0;
-    for (auto & it : lru_map)
+    for (auto& it : lru_map)
     {
         EXPECT_EQ(it.first, it.second.a);
         EXPECT_EQ(it.second.a + it.second.b, it.second.c);
@@ -305,7 +305,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_min_size)
     // 记录下每个node的key，后面测试是否node都没错
     set<uint32_t> key_set;
     size_t count = 0;
-    for (auto & it : lru_map)
+    for (auto& it : lru_map)
     {
         EXPECT_EQ(it.first, it.second.a);
         EXPECT_EQ(it.second.a + it.second.b, it.second.c);
@@ -472,6 +472,5 @@ TEST(MemLRUMapTest, mem_lru_map_test_min_size_active)
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
 }
-
 
 #endif

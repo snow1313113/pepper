@@ -12,32 +12,23 @@
 #include "../utils/traits_utils.h"
 namespace std
 {
-
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 struct hash<std::pair<T1, T2>>
 {
-    size_t operator()(const std::pair<T1, T2> & t_) const
-    {
-        return hash<T1>{}(t_.first);
-    }
+    size_t operator()(const std::pair<T1, T2>& t_) const { return hash<T1>{}(t_.first); }
 };
 
-}
+}  // namespace std
 
 namespace Pepper
 {
-
 template <typename T1, typename T2>
-struct IsEqual<std::pair<T1, T2> >
+struct IsEqual<std::pair<T1, T2>>
 {
     typedef std::pair<T1, T2> T;
-    bool operator()(const T & x_, const T & y_) const
-    {
-        return IsEqual<T1>()(x_.first, y_.first);
-    }
+    bool operator()(const T& x_, const T& y_) const { return IsEqual<T1>()(x_.first, y_.first); }
 };
 
-}
-
+}  // namespace Pepper
 
 #endif

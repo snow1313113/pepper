@@ -15,8 +15,7 @@
 
 namespace Pepper
 {
-
-template<size_t MAX_SIZE = 0>
+template <size_t MAX_SIZE = 0>
 class UnfixedRingBuf
 {
 public:
@@ -33,13 +32,13 @@ public:
     /// 获取插入了多少数据包
     size_t get_num() const;
     /// 队尾入队
-    bool push(const uint8_t * data_, size_t len_, bool over_write_ = false);
+    bool push(const uint8_t *data_, size_t len_, bool over_write_ = false);
     bool push(const struct iovec *iov_, size_t iov_cnt_, bool over_write_ = false);
     /// 队头弹出一个
     void pop();
     /// 获取队头往后数第index_个元素(从0开始计数)，返回该元素的指针，len_表示数据长度
-    const uint8_t * front(size_t & len_, size_t index_ = 0) const;
-    uint8_t * front(size_t & len_, size_t index_ = 0);
+    const uint8_t *front(size_t &len_, size_t index_ = 0) const;
+    uint8_t *front(size_t &len_, size_t index_ = 0);
 
 private:
     typedef typename FixIntType<MAX_SIZE>::IntType IntType;
@@ -132,7 +131,7 @@ private:
 };
 
 ////////////////////////////////////////////////////
-template<size_t MAX_SIZE>
+template <size_t MAX_SIZE>
 void UnfixedRingBuf<MAX_SIZE>::clear()
 {
     m_start = 0;
@@ -141,38 +140,38 @@ void UnfixedRingBuf<MAX_SIZE>::clear()
     m_item_num = 0;
 }
 
-template<size_t MAX_SIZE>
+template <size_t MAX_SIZE>
 bool UnfixedRingBuf<MAX_SIZE>::empty() const
 {
     return m_used_size == 0;
 }
 
-template<size_t MAX_SIZE>
+template <size_t MAX_SIZE>
 bool UnfixedRingBuf<MAX_SIZE>::full() const
 {
     return m_used_size >= MAX_SIZE;
 }
 
-template<size_t MAX_SIZE>
+template <size_t MAX_SIZE>
 size_t UnfixedRingBuf<MAX_SIZE>::size() const
 {
     return m_used_size;
 }
 
-template<size_t MAX_SIZE>
+template <size_t MAX_SIZE>
 size_t UnfixedRingBuf<MAX_SIZE>::capacity() const
 {
     return MAX_SIZE;
 }
 
-template<size_t MAX_SIZE>
+template <size_t MAX_SIZE>
 size_t UnfixedRingBuf<MAX_SIZE>::get_num() const
 {
     return m_item_num;
 }
 
-template<size_t MAX_SIZE>
-bool UnfixedRingBuf<MAX_SIZE>::push(const uint8_t * data_, size_t len_, bool over_write_)
+template <size_t MAX_SIZE>
+bool UnfixedRingBuf<MAX_SIZE>::push(const uint8_t *data_, size_t len_, bool over_write_)
 {
     struct iovec iov[1];
     iov[0].iov_base = const_cast<void *>(reinterpret_cast<const void *>(data_));
@@ -193,7 +192,7 @@ bool UnfixedRingBuf<MAX_SIZE>::push(const struct iovec *iov_, size_t iov_cnt_, b
     return push_impl(iov_, iov_cnt_, total_len, need_len, over_write_);
 }
 
-template<size_t MAX_SIZE>
+template <size_t MAX_SIZE>
 void UnfixedRingBuf<MAX_SIZE>::pop()
 {
     if (empty())
@@ -202,7 +201,7 @@ void UnfixedRingBuf<MAX_SIZE>::pop()
     // 每次pop的时候都会把后面的padding Item或者小空隙pop完
     // 所以每次到这里的时候一定不可能没有一个完整的Item
     assert(m_used_size >= sizeof(ItemHeader));
-    ItemHeader * item_header = reinterpret_cast<ItemHeader *>(m_buf + m_start);
+    ItemHeader *item_header = reinterpret_cast<ItemHeader *>(m_buf + m_start);
 
     assert(item_header->m_flag == 0);
     m_start = (m_start + sizeof(ItemHeader) + item_header->m_len) % MAX_SIZE;
@@ -237,8 +236,8 @@ void UnfixedRingBuf<MAX_SIZE>::pop()
     }
 }
 
-template<size_t MAX_SIZE>
-const uint8_t * UnfixedRingBuf<MAX_SIZE>::front(size_t & len_, size_t index_) const
+template <size_t MAX_SIZE>
+const uint8_t *UnfixedRingBuf<MAX_SIZE>::front(size_t &len_, size_t index_) const
 {
     if (empty())
         return NULL;
@@ -246,14 +245,14 @@ const uint8_t * UnfixedRingBuf<MAX_SIZE>::front(size_t & len_, size_t index_) co
     IntType item_start = find_start(index_);
     if (item_start == m_end)
         return NULL;
- 
-    const ItemHeader * item_header = reinterpret_cast<const ItemHeader *>(m_buf + item_start);
+
+    const ItemHeader *item_header = reinterpret_cast<const ItemHeader *>(m_buf + item_start);
     len_ = item_header->m_len;
-    return reinterpret_cast<const uint8_t*>(item_header + 1);
+    return reinterpret_cast<const uint8_t *>(item_header + 1);
 }
 
-template<size_t MAX_SIZE>
-uint8_t * UnfixedRingBuf<MAX_SIZE>::front(size_t & len_, size_t index_)
+template <size_t MAX_SIZE>
+uint8_t *UnfixedRingBuf<MAX_SIZE>::front(size_t &len_, size_t index_)
 {
     if (empty())
         return NULL;
@@ -261,19 +260,19 @@ uint8_t * UnfixedRingBuf<MAX_SIZE>::front(size_t & len_, size_t index_)
     IntType item_start = find_start(index_);
     if (item_start == m_end)
         return NULL;
- 
-    ItemHeader * item_header = reinterpret_cast<ItemHeader *>(m_buf + item_start);
+
+    ItemHeader *item_header = reinterpret_cast<ItemHeader *>(m_buf + item_start);
     len_ = item_header->m_len;
-    return reinterpret_cast<uint8_t*>(item_header + 1);
+    return reinterpret_cast<uint8_t *>(item_header + 1);
 }
 
-template<size_t MAX_SIZE>
+template <size_t MAX_SIZE>
 typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::find_start(size_t index_) const
 {
     IntType item_start = m_start;
     for (size_t i = 0; i < index_; ++i)
     {
-        const ItemHeader * header = reinterpret_cast<const ItemHeader *>(m_buf + item_start);
+        const ItemHeader *header = reinterpret_cast<const ItemHeader *>(m_buf + item_start);
         item_start = (item_start + sizeof(ItemHeader) + header->m_len) % MAX_SIZE;
 
         IntType skip_bytes = need_skip_bytes(item_start);
@@ -285,7 +284,7 @@ typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::find_start(
         {
             if (item_start != m_end)
             {
-                const ItemHeader * padding_header = reinterpret_cast<const ItemHeader *>(m_buf + item_start);
+                const ItemHeader *padding_header = reinterpret_cast<const ItemHeader *>(m_buf + item_start);
                 if (padding_header->m_flag == 1)
                     item_start = (item_start + sizeof(ItemHeader) + padding_header->m_len) % MAX_SIZE;
             }
@@ -297,9 +296,9 @@ typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::find_start(
     return item_start;
 }
 
-
-template<size_t MAX_SIZE>
-bool UnfixedRingBuf<MAX_SIZE>::push_impl(const struct iovec *iov_, size_t iov_cnt_, size_t total_len_, size_t need_len_, bool over_write_)
+template <size_t MAX_SIZE>
+bool UnfixedRingBuf<MAX_SIZE>::push_impl(const struct iovec *iov_, size_t iov_cnt_, size_t total_len_, size_t need_len_,
+                                         bool over_write_)
 {
     if (full())
     {
@@ -399,26 +398,26 @@ bool UnfixedRingBuf<MAX_SIZE>::push_impl(const struct iovec *iov_, size_t iov_cn
     return false;
 }
 
-template<size_t MAX_SIZE>
+template <size_t MAX_SIZE>
 void UnfixedRingBuf<MAX_SIZE>::push_padding()
 {
     // 如果，一个ItemHeader都放不下呢，在push和pop的时候
     // 都会跳过尾部不足一个ItemHeader大小的字节
     assert(m_start <= m_end);
-    ItemHeader * item_header = reinterpret_cast<ItemHeader *>(m_buf + m_end);
+    ItemHeader *item_header = reinterpret_cast<ItemHeader *>(m_buf + m_end);
     item_header->m_len = (MAX_SIZE - m_end - sizeof(ItemHeader));
     item_header->m_flag = 1;
     m_used_size += (MAX_SIZE - m_end);
     m_end = 0;
 }
 
-template<size_t MAX_SIZE>
+template <size_t MAX_SIZE>
 void UnfixedRingBuf<MAX_SIZE>::pop_padding()
 {
     // 如果，一个ItemHeader都放不下呢，在push和pop的时候
     // 都会跳过尾部不足一个ItemHeader大小的字节
     assert(m_used_size >= sizeof(ItemHeader));
-    ItemHeader * item_header = reinterpret_cast<ItemHeader *>(m_buf + m_start);
+    ItemHeader *item_header = reinterpret_cast<ItemHeader *>(m_buf + m_start);
     if (item_header->m_flag == 1)
     {
         m_start = (m_start + sizeof(ItemHeader) + item_header->m_len) % MAX_SIZE;
@@ -427,8 +426,9 @@ void UnfixedRingBuf<MAX_SIZE>::pop_padding()
     }
 }
 
-template<size_t MAX_SIZE>
-typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::need_skip_bytes(UnfixedRingBuf<MAX_SIZE>::IntType cur_pos_) const
+template <size_t MAX_SIZE>
+typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::need_skip_bytes(
+    UnfixedRingBuf<MAX_SIZE>::IntType cur_pos_) const
 {
     assert(cur_pos_ <= MAX_SIZE);
     if (cur_pos_ + sizeof(ItemHeader) > MAX_SIZE)
@@ -437,6 +437,6 @@ typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::need_skip_b
         return 0;
 }
 
-}
+}  // namespace Pepper
 
 #endif

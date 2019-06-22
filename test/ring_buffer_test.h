@@ -8,16 +8,16 @@
 #ifndef _RING_BUFFER_TEST_H_
 #define _RING_BUFFER_TEST_H_
 
-#include <cstdlib>
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <set>
 #include <vector>
 #include "base_test_struct.h"
 #include "fixed_ring_buf.h"
-#include "unfixed_ring_buf.h"
 #include "gtest/gtest.h"
+#include "unfixed_ring_buf.h"
 
 using namespace Pepper;
 using std::map;

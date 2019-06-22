@@ -8,14 +8,14 @@
 #ifndef _HASH_MEM_POOL_TEST_H_
 #define _HASH_MEM_POOL_TEST_H_
 
-#include <cstdlib>
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <set>
 #include "base_test_struct.h"
-#include "hash_mem_pool.h"
 #include "gtest/gtest.h"
+#include "hash_mem_pool.h"
 
 using namespace Pepper;
 using std::map;

@@ -8,5 +8,4 @@
 #ifndef COMM_MACRO_H
 #define COMM_MACRO_H
 
-
 #endif

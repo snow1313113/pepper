@@ -9,7 +9,6 @@
 
 namespace Pepper
 {
-
 bool UnfixedRingBuf<0>::init(void *mem_, size_t mem_size_, bool check_)
 {
     if (!mem_ || mem_size_ < sizeof(BuffHead))
@@ -199,7 +198,7 @@ uint8_t *UnfixedRingBuf<0>::front(size_t &len_, size_t index_)
 }
 
 bool UnfixedRingBuf<0>::push_impl(const struct iovec *iov_, size_t iov_cnt_, size_t total_len_, size_t need_len_,
-                                    bool over_write_)
+                                  bool over_write_)
 {
     if (full())
     {
@@ -334,4 +333,4 @@ typename UnfixedRingBuf<0>::IntType UnfixedRingBuf<0>::need_skip_bytes(UnfixedRi
         return 0;
 }
 
-}
+}  // namespace Pepper
