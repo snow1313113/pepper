@@ -1,7 +1,7 @@
 /*
  * * file name: base_struct.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018  1 12
  * */
 #ifndef _BASE_STRUCT_H_

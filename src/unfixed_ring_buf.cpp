@@ -162,7 +162,7 @@ typename UnfixedRingBuf<0>::IntType UnfixedRingBuf<0>::find_start(size_t index_)
 const uint8_t *UnfixedRingBuf<0>::front(size_t &len_, size_t index_) const
 {
     if (empty())
-        return NULL;
+        return nullptr;
 
     IntType item_start = m_head->m_start;
     if (index_ > 0)
@@ -170,7 +170,7 @@ const uint8_t *UnfixedRingBuf<0>::front(size_t &len_, size_t index_) const
         // 如果不是第一个节点，则找开始的偏移，找到尾部为止
         item_start = find_start(index_);
         if (item_start == m_head->m_end)
-            return NULL;
+            return nullptr;
     }
 
     const ItemHeader *item_header = reinterpret_cast<const ItemHeader *>(m_buf + item_start);
@@ -181,7 +181,7 @@ const uint8_t *UnfixedRingBuf<0>::front(size_t &len_, size_t index_) const
 uint8_t *UnfixedRingBuf<0>::front(size_t &len_, size_t index_)
 {
     if (empty())
-        return NULL;
+        return nullptr;
 
     IntType item_start = m_head->m_start;
     if (index_ > 0)
@@ -189,7 +189,7 @@ uint8_t *UnfixedRingBuf<0>::front(size_t &len_, size_t index_)
         // 如果不是第一个节点，则找开始的偏移，找到尾部为止
         item_start = find_start(index_);
         if (item_start == m_head->m_end)
-            return NULL;
+            return nullptr;
     }
 
     ItemHeader *item_header = reinterpret_cast<ItemHeader *>(m_buf + item_start);

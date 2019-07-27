@@ -2,7 +2,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 project(pepper_sample)
 
-add_subdirectory(fixed_mem_pool)
 add_subdirectory(is_prime)
 add_subdirectory(mem_list)
 add_subdirectory(mem_lru_set)

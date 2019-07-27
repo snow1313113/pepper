@@ -1,12 +1,12 @@
 /*
  * * file name: traits_utils.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018  1 15
  * */
 
-#ifndef TRAITS_UTILS_H
-#define TRAITS_UTILS_H
+#ifndef _TRAITS_UTILS_H_
+#define _TRAITS_UTILS_H_
 
 #include <type_traits>
 #include "../inner/head.h"
@@ -90,6 +90,9 @@ struct PowerOfN<Power, 0>
 {
     static const size_t RESULT = 1;
 };
+
+template <size_t Num>
+using IsPowOfTwo = std::integral_constant<bool, Num && ((Num & (Num - 1)) == 0)>;
 
 // 根据要表示的数量选择一个合适字节的INT类型
 template <size_t Size>

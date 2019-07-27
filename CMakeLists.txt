@@ -1,5 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+project(pepper_root)
+
 # color
 if(NOT WIN32)
   string(ASCII 27 Esc)

@@ -29,7 +29,7 @@ TEST(FixedMemPoolTest, know_node_size)
     uint8_t* mem = new uint8_t[mem_size];
     FixedMemPool<TestNode> mem_pool;
 
-    bool result = mem_pool.init(mem, mem_size);
+    bool result = mem_pool.init(mem, mem_size, max_num);
     ASSERT_TRUE(result);
     ASSERT_TRUE(mem_pool.empty());
     ASSERT_FALSE(mem_pool.full());
@@ -120,7 +120,7 @@ TEST(FixedMemPoolTest, know_node_size)
     EXPECT_EQ(mem_pool.size(), count);
 
     // 测试init的check_参数
-    result = mem_pool.init(mem, mem_size, true);
+    result = mem_pool.init(mem, mem_size, max_num, true);
     ASSERT_TRUE(result);
 
     ASSERT_FALSE(mem_pool.full());
@@ -158,7 +158,7 @@ TEST(FixedMemPoolTest, unknow_node_size)
     uint8_t* mem = new uint8_t[mem_size];
     FixedMemPool<BaseNode> mem_pool;
 
-    bool result = mem_pool.init(mem, mem_size, sizeof(TestNode));
+    bool result = mem_pool.init(mem, mem_size, max_num, sizeof(TestNode));
     ASSERT_TRUE(result);
     ASSERT_TRUE(mem_pool.empty());
     ASSERT_FALSE(mem_pool.full());
@@ -252,7 +252,7 @@ TEST(FixedMemPoolTest, unknow_node_size)
     EXPECT_EQ(mem_pool.size(), count);
 
     // 测试init的check_参数
-    result = mem_pool.init(mem, mem_size, sizeof(TestNode), true);
+    result = mem_pool.init(mem, mem_size, max_num, sizeof(TestNode), true);
     ASSERT_TRUE(result);
 
     ASSERT_FALSE(mem_pool.full());

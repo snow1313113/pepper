@@ -41,7 +41,7 @@ public:
     uint8_t *front(size_t &len_, size_t index_ = 0);
 
 private:
-    typedef typename FixIntType<MAX_SIZE>::IntType IntType;
+    using IntType = typename FixIntType<MAX_SIZE>::IntType;
 
     IntType find_start(size_t index_) const;
     bool push_impl(const struct iovec *iov_, size_t iov_cnt_, size_t total_len_, size_t need_len_, bool over_write_);
@@ -98,7 +98,7 @@ public:
     uint8_t *front(size_t &len_, size_t index_ = 0);
 
 private:
-    typedef size_t IntType;
+    using IntType = size_t;
 
     IntType find_start(size_t index_) const;
     bool push_impl(const struct iovec *iov_, size_t iov_cnt_, size_t total_len_, size_t need_len_, bool over_write_);
@@ -240,11 +240,11 @@ template <size_t MAX_SIZE>
 const uint8_t *UnfixedRingBuf<MAX_SIZE>::front(size_t &len_, size_t index_) const
 {
     if (empty())
-        return NULL;
+        return nullptr;
 
     IntType item_start = find_start(index_);
     if (item_start == m_end)
-        return NULL;
+        return nullptr;
 
     const ItemHeader *item_header = reinterpret_cast<const ItemHeader *>(m_buf + item_start);
     len_ = item_header->m_len;
@@ -255,11 +255,11 @@ template <size_t MAX_SIZE>
 uint8_t *UnfixedRingBuf<MAX_SIZE>::front(size_t &len_, size_t index_)
 {
     if (empty())
-        return NULL;
+        return nullptr;
 
     IntType item_start = find_start(index_);
     if (item_start == m_end)
-        return NULL;
+        return nullptr;
 
     ItemHeader *item_header = reinterpret_cast<ItemHeader *>(m_buf + item_start);
     len_ = item_header->m_len;

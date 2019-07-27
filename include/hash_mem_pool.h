@@ -19,7 +19,7 @@ template <typename KEY, typename VALUE, typename HASH = std::hash<KEY> >
 class HashMemPool
 {
 public:
-    typedef std::pair<KEY, VALUE> Node;
+    using Node = std::pair<KEY, VALUE>;
 
     struct Iterator
     {
@@ -169,13 +169,13 @@ bool HashMemPool<KEY, VALUE, HASH>::init(void* mem_, uint32_t max_node_, uint32_
             return false;
 
         size_t mem_pool_size = FixedMemPool<HashNode>::calc_need_size(max_node_, sizeof(HashNode));
-        if (!m_pool.init(p, mem_pool_size, sizeof(HashNode), check_))
+        if (!m_pool.init(p, mem_pool_size, max_node_, sizeof(HashNode), check_))
             return false;
     }
     else
     {
         size_t mem_pool_size = FixedMemPool<HashNode>::calc_need_size(max_node_, sizeof(HashNode));
-        if (!m_pool.init(p, mem_pool_size, sizeof(HashNode), check_))
+        if (!m_pool.init(p, mem_pool_size, max_node_, sizeof(HashNode), check_))
             return false;
 
         m_header->bucket_num = bucket_num_;
