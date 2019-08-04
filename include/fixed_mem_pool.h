@@ -18,6 +18,7 @@ namespace Pepper
 template <typename T, size_t ALIGN = alignof(size_t)>
 class FixedMemPool
 {
+    static_assert(IsPowOfTwo<ALIGN>::value, "ALIGN must be pow of 2");
 public:
     struct Iterator
     {
@@ -52,7 +53,6 @@ public:
     static size_t calc_need_size(size_t max_node_num_) { return calc_need_size(max_node_num_, sizeof(T)); }
 
     FixedMemPool() = default;
-    ~FixedMemPool();
 
     /// 初始化内存池，内存由调用者提供，check_ == true表示mem_指向的内存已经初始化过的，校验一下
     bool init(void *mem_, size_t size_, size_t max_node_num_, bool check_ = false);
@@ -138,12 +138,6 @@ private:
 private:
     MemHeader *m_header = nullptr;
 };
-
-template <typename T, size_t ALIGN>
-FixedMemPool<T, ALIGN>::~FixedMemPool()
-{
-    static_assert(IsPowOfTwo<ALIGN>::value, "ALIGN must be pow of 2");
-}
 
 template <typename T, size_t ALIGN>
 bool FixedMemPool<T, ALIGN>::init(void *mem_, size_t size_, size_t max_node_num_, bool check_)

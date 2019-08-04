@@ -1,7 +1,7 @@
 /*
  * * file name: mem_lru_map.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018  8 17
  * */
 
@@ -18,11 +18,11 @@ class MemLRUMap : private BaseMemLRUSet<std::pair<KEY, VALUE>, MAX_SIZE, std::ha
                                         IsEqual<std::pair<KEY, VALUE>>>
 {
 public:
-    typedef std::pair<KEY, VALUE> SET_VALUE;
-    typedef BaseMemLRUSet<SET_VALUE, MAX_SIZE, std::hash<SET_VALUE>, IsEqual<SET_VALUE>> BaseType;
-    typedef typename BaseType::IntType IntType;
-    typedef typename BaseType::ValueType SetValue;
-    typedef typename BaseType::Iterator Iterator;
+    using NodeType = std::pair<KEY, VALUE>;
+    using BaseType = BaseMemLRUSet<NodeType, MAX_SIZE, std::hash<NodeType>, IsEqual<NodeType>>;
+    using IntType = typename BaseType::IntType;
+    using SetValue = typename BaseType::ValueType;
+    using Iterator = typename BaseType::Iterator;
 
     /// 清空列表
     void clear();
@@ -91,31 +91,31 @@ template <typename KEY, typename VALUE, size_t MAX_SIZE>
 std::pair<typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator, bool> MemLRUMap<KEY, VALUE, MAX_SIZE>::insert(
     const KEY& key_, const VALUE& value_, bool force_)
 {
-    return BaseType::insert(SET_VALUE(key_, value_), force_);
+    return BaseType::insert(NodeType(key_, value_), force_);
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
 const typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::find(const KEY& key_) const
 {
-    SET_VALUE set_value;
-    set_value.first = key_;
-    return BaseType::find(set_value);
+    NodeType node;
+    node.first = key_;
+    return BaseType::find(node);
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
 typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::find(const KEY& key_)
 {
-    SET_VALUE set_value;
-    set_value.first = key_;
-    return BaseType::find(set_value);
+    NodeType node;
+    node.first = key_;
+    return BaseType::find(node);
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
 bool MemLRUMap<KEY, VALUE, MAX_SIZE>::exist(const KEY& key_) const
 {
-    SET_VALUE set_value;
-    set_value.first = key_;
-    return BaseType::exist(set_value);
+    NodeType node;
+    node.first = key_;
+    return BaseType::exist(node);
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
@@ -127,17 +127,17 @@ void MemLRUMap<KEY, VALUE, MAX_SIZE>::erase(const Iterator& it_)
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
 void MemLRUMap<KEY, VALUE, MAX_SIZE>::erase(const KEY& key_)
 {
-    SET_VALUE set_value;
-    set_value.first = key_;
-    BaseType::erase(set_value);
+    NodeType node;
+    node.first = key_;
+    BaseType::erase(node);
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
 typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZE>::active(const KEY& key_)
 {
-    SET_VALUE set_value;
-    set_value.first = key_;
-    return BaseType::active(set_value);
+    NodeType node;
+    node.first = key_;
+    return BaseType::active(node);
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE>

@@ -1,7 +1,7 @@
 /*
  * * file name: mem_rank.h
  * * description: 用跳跃表加哈希表实现的一个实时排名模板类
- * * author: lemonxu
+ * * author: snow
  * * create time: 2016-六月-13
  * */
 
@@ -21,7 +21,7 @@ template <typename T, typename T_Key = ExtractKey<T>, typename T_Compare = std::
 class MemRank
 {
 private:
-    typedef typename T_Key::KeyType KeyType;
+    using KeyType = typename T_Key::KeyType;
     static const size_t SKIPTABLE_P = 10;
 
     struct MRNode

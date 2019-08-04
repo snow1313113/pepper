@@ -1,7 +1,7 @@
 /*
  * * file name: string_utils.cpp
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018  1 12
  * */
 

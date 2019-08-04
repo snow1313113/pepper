@@ -1,7 +1,7 @@
 /*
  * * file name: head.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018  1 15
  * */
 

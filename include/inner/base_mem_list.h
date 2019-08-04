@@ -1,7 +1,7 @@
 /*
  * * file name: base_mem_list.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018  7 28
  * */
 
@@ -17,8 +17,8 @@ namespace Pepper
 template <typename T, size_t MAX_SIZE>
 struct BaseMemList
 {
-    typedef typename FixIntType<MAX_SIZE + 1>::IntType IntType;
-    typedef T ValueType;
+    using IntType = typename FixIntType<MAX_SIZE + 1>::IntType;
+    using ValueType = T;
 
     class Iterator
     {
@@ -88,7 +88,7 @@ public:
     Iterator end();
 
 private:
-    typedef Link<IntType> LinkNode;
+    using LinkNode = Link<IntType>;
     IntType m_used = 0;
     // 这个是空闲连头下标，m_link的下标
     IntType m_free_index = 0;

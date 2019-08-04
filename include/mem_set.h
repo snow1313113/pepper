@@ -1,7 +1,7 @@
 /*
  * * file name: mem_set.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018 7月 16
  * */
 
@@ -16,10 +16,10 @@ template <typename T, size_t MAX_SIZE, typename HASH = std::hash<T>, typename IS
 class MemSet : private BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL>
 {
 public:
-    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL> BaseType;
-    typedef typename BaseType::IntType IntType;
-    typedef typename BaseType::ValueType ValueType;
-    typedef typename BaseType::Iterator Iterator;
+    using BaseType = BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL>;
+    using IntType = typename BaseType::IntType;
+    using ValueType = typename BaseType::ValueType;
+    using Iterator = typename BaseType::Iterator;
 
     /// 清空列表
     void clear();

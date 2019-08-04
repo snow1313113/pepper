@@ -19,7 +19,12 @@ template <typename KEY, typename VALUE, typename HASH = std::hash<KEY> >
 class HashMemPool
 {
 public:
+    static_assert(std::is_trivial<KEY>::value, "KEY must be trivial");
+    static_assert(std::is_trivial<VALUE>::value, "VALUE must be trivial");
+    // static_assert(std::is_trivially_copyable<VALUE>::value, "VALUE must be is_trivially_copyable");
+ 
     using Node = std::pair<KEY, VALUE>;
+    using InnerPool = FixedMemPool<Node>;
 
     struct Iterator
     {
@@ -37,15 +42,14 @@ public:
 
     private:
         friend class HashMemPool;
-        typename FixedMemPool<Node>::Iterator m_iter;
-        Iterator(const typename FixedMemPool<Node>::Iterator& iter) : m_iter(iter) {}
+        typename InnerPool::Iterator m_iter;
+        Iterator(const typename InnerPool::Iterator& iter) : m_iter(iter) {}
     };
 
 public:
     // 获取内存大小
     static size_t calc_mem_size(uint32_t max_node_, uint32_t bucket_num_);
 
-    ~HashMemPool();
     /// 当前已经用的个数
     size_t size() const;
     /// 最大容量
@@ -98,16 +102,8 @@ private:
 
     HashHeader* m_header = nullptr;
     size_t* m_buckets = nullptr;
-    FixedMemPool<Node> m_pool;
+    InnerPool m_pool;
 };
-
-template <typename KEY, typename VALUE, typename HASH>
-HashMemPool<KEY, VALUE, HASH>::~HashMemPool()
-{
-    static_assert(std::is_trivial<KEY>::value, "KEY must be trivial");
-    static_assert(std::is_trivial<VALUE>::value, "VALUE must be trivial");
-    // static_assert(std::is_trivially_copyable<VALUE>::value, "VALUE must be is_trivially_copyable");
-}
 
 template <typename KEY, typename VALUE, typename HASH>
 size_t HashMemPool<KEY, VALUE, HASH>::size() const
@@ -168,13 +164,13 @@ bool HashMemPool<KEY, VALUE, HASH>::init(void* mem_, uint32_t max_node_, uint32_
         if (m_header->bucket_num != bucket_num_ || m_header->max_node != max_node_)
             return false;
 
-        size_t mem_pool_size = FixedMemPool<HashNode>::calc_need_size(max_node_, sizeof(HashNode));
+        size_t mem_pool_size = InnerPool::calc_need_size(max_node_, sizeof(HashNode));
         if (!m_pool.init(p, mem_pool_size, max_node_, sizeof(HashNode), check_))
             return false;
     }
     else
     {
-        size_t mem_pool_size = FixedMemPool<HashNode>::calc_need_size(max_node_, sizeof(HashNode));
+        size_t mem_pool_size = InnerPool::calc_need_size(max_node_, sizeof(HashNode));
         if (!m_pool.init(p, mem_pool_size, max_node_, sizeof(HashNode), check_))
             return false;
 
@@ -191,7 +187,6 @@ void HashMemPool<KEY, VALUE, HASH>::clear()
 {
     if (m_header)
     {
-        // todo is wrong?
         init(m_header, m_header->max_node, m_header->bucket_num,
              HashMemPool<KEY, VALUE, HASH>::calc_mem_size(m_header->max_node, m_header->bucket_num), false);
     }
@@ -300,7 +295,7 @@ bool HashMemPool<KEY, VALUE, HASH>::erase(const KEY& key_)
 template <typename KEY, typename VALUE, typename HASH>
 size_t HashMemPool<KEY, VALUE, HASH>::calc_mem_size(uint32_t max_node_, uint32_t bucket_num_)
 {
-    return sizeof(HashHeader) + sizeof(m_buckets[0]) * bucket_num_ + FixedMemPool<HashNode>::calc_need_size(max_node_);
+    return sizeof(HashHeader) + sizeof(m_buckets[0]) * bucket_num_ + InnerPool::calc_need_size(max_node_, sizeof(HashNode));
 }
 
 template <typename KEY, typename VALUE, typename HASH>

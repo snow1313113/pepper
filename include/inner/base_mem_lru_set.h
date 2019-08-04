@@ -1,7 +1,7 @@
 /*
  * * file name: base_mem_lru_set.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018  7 26
  * */
 
@@ -17,10 +17,10 @@ template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 struct BaseMemLRUSet
 {
 public:
-    typedef BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL> BaseType;
+    using BaseType = BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL>;
     // 不能直接用basetype的inttype，因为我们的大小是不一样的
-    typedef typename FixIntType<MAX_SIZE + 1>::IntType IntType;
-    typedef T ValueType;
+    using IntType = typename FixIntType<MAX_SIZE + 1>::IntType;
+    using ValueType = T;
 
     class Iterator
     {
@@ -80,7 +80,7 @@ private:
     T& deref(IntType index_);
 
 private:
-    typedef Link<IntType> LinkNode;
+    using LinkNode = Link<IntType>;
     /// 第一个节点作为flag 活跃双向链表，最近被访问的放在最前面，和每一个value数组一一对应
     LinkNode m_active_link[MAX_SIZE + 1];
     BaseType m_base;

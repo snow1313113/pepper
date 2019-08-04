@@ -1,7 +1,7 @@
 /*
  * * file name: base_specialization.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018  8 11
  * */
 
@@ -25,7 +25,7 @@ namespace Pepper
 template <typename T1, typename T2>
 struct IsEqual<std::pair<T1, T2>>
 {
-    typedef std::pair<T1, T2> T;
+    using T = std::pair<T1, T2>;
     bool operator()(const T& x_, const T& y_) const { return IsEqual<T1>()(x_.first, y_.first); }
 };
 

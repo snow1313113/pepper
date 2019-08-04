@@ -1,7 +1,7 @@
 /*
  * * file name: mem_list.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018 4月 20
  * */
 
@@ -16,10 +16,10 @@ template <typename T, size_t MAX_SIZE>
 class MemList : private BaseMemList<T, MAX_SIZE>
 {
 public:
-    typedef BaseMemList<T, MAX_SIZE> BaseType;
-    typedef typename BaseType::IntType IntType;
-    typedef typename BaseType::ValueType ValueType;
-    typedef typename BaseType::Iterator Iterator;
+    using BaseType = BaseMemList<T, MAX_SIZE>;
+    using IntType = typename BaseType::IntType;
+    using ValueType = typename BaseType::ValueType;
+    using Iterator = typename BaseType::Iterator;
 
 public:
     /// 清空列表

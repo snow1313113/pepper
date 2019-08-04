@@ -1,7 +1,7 @@
 /*
  * * file name: mem_map.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2018  8 03
  * */
 
@@ -18,10 +18,10 @@ class MemMap : private BaseMemSet<std::pair<KEY, VALUE>, MAX_SIZE, std::hash<std
                                   IsEqual<std::pair<KEY, VALUE>>>
 {
 public:
-    typedef std::pair<KEY, VALUE> T;
-    typedef BaseMemSet<T, MAX_SIZE, std::hash<T>, IsEqual<T>> BaseType;
-    typedef typename BaseType::IntType IntType;
-    typedef typename BaseType::Iterator Iterator;
+    using T = std::pair<KEY, VALUE>;
+    using BaseType = BaseMemSet<T, MAX_SIZE, std::hash<T>, IsEqual<T>>;
+    using IntType = typename BaseType::IntType;
+    using Iterator = typename BaseType::Iterator;
 
     /// 清空列表
     void clear();

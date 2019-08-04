@@ -1,7 +1,7 @@
 /*
  * * file name: algorithm_util.h
  * * description: 当年闲的蛋疼写的东西，后面再整理看看，如果没用就删掉吧
- * * author: lemonxu
+ * * author: snow
  * * create time:2018  1 12
  * */
 
