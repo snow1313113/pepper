@@ -233,4 +233,46 @@ TEST(MemMapTest, mem_map_test_min_size)
     EXPECT_EQ(mem_map.size(), 0);
 }
 
+TEST(MemMapTest, mem_map_test_iterator)
+{
+    static const size_t MAX_SIZE = 1027;
+    MemMap<uint32_t, size_t, MAX_SIZE> mem_map;
+
+    ASSERT_TRUE(mem_map.empty());
+    ASSERT_FALSE(mem_map.full());
+    EXPECT_EQ(mem_map.size(), 0);
+    EXPECT_EQ(mem_map.capacity(), MAX_SIZE);
+
+    for (size_t i = 0; i < MAX_SIZE; ++i)
+    {
+        auto result_pair = mem_map.insert(i + 1, (i + 1) * 100);
+        ASSERT_TRUE(result_pair.second);
+        EXPECT_NE(result_pair.first, mem_map.end());
+    }
+
+    auto iter = std::find_if(mem_map.begin(), mem_map.end(), [=](const auto& tmp) { return tmp.first == 100; });
+    EXPECT_NE(iter, mem_map.end());
+}
+
+TEST(MemMapTest, mem_map_test_iterator_min_size)
+{
+    static const size_t MAX_SIZE = 17;
+    MemMap<uint32_t, size_t, MAX_SIZE> mem_map;
+
+    ASSERT_TRUE(mem_map.empty());
+    ASSERT_FALSE(mem_map.full());
+    EXPECT_EQ(mem_map.size(), 0);
+    EXPECT_EQ(mem_map.capacity(), MAX_SIZE);
+
+    for (size_t i = 0; i < MAX_SIZE; ++i)
+    {
+        auto result_pair = mem_map.insert(i + 1, (i + 1) * 100);
+        ASSERT_TRUE(result_pair.second);
+        EXPECT_NE(result_pair.first, mem_map.end());
+    }
+
+    auto iter = std::find_if(mem_map.begin(), mem_map.end(), [=](const auto& tmp) { return tmp.first == 10; });
+    EXPECT_NE(iter, mem_map.end());
+}
+
 #endif
