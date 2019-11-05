@@ -11,6 +11,7 @@
 #define _BASE_MEM_SET_H_
 
 #include <utility>
+#include <iterator>
 #include "../utils/traits_utils.h"
 #include "head.h"
 
@@ -30,6 +31,12 @@ struct BaseMemSet
         Iterator(const BaseMemSet* set_, IntType index_) : m_set(set_), m_index(index_) {}
 
     public:
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = std::forward_iterator_tag;
+
         Iterator() = default;
         const T& operator*() const;
         T& operator*();

@@ -8,6 +8,7 @@
 #ifndef BASE_MEM_LIST_H
 #define BASE_MEM_LIST_H
 
+#include <iterator>
 #include "../base_struct.h"
 #include "../utils/traits_utils.h"
 #include "head.h"
@@ -28,6 +29,12 @@ struct BaseMemList
         Iterator(const BaseMemList* list_, IntType index_) : m_list(list_), m_index(index_) {}
 
     public:
+        using difference_type = std::ptrdiff_t;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = std::bidirectional_iterator_tag;
+
         Iterator() = default;
         const T& operator*() const;
         T& operator*();
