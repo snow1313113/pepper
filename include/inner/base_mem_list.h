@@ -13,7 +13,7 @@
 #include "../utils/traits_utils.h"
 #include "head.h"
 
-namespace Pepper
+namespace pepper
 {
 template <typename T, size_t MAX_SIZE>
 struct BaseMemList
@@ -434,6 +434,6 @@ typename BaseMemList<T, MAX_SIZE>::IntType BaseMemList<T, MAX_SIZE>::Iterator::t
     return m_index;
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

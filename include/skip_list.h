@@ -5,15 +5,15 @@
  * * create time: 2016-六月-13
  * */
 
-#ifndef MEM_RANK_H
-#define MEM_RANK_H
+#ifndef _SKIP_LIST_H_
+#define _SKIP_LIST_H_
 
 #include <vector>
 #include "inner/head.h"
 #include "utils/traits_utils.h"
 using std::vector;
 
-namespace Pepper
+namespace pepper
 {
 // 对于自定义复合类型T，需要特化两个类，ExtractKey和std::less
 // 或者自己实现类似的类作为模板参数也可以
@@ -648,5 +648,5 @@ void MemRank<T, T_Key, T_Compare>::free_node(MRNode *node_)
     ++(m_header->free_num);
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 #endif

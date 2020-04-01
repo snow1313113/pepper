@@ -12,7 +12,7 @@
 #include "../base_struct.h"
 #include "base_mem_set.h"
 
-namespace Pepper
+namespace pepper
 {
 template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 struct BaseMemLRUSet
@@ -322,6 +322,6 @@ operator++(int)
     return temp;
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

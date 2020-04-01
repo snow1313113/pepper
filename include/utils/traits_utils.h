@@ -11,7 +11,7 @@
 #include <type_traits>
 #include "../inner/head.h"
 
-namespace Pepper
+namespace pepper
 {
 template <size_t>
 struct SizeTraits
@@ -255,6 +255,6 @@ struct ExtractKey
     const KeyType &operator()(const T &x) const { return x; }
 };
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

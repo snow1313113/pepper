@@ -15,7 +15,7 @@
 #include "../utils/traits_utils.h"
 #include "head.h"
 
-namespace Pepper
+namespace pepper
 {
 template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 struct BaseMemSet
@@ -426,6 +426,6 @@ operator++(int)
     return temp;
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

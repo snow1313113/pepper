@@ -2,7 +2,7 @@
 #include <iostream>
 #include "../../include/hash_mem_pool.h"
 using namespace std;
-using namespace Pepper;
+using namespace pepper;
 
 struct BaseNode
 {

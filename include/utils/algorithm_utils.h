@@ -5,7 +5,7 @@
  * * create time:2018  1 12
  * */
 
-namespace Pepper
+namespace pepper
 {
 /**
     \brief find out the t_ in the x_
@@ -53,4 +53,4 @@ extern size_t binary_search_last(const T* x_, size_t begin_, size_t end_, const 
         return end_ + 1;
 }
 
-}  // namespace Pepper
+}  // namespace pepper

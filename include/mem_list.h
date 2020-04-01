@@ -4,13 +4,12 @@
  * * author: snow
  * * create time:2018 4月 20
  * */
-
-#ifndef MEM_LIST_H
-#define MEM_LIST_H
+#ifndef _MEM_LIST_H_
+#define _MEM_LIST_H_
 
 #include "inner/base_mem_list.h"
 
-namespace Pepper
+namespace pepper
 {
 template <typename T, size_t MAX_SIZE>
 class MemList : private BaseMemList<T, MAX_SIZE>
@@ -191,6 +190,6 @@ typename MemList<T, MAX_SIZE>::Iterator MemList<T, MAX_SIZE>::end()
     return BaseType::end();
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

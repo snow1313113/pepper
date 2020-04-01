@@ -5,8 +5,8 @@
  * * create time:2018  8 11
  * */
 
-#ifndef BASE_SPECIALIZATION_H
-#define BASE_SPECIALIZATION_H
+#ifndef _BASE_SPECIALIZATION_H_
+#define _BASE_SPECIALIZATION_H_
 
 #include <functional>
 #include "../utils/traits_utils.h"
@@ -20,7 +20,7 @@ struct hash<std::pair<T1, T2>>
 
 }  // namespace std
 
-namespace Pepper
+namespace pepper
 {
 template <typename T1, typename T2>
 struct IsEqual<std::pair<T1, T2>>
@@ -29,6 +29,6 @@ struct IsEqual<std::pair<T1, T2>>
     bool operator()(const T& x_, const T& y_) const { return IsEqual<T1>()(x_.first, y_.first); }
 };
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

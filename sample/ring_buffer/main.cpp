@@ -1,7 +1,7 @@
 #include <iostream>
 #include "../../include/fixed_ring_buf.h"
 using namespace std;
-using namespace Pepper;
+using namespace pepper;
 
 struct Test
 {

@@ -3,7 +3,7 @@
 #include <vector>
 #include "../../include/mem_map.h"
 using namespace std;
-using namespace Pepper;
+using namespace pepper;
 
 int main()
 {

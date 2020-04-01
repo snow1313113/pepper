@@ -5,12 +5,12 @@
  * * create time:2018  7 26
  * */
 
-#ifndef MEM_LRU_SET_H
-#define MEM_LRU_SET_H
+#ifndef _MEM_LRU_SET_H_
+#define _MEM_LRU_SET_H_
 
 #include "inner/base_mem_lru_set.h"
 
-namespace Pepper
+namespace pepper
 {
 template <typename T, size_t MAX_SIZE, typename HASH = std::hash<T>, typename IS_EQUAL = IsEqual<T> >
 class MemLRUSet : private BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>
@@ -159,6 +159,6 @@ typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE,
     return BaseType::end();
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

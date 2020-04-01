@@ -17,7 +17,7 @@
 #include "fixed_mem_pool.h"
 #include "gtest/gtest.h"
 
-using namespace Pepper;
+using namespace pepper;
 using std::map;
 using std::set;
 

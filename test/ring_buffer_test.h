@@ -19,7 +19,7 @@
 #include "gtest/gtest.h"
 #include "unfixed_ring_buf.h"
 
-using namespace Pepper;
+using namespace pepper;
 using std::map;
 using std::set;
 using std::vector;

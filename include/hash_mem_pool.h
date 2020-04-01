@@ -13,7 +13,7 @@
 #include <cassert>
 #include "fixed_mem_pool.h"
 
-namespace Pepper
+namespace pepper
 {
 template <typename KEY, typename VALUE, typename HASH = std::hash<KEY> >
 class HashMemPool
@@ -22,7 +22,7 @@ public:
     static_assert(std::is_trivial<KEY>::value, "KEY must be trivial");
     static_assert(std::is_trivial<VALUE>::value, "VALUE must be trivial");
     // static_assert(std::is_trivially_copyable<VALUE>::value, "VALUE must be is_trivially_copyable");
- 
+
     using Node = std::pair<KEY, VALUE>;
     using InnerPool = FixedMemPool<Node>;
 
@@ -295,7 +295,8 @@ bool HashMemPool<KEY, VALUE, HASH>::erase(const KEY& key_)
 template <typename KEY, typename VALUE, typename HASH>
 size_t HashMemPool<KEY, VALUE, HASH>::calc_mem_size(uint32_t max_node_, uint32_t bucket_num_)
 {
-    return sizeof(HashHeader) + sizeof(m_buckets[0]) * bucket_num_ + InnerPool::calc_need_size(max_node_, sizeof(HashNode));
+    return sizeof(HashHeader) + sizeof(m_buckets[0]) * bucket_num_ +
+           InnerPool::calc_need_size(max_node_, sizeof(HashNode));
 }
 
 template <typename KEY, typename VALUE, typename HASH>
@@ -388,6 +389,6 @@ typename HashMemPool<KEY, VALUE, HASH>::Iterator HashMemPool<KEY, VALUE, HASH>::
     return temp;
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
-#endif /* HASH_MEM_POOL_H_ */
+#endif

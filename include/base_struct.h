@@ -7,7 +7,7 @@
 #ifndef _BASE_STRUCT_H_
 #define _BASE_STRUCT_H_
 
-namespace Pepper
+namespace pepper
 {
 template <typename T>
 struct Singleton
@@ -52,6 +52,6 @@ struct Link
     T next = 0;
 };
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

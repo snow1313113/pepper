@@ -13,7 +13,7 @@
 #include "base_struct.h"
 #include "utils/traits_utils.h"
 
-namespace Pepper
+namespace pepper
 {
 template <typename T, size_t ALIGN = alignof(size_t)>
 class FixedMemPool
@@ -470,6 +470,6 @@ typename FixedMemPool<T, ALIGN>::Iterator FixedMemPool<T, ALIGN>::Iterator::oper
     return temp;
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

@@ -18,7 +18,7 @@
 #include "gtest/gtest.h"
 #include "mem_lru_map.h"
 
-using namespace Pepper;
+using namespace pepper;
 using std::list;
 using std::map;
 using std::set;

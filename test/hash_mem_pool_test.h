@@ -17,7 +17,7 @@
 #include "gtest/gtest.h"
 #include "hash_mem_pool.h"
 
-using namespace Pepper;
+using namespace pepper;
 using std::map;
 using std::set;
 

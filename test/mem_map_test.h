@@ -17,7 +17,7 @@
 #include "gtest/gtest.h"
 #include "mem_map.h"
 
-using namespace Pepper;
+using namespace pepper;
 using std::map;
 using std::set;
 

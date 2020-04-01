@@ -7,7 +7,7 @@
 
 #include "unfixed_ring_buf.h"
 
-namespace Pepper
+namespace pepper
 {
 bool UnfixedRingBuf<0>::init(void *mem_, size_t mem_size_, bool check_)
 {
@@ -333,4 +333,4 @@ typename UnfixedRingBuf<0>::IntType UnfixedRingBuf<0>::need_skip_bytes(UnfixedRi
         return 0;
 }
 
-}  // namespace Pepper
+}  // namespace pepper

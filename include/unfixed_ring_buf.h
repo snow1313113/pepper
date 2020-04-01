@@ -13,7 +13,7 @@
 #include "inner/head.h"
 #include "utils/traits_utils.h"
 
-namespace Pepper
+namespace pepper
 {
 template <size_t MAX_SIZE = 0>
 class UnfixedRingBuf
@@ -437,6 +437,6 @@ typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::need_skip_b
         return 0;
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

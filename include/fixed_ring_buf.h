@@ -12,7 +12,7 @@
 #include "inner/head.h"
 #include "utils/traits_utils.h"
 
-namespace Pepper
+namespace pepper
 {
 template <typename T, size_t MAX_SIZE = 0>
 class FixedRingBuf
@@ -317,6 +317,6 @@ const T &FixedRingBuf<T, 0>::back(size_t index_) const
     return m_buf[(m_head->m_end + m_head->m_max_num - 1 - index_) % m_head->m_max_num];
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

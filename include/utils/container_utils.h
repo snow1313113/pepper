@@ -5,7 +5,10 @@
  * * create time:2018  1 12
  * */
 
-namespace Pepper
+#ifndef _CONTAINER_UTILS_H_
+#define _CONTAINER_UTILS_H_
+
+namespace pepper
 {
 template <typename map_type, typename key_arg_type, typename value_arg_type>
 inline typename map_type::iterator effective_add_or_update(map_type& m_, const key_arg_type& k_,
@@ -24,4 +27,6 @@ inline typename map_type::iterator effective_add_or_update(map_type& m_, const k
     }
 }
 
-}  // namespace Pepper
+}  // namespace pepper
+
+#endif

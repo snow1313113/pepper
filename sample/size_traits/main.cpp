@@ -1,7 +1,7 @@
 #include <iostream>
 #include "../../include/utils/traits_utils.h"
 using namespace std;
-using namespace Pepper;
+using namespace pepper;
 
 int main()
 {

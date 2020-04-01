@@ -11,7 +11,7 @@
 
 using std::string;
 
-namespace Pepper
+namespace pepper
 {
 static string left_trim(const string& original_str_, const string& trim_str_)
 {
@@ -60,4 +60,4 @@ string string_to_token(const string& str_, const string& delimiter_, string& res
     return "";
 }
 
-}  // namespace Pepper
+}  // namespace pepper

@@ -1,7 +1,7 @@
 #include <iostream>
 #include "../../include/base_struct.h"
 using namespace std;
-using namespace Pepper;
+using namespace pepper;
 
 class Test : public Singleton<Test>
 {

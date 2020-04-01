@@ -5,13 +5,13 @@
  * * create time:2018  8 03
  * */
 
-#ifndef MEM_MAP_H
-#define MEM_MAP_H
+#ifndef _MEM_MAP_H_
+#define _MEM_MAP_H_
 
 #include "inner/base_mem_set.h"
 #include "inner/base_specialization.h"
 
-namespace Pepper
+namespace pepper
 {
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
 class MemMap : private BaseMemSet<std::pair<KEY, VALUE>, MAX_SIZE, std::hash<std::pair<KEY, VALUE>>,
@@ -150,6 +150,6 @@ typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::en
     return BaseType::end();
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif

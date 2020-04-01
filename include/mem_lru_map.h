@@ -5,13 +5,13 @@
  * * create time:2018  8 17
  * */
 
-#ifndef MEM_LRU_MAP_H
-#define MEM_LRU_MAP_H
+#ifndef _MEM_LRU_MAP_H_
+#define _MEM_LRU_MAP_H_
 
 #include "inner/base_mem_lru_set.h"
 #include "inner/base_specialization.h"
 
-namespace Pepper
+namespace pepper
 {
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
 class MemLRUMap : private BaseMemLRUSet<std::pair<KEY, VALUE>, MAX_SIZE, std::hash<std::pair<KEY, VALUE>>,
@@ -170,6 +170,6 @@ typename MemLRUMap<KEY, VALUE, MAX_SIZE>::Iterator MemLRUMap<KEY, VALUE, MAX_SIZ
     return BaseType::end();
 }
 
-}  // namespace Pepper
+}  // namespace pepper
 
 #endif
