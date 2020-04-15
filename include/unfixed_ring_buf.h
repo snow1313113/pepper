@@ -42,7 +42,7 @@ public:
 
 private:
     using IntType = typename FixIntType<MAX_SIZE>::IntType;
-
+    /// 找不到就返回MAX_SIZE
     IntType find_start(size_t index_) const;
     bool push_impl(const struct iovec *iov_, size_t iov_cnt_, size_t total_len_, size_t need_len_, bool over_write_);
     /// 在尾部补一个节点到补满
@@ -56,9 +56,9 @@ private:
     struct ItemHeader
     {
         /// 0 表示数据节点，1 表示填充用的
-        uint8_t m_flag;
+        uint8_t m_flag = 0;
         /// 后面的数据长度
-        IntType m_len;
+        IntType m_len = 0;
     };
 
     IntType m_start = 0;
@@ -66,7 +66,7 @@ private:
     IntType m_used_size = 0;
     IntType m_item_num = 0;
     /// todo 其实可以把max_size做一下对齐的，后面再加吧
-    uint8_t m_buf[MAX_SIZE];
+    uint8_t m_buf[MAX_SIZE] = {0};
 };
 
 template <size_t MAX_SIZE>
@@ -177,16 +177,9 @@ void UnfixedRingBuf<MAX_SIZE>::pop()
 template <size_t MAX_SIZE>
 const uint8_t *UnfixedRingBuf<MAX_SIZE>::front(size_t &len_, size_t index_) const
 {
-    if (empty())
+    IntType item_start = find_start(index_);
+    if (item_start == MAX_SIZE)
         return nullptr;
-
-    IntType item_start = m_start;
-    if (index_ > 0)
-    {
-        item_start = find_start(index_);
-        if (item_start == m_end)
-            return nullptr;
-    }
 
     const ItemHeader *item_header = reinterpret_cast<const ItemHeader *>(m_buf + item_start);
     len_ = item_header->m_len;
@@ -196,16 +189,9 @@ const uint8_t *UnfixedRingBuf<MAX_SIZE>::front(size_t &len_, size_t index_) cons
 template <size_t MAX_SIZE>
 uint8_t *UnfixedRingBuf<MAX_SIZE>::front(size_t &len_, size_t index_)
 {
-    if (empty())
+    IntType item_start = find_start(index_);
+    if (item_start == MAX_SIZE)
         return nullptr;
-
-    IntType item_start = m_start;
-    if (index_ > 0)
-    {
-        item_start = find_start(index_);
-        if (item_start == m_end)
-            return nullptr;
-    }
 
     ItemHeader *item_header = reinterpret_cast<ItemHeader *>(m_buf + item_start);
     len_ = item_header->m_len;
@@ -215,6 +201,12 @@ uint8_t *UnfixedRingBuf<MAX_SIZE>::front(size_t &len_, size_t index_)
 template <size_t MAX_SIZE>
 typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::find_start(size_t index_) const
 {
+    if (empty() || index_ >= MAX_SIZE)
+        return MAX_SIZE;
+
+    if (index_ == 0)
+        return m_start;
+
     IntType item_start = m_start;
     for (size_t i = 0; i < index_; ++i)
     {
@@ -236,8 +228,9 @@ typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::find_start(
             }
         }
 
+        // 找了一圈都找不到，理论上不应该
         if (item_start == m_end)
-            break;
+            return MAX_SIZE;
     }
     return item_start;
 }
@@ -507,17 +500,9 @@ public:
     /// 获取队头往后数第index_个元素(从0开始计数)，返回该元素的指针，len_表示数据长度
     const uint8_t *front(size_t &len_, size_t index_ = 0) const
     {
-        if (empty())
+        IntType item_start = find_start(index_);
+        if (item_start == m_head->m_size)
             return nullptr;
-
-        IntType item_start = m_head->m_start;
-        if (index_ > 0)
-        {
-            // 如果不是第一个节点，则找开始的偏移，找到尾部为止
-            item_start = find_start(index_);
-            if (item_start == m_head->m_end)
-                return nullptr;
-        }
 
         const ItemHeader *item_header = reinterpret_cast<const ItemHeader *>(m_buf + item_start);
         len_ = item_header->m_len;
@@ -526,17 +511,9 @@ public:
 
     uint8_t *front(size_t &len_, size_t index_ = 0)
     {
-        if (empty())
+        IntType item_start = find_start(index_);
+        if (item_start == m_head->m_size)
             return nullptr;
-
-        IntType item_start = m_head->m_start;
-        if (index_ > 0)
-        {
-            // 如果不是第一个节点，则找开始的偏移，找到尾部为止
-            item_start = find_start(index_);
-            if (item_start == m_head->m_end)
-                return nullptr;
-        }
 
         ItemHeader *item_header = reinterpret_cast<ItemHeader *>(m_buf + item_start);
         len_ = item_header->m_len;
@@ -544,8 +521,15 @@ public:
     }
 
 private:
+    // 如果找不到就返回最大的size值
     IntType find_start(size_t index_) const
     {
+        if (empty() || index_ >= m_head->m_item_num)
+            return m_head->m_size;
+
+        if (index_ == 0)
+            return m_head->m_start;
+
         IntType item_start = m_head->m_start;
         for (size_t i = 0; i < index_; ++i)
         {
@@ -567,9 +551,11 @@ private:
                 }
             }
 
+            // 找了一圈都找不到，理论上不应该
             if (item_start == m_head->m_end)
-                break;
+                return m_head->m_size;
         }
+
         return item_start;
     }
 
@@ -714,18 +700,18 @@ private:
     struct ItemHeader
     {
         /// 0 表示数据节点，1 表示填充用的
-        uint8_t m_flag;
+        uint8_t m_flag = 0;
         /// 后面的数据长度
-        IntType m_len;
+        IntType m_len = 0;
     };
 
     struct BuffHead
     {
-        IntType m_start;
-        IntType m_end;
-        IntType m_used_size;
-        IntType m_item_num;
-        IntType m_size;
+        IntType m_start = 0;
+        IntType m_end = 0;
+        IntType m_used_size = 0;
+        IntType m_item_num = 0;
+        IntType m_size = 0;
     };
     BuffHead *m_head = nullptr;
     uint8_t *m_buf = nullptr;
