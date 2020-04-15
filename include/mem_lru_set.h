@@ -20,6 +20,7 @@ public:
     using IntType = typename BaseType::IntType;
     using ValueType = typename BaseType::ValueType;
     using Iterator = typename BaseType::Iterator;
+    using DisuseCallback = typename BaseType::DisuseCallback;
 
     /// 清空列表
     void clear();
@@ -32,7 +33,7 @@ public:
     /// 列表最大容量
     size_t capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
-    std::pair<Iterator, bool> insert(const T& value_, bool force_ = false);
+    std::pair<Iterator, bool> insert(const T& value_, bool force_ = false, DisuseCallback call_back_ = nullptr);
     /// 找到节点的迭代器
     const Iterator find(const T& value_) const;
     Iterator find(const T& value_);
@@ -45,7 +46,7 @@ public:
     /// 激活一下节点
     Iterator active(const T& value_);
     /// 淘汰掉几个
-    size_t disuse(size_t num_);
+    size_t disuse(size_t num_, DisuseCallback call_back_ = nullptr);
 
     /// 迭代器
     const Iterator begin() const;
@@ -86,9 +87,9 @@ size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::capacity() const
 
 template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 std::pair<typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool>
-MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T& value_, bool force_)
+MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T& value_, bool force_, DisuseCallback call_back_)
 {
-    return BaseType::insert(value_, force_);
+    return BaseType::insert(value_, force_, call_back_);
 }
 
 template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
@@ -130,9 +131,9 @@ typename MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemLRUSet<T, MAX_SIZE,
 }
 
 template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::disuse(size_t num_)
+size_t MemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::disuse(size_t num_, DisuseCallback call_back_)
 {
-    return BaseType::disuse(num_);
+    return BaseType::disuse(num_, call_back_);
 }
 
 template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>

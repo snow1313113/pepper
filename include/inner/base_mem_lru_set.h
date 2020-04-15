@@ -22,6 +22,7 @@ public:
     // 不能直接用basetype的inttype，因为我们的大小是不一样的
     using IntType = typename FixIntType<MAX_SIZE + 1>::IntType;
     using ValueType = T;
+    using DisuseCallback = std::function<void(ValueType&)>;
 
     class Iterator
     {
@@ -61,7 +62,7 @@ public:
     /// 列表最大容量
     size_t capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
-    std::pair<Iterator, bool> insert(const T& value_, bool force_);
+    std::pair<Iterator, bool> insert(const T& value_, bool force_, DisuseCallback call_back_ = nullptr);
     /// 找到节点的迭代器
     const Iterator find(const T& value_) const;
     Iterator find(const T& value_);
@@ -74,7 +75,7 @@ public:
     /// 找到激活一下节点
     Iterator active(const T& value_);
     /// 淘汰掉几个
-    size_t disuse(size_t num_);
+    size_t disuse(size_t num_, DisuseCallback call_back_ = nullptr);
 
     /// 迭代器
     const Iterator begin() const;
@@ -129,11 +130,11 @@ size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::capacity() const
 
 template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 std::pair<typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool>
-BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T& value_, bool force_)
+BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T& value_, bool force_, DisuseCallback call_back_)
 {
     if (m_base.full())
     {
-        if (!force_ || disuse(1) == 0)
+        if (!force_ || disuse(1, call_back_) == 0)
             return std::make_pair(end(), false);
     }
 
@@ -220,12 +221,14 @@ typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator BaseMemLRUSet<T, M
 }
 
 template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::disuse(size_t num_)
+size_t BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::disuse(size_t num_, DisuseCallback call_back_)
 {
     for (size_t i = 0; i < num_; ++i)
     {
         if (m_base.empty())
             return i;
+        if (call_back_)
+            call_back_(deref(m_active_link[0].prev));
         erase(deref(m_active_link[0].prev));
     }
     return num_;

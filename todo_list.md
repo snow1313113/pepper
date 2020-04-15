@@ -9,7 +9,7 @@
    + ~~BaseMemSet的特花版本实现有些地方不合理，不能和非特化版本的接口保持一致的语义~~
 + ~~BaseMemLRUSet的两个实现重复代码太多~~
 + 增加一个UnFixedMemPool的实现
-+ LRU disuse的时候增加callback
++ ~~LRU disuse的时候增加callback~~
 + 所有容器是否都要提供ref接口
 + 所有容器是否都要提供无内存的版本
 + SkipList有bug
