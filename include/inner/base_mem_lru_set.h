@@ -134,6 +134,10 @@ BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T& value_, bool force_,
 {
     if (m_base.full())
     {
+        auto iter = find(value_);
+        if (iter != end())
+            return std::make_pair(iter, false);
+
         if (!force_ || disuse(1, call_back_) == 0)
             return std::make_pair(end(), false);
     }
@@ -150,6 +154,7 @@ BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T& value_, bool force_,
         m_active_link[index].next = head.next;
         head.next = index;
     }
+
     return std::make_pair(Iterator(this, result_pair.first), result_pair.second);
 }
 

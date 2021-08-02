@@ -164,32 +164,33 @@ template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 std::pair<typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool>
 BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(const T& value_)
 {
-    if (full())
-        return std::make_pair(end(), false);
-
-    // 需要看看有没有存在
     IntType bucket_index = BaseMemSet::get_bucket_index(value_);
     IntType index = find_index(bucket_index, value_);
     if (index != 0)
         return std::make_pair(Iterator(this, index), false);
     else
+    {
+        if (full())
+            return std::make_pair(end(), false);
+
         return std::make_pair(Iterator(this, insert(bucket_index, value_)), true);
+    }
 }
 
 template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
 std::pair<typename BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL>::IntType, bool>
 BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert2(const T& value_)
 {
-    if (full())
-        return std::make_pair(0, false);
-
-    // 需要看看有没有存在
     IntType bucket_index = BaseMemSet::get_bucket_index(value_);
     IntType index = find_index(bucket_index, value_);
     if (index != 0)
         return std::make_pair(index, false);
     else
+    {
+        if (full())
+            return std::make_pair(0, false);
         return std::make_pair(insert(bucket_index, value_), true);
+    }
 }
 
 template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
