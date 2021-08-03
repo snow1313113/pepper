@@ -34,7 +34,7 @@ TEST(FixedMemPoolTest, know_node_size)
     ASSERT_TRUE(mem_pool.empty());
     ASSERT_FALSE(mem_pool.full());
     EXPECT_EQ(mem_pool.capacity(), max_num);
-    EXPECT_EQ(mem_pool.size(), 0);
+    EXPECT_EQ(mem_pool.size(), 0ul);
     EXPECT_EQ(mem_pool.node_size(), sizeof(TestNode));
 
     // 记录下每个node的ref，后面测试int_2_ptr转回来的结果是否正确
@@ -53,7 +53,7 @@ TEST(FixedMemPoolTest, know_node_size)
         seed = p->b;
 
         size_t index = mem_pool.ptr_2_int(p);
-        EXPECT_NE(index, 0);
+        EXPECT_NE(index, 0ul);
 
         auto ret_pair = index_map.insert(std::make_pair(index, p->c));
         ASSERT_TRUE(ret_pair.second);
@@ -146,7 +146,7 @@ TEST(FixedMemPoolTest, know_node_size)
     ASSERT_TRUE(mem_pool.empty());
     ASSERT_FALSE(mem_pool.full());
     EXPECT_EQ(mem_pool.capacity(), max_num);
-    EXPECT_EQ(mem_pool.size(), 0);
+    EXPECT_EQ(mem_pool.size(), 0ul);
     EXPECT_EQ(mem_pool.node_size(), sizeof(TestNode));
 }
 
@@ -163,7 +163,7 @@ TEST(FixedMemPoolTest, unknow_node_size)
     ASSERT_TRUE(mem_pool.empty());
     ASSERT_FALSE(mem_pool.full());
     EXPECT_EQ(mem_pool.capacity(), max_num);
-    EXPECT_EQ(mem_pool.size(), 0);
+    EXPECT_EQ(mem_pool.size(), 0ul);
     EXPECT_EQ(mem_pool.node_size(), sizeof(TestNode));
 
     // 记录下每个node的ref，后面测试int_2_ptr转回来的结果是否正确
@@ -182,7 +182,7 @@ TEST(FixedMemPoolTest, unknow_node_size)
         seed = p->b;
 
         size_t index = mem_pool.ptr_2_int(p);
-        EXPECT_NE(index, 0);
+        EXPECT_NE(index, 0ul);
 
         auto ret_pair = index_map.insert(std::make_pair(index, p->c));
         ASSERT_TRUE(ret_pair.second);

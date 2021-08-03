@@ -28,7 +28,7 @@ TEST(MemMapTest, mem_map_test_normal)
 
     ASSERT_TRUE(mem_map.empty());
     ASSERT_FALSE(mem_map.full());
-    EXPECT_EQ(mem_map.size(), 0);
+    EXPECT_EQ(mem_map.size(), 0ul);
     EXPECT_EQ(mem_map.capacity(), MAX_SIZE);
 
     // 记录一批要del的node，后面做删除测试用
@@ -124,7 +124,7 @@ TEST(MemMapTest, mem_map_test_normal)
     ASSERT_TRUE(mem_map.empty());
     ASSERT_FALSE(mem_map.full());
     EXPECT_EQ(mem_map.capacity(), MAX_SIZE);
-    EXPECT_EQ(mem_map.size(), 0);
+    EXPECT_EQ(mem_map.size(), 0ul);
 }
 
 TEST(MemMapTest, mem_map_test_min_size)
@@ -134,7 +134,7 @@ TEST(MemMapTest, mem_map_test_min_size)
 
     ASSERT_TRUE(mem_map.empty());
     ASSERT_FALSE(mem_map.full());
-    EXPECT_EQ(mem_map.size(), 0);
+    EXPECT_EQ(mem_map.size(), 0ul);
     EXPECT_EQ(mem_map.capacity(), MAX_SIZE);
 
     // 记录一批要del的node，后面做删除测试用
@@ -230,7 +230,7 @@ TEST(MemMapTest, mem_map_test_min_size)
     ASSERT_TRUE(mem_map.empty());
     ASSERT_FALSE(mem_map.full());
     EXPECT_EQ(mem_map.capacity(), MAX_SIZE);
-    EXPECT_EQ(mem_map.size(), 0);
+    EXPECT_EQ(mem_map.size(), 0ul);
 }
 
 TEST(MemMapTest, mem_map_test_iterator)
@@ -240,7 +240,7 @@ TEST(MemMapTest, mem_map_test_iterator)
 
     ASSERT_TRUE(mem_map.empty());
     ASSERT_FALSE(mem_map.full());
-    EXPECT_EQ(mem_map.size(), 0);
+    EXPECT_EQ(mem_map.size(), 0ul);
     EXPECT_EQ(mem_map.capacity(), MAX_SIZE);
 
     for (size_t i = 0; i < MAX_SIZE; ++i)
@@ -261,7 +261,7 @@ TEST(MemMapTest, mem_map_test_iterator_min_size)
 
     ASSERT_TRUE(mem_map.empty());
     ASSERT_FALSE(mem_map.full());
-    EXPECT_EQ(mem_map.size(), 0);
+    EXPECT_EQ(mem_map.size(), 0ul);
     EXPECT_EQ(mem_map.capacity(), MAX_SIZE);
 
     for (size_t i = 0; i < MAX_SIZE; ++i)
@@ -273,6 +273,39 @@ TEST(MemMapTest, mem_map_test_iterator_min_size)
 
     auto iter = std::find_if(mem_map.begin(), mem_map.end(), [=](const auto& tmp) { return tmp.first == 10; });
     EXPECT_NE(iter, mem_map.end());
+}
+
+TEST(MemMapTest, mem_map_test_insert)
+{
+    static const size_t MAX_SIZE = 101;
+    MemMap<uint32_t, size_t, MAX_SIZE> mem_map;
+
+    ASSERT_TRUE(mem_map.empty());
+    ASSERT_FALSE(mem_map.full());
+    EXPECT_EQ(mem_map.size(), 0ul);
+    EXPECT_EQ(mem_map.capacity(), MAX_SIZE);
+
+    for (size_t i = 0; i < MAX_SIZE; ++i)
+    {
+        auto result_pair = mem_map.insert(i + 1, (i + 1) * 100);
+        ASSERT_TRUE(result_pair.second);
+        EXPECT_NE(result_pair.first, mem_map.end());
+    }
+
+    ASSERT_FALSE(mem_map.empty());
+    ASSERT_TRUE(mem_map.full());
+    EXPECT_EQ(mem_map.size(), MAX_SIZE);
+    EXPECT_EQ(mem_map.capacity(), MAX_SIZE);
+
+    for (size_t i = 0; i < MAX_SIZE; ++i)
+    {
+        auto result_pair = mem_map.insert(i + 1, (i + 1) * 100);
+        ASSERT_FALSE(result_pair.second);
+        EXPECT_NE(result_pair.first, mem_map.end());
+        auto& tmp = *(result_pair.first);
+        EXPECT_EQ(tmp.first, i + 1);
+        EXPECT_EQ(tmp.second, (i + 1) * 100);
+    }
 }
 
 #endif

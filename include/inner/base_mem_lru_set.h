@@ -9,6 +9,7 @@
 #define BASE_MEM_LRU_SET_H
 
 #include <iterator>
+#include <functional>
 #include "../base_struct.h"
 #include "base_mem_set.h"
 

@@ -31,7 +31,7 @@ TEST(RingBufferTest, fixed_ring_buffer_1024)
 
     ASSERT_TRUE(ring_buf.empty());
     ASSERT_FALSE(ring_buf.full());
-    EXPECT_EQ(ring_buf.size(), 0);
+    EXPECT_EQ(ring_buf.size(), 0ul);
     EXPECT_EQ(ring_buf.capacity(), MAX_SIZE);
 
     uint32_t seed = MAX_SIZE;
@@ -78,7 +78,7 @@ TEST(RingBufferTest, fixed_ring_buffer_1024)
 
     ring_buf.clear();
     ASSERT_TRUE(ring_buf.empty());
-    EXPECT_EQ(ring_buf.size(), 0);
+    EXPECT_EQ(ring_buf.size(), 0ul);
 
     // 测试循环push
     index_2_node.clear();
@@ -124,7 +124,7 @@ TEST(RingBufferTest, fixed_ring_buffer_0)
 
     ASSERT_TRUE(ring_buf.empty());
     ASSERT_FALSE(ring_buf.full());
-    EXPECT_EQ(ring_buf.size(), 0);
+    EXPECT_EQ(ring_buf.size(), 0ul);
     EXPECT_EQ(ring_buf.capacity(), MAX_SIZE);
 
     uint32_t seed = MAX_SIZE;
@@ -171,7 +171,7 @@ TEST(RingBufferTest, fixed_ring_buffer_0)
 
     ring_buf.clear();
     ASSERT_TRUE(ring_buf.empty());
-    EXPECT_EQ(ring_buf.size(), 0);
+    EXPECT_EQ(ring_buf.size(), 0ul);
 
     // 测试循环push
     index_2_node.clear();
@@ -221,9 +221,9 @@ TEST(RingBufferTest, un_fixed_ring_buffer_1024)
 
     ASSERT_TRUE(ring_buf.empty());
     ASSERT_FALSE(ring_buf.full());
-    EXPECT_EQ(ring_buf.size(), 0);
+    EXPECT_EQ(ring_buf.size(), 0ul);
     EXPECT_EQ(ring_buf.capacity(), MAX_SIZE);
-    EXPECT_EQ(ring_buf.get_num(), 0);
+    EXPECT_EQ(ring_buf.get_num(), 0ul);
 
     uint32_t seed = MAX_SIZE;
     vector<uint32_t> index_2_node;
@@ -292,8 +292,8 @@ TEST(RingBufferTest, un_fixed_ring_buffer_1024)
 
     ring_buf.clear();
     ASSERT_TRUE(ring_buf.empty());
-    EXPECT_EQ(ring_buf.size(), 0);
-    EXPECT_EQ(ring_buf.get_num(), 0);
+    EXPECT_EQ(ring_buf.size(), 0ul);
+    EXPECT_EQ(ring_buf.get_num(), 0ul);
 
     // 测试循环push
     index_2_node.clear();
@@ -362,9 +362,9 @@ TEST(RingBufferTest, un_fixed_ring_buffer_0)
 
     ASSERT_TRUE(ring_buf.empty());
     ASSERT_FALSE(ring_buf.full());
-    EXPECT_EQ(ring_buf.size(), 0);
+    EXPECT_EQ(ring_buf.size(), 0ul);
     ASSERT_TRUE(ring_buf.capacity() <= MAX_SIZE);
-    EXPECT_EQ(ring_buf.get_num(), 0);
+    EXPECT_EQ(ring_buf.get_num(), 0ul);
 
     uint32_t seed = MAX_SIZE;
     vector<uint32_t> index_2_node;
@@ -433,8 +433,8 @@ TEST(RingBufferTest, un_fixed_ring_buffer_0)
 
     ring_buf.clear();
     ASSERT_TRUE(ring_buf.empty());
-    EXPECT_EQ(ring_buf.size(), 0);
-    EXPECT_EQ(ring_buf.get_num(), 0);
+    EXPECT_EQ(ring_buf.size(), 0ul);
+    EXPECT_EQ(ring_buf.get_num(), 0ul);
 
     // 测试循环push
     index_2_node.clear();

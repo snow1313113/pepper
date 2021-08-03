@@ -30,7 +30,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_normal)
 
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
     EXPECT_EQ(lru_map.capacity(), MAX_SIZE);
 
     // 记录一批要del的node，后面做删除测试用
@@ -126,7 +126,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_normal)
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
     EXPECT_EQ(lru_map.capacity(), MAX_SIZE);
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
 }
 
 TEST(MemLRUMapTest, mem_lru_map_test_normal_disuse)
@@ -136,7 +136,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_normal_disuse)
 
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
     EXPECT_EQ(lru_map.capacity(), MAX_SIZE);
 
     // 每个节点的random值，后面校验测试用
@@ -170,7 +170,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_normal_disuse)
     {
         active_list.pop_front();
 
-        EXPECT_EQ(lru_map.disuse(1), 1);
+        EXPECT_EQ(lru_map.disuse(1), 1ul);
         EXPECT_EQ(lru_map.size(), active_list.size());
 
         for (auto it : active_list)
@@ -180,7 +180,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_normal_disuse)
         }
     };
 
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
 }
@@ -192,7 +192,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_normal_active)
 
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
     EXPECT_EQ(lru_map.capacity(), MAX_SIZE);
 
     // 每个节点的random值，后面校验测试用
@@ -233,7 +233,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_normal_active)
     {
         active_list.pop_front();
 
-        EXPECT_EQ(lru_map.disuse(1), 1);
+        EXPECT_EQ(lru_map.disuse(1), 1ul);
         EXPECT_EQ(lru_map.size(), active_list.size());
 
         for (auto it : active_list)
@@ -243,7 +243,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_normal_active)
         }
     };
 
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
 }
@@ -255,7 +255,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_min_size)
 
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
     EXPECT_EQ(lru_map.capacity(), MAX_SIZE);
 
     // 记录一批要del的node，后面做删除测试用
@@ -351,7 +351,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_min_size)
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
     EXPECT_EQ(lru_map.capacity(), MAX_SIZE);
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
 }
 
 TEST(MemLRUMapTest, mem_lru_map_test_min_size_disuse)
@@ -361,7 +361,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_min_size_disuse)
 
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
     EXPECT_EQ(lru_map.capacity(), MAX_SIZE);
 
     // 每个节点的random值，后面校验测试用
@@ -395,7 +395,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_min_size_disuse)
     {
         active_list.pop_front();
 
-        EXPECT_EQ(lru_map.disuse(1), 1);
+        EXPECT_EQ(lru_map.disuse(1), 1ul);
         EXPECT_EQ(lru_map.size(), active_list.size());
 
         for (auto it : active_list)
@@ -405,7 +405,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_min_size_disuse)
         }
     };
 
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
 }
@@ -417,7 +417,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_min_size_active)
 
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
     EXPECT_EQ(lru_map.capacity(), MAX_SIZE);
 
     // 每个节点的random值，后面校验测试用
@@ -458,7 +458,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_min_size_active)
     {
         active_list.pop_front();
 
-        EXPECT_EQ(lru_map.disuse(1), 1);
+        EXPECT_EQ(lru_map.disuse(1), 1ul);
         EXPECT_EQ(lru_map.size(), active_list.size());
 
         for (auto it : active_list)
@@ -468,7 +468,7 @@ TEST(MemLRUMapTest, mem_lru_map_test_min_size_active)
         }
     };
 
-    EXPECT_EQ(lru_map.size(), 0);
+    EXPECT_EQ(lru_map.size(), 0ul);
     ASSERT_TRUE(lru_map.empty());
     ASSERT_FALSE(lru_map.full());
 }

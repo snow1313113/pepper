@@ -36,7 +36,7 @@ TEST(HashMemPoolTest, hash_mem_pool)
     ASSERT_TRUE(mem_pool.empty());
     ASSERT_FALSE(mem_pool.full());
     EXPECT_EQ(mem_pool.capacity(), max_num);
-    EXPECT_EQ(mem_pool.size(), 0);
+    EXPECT_EQ(mem_pool.size(), 0ul);
 
     // 记录下每个node的ref，后面测试deref转回来的结果是否正确
     map<size_t, size_t> index_map;
@@ -59,7 +59,7 @@ TEST(HashMemPoolTest, hash_mem_pool)
         seed = p->b;
 
         size_t index = mem_pool.ref(&(*result_pair.first));
-        EXPECT_NE(index, 0);
+        EXPECT_NE(index, 0ul);
 
         auto ret_pair = index_map.insert(std::make_pair(index, i));
         ASSERT_TRUE(ret_pair.second);
@@ -166,7 +166,7 @@ TEST(HashMemPoolTest, hash_mem_pool)
     ASSERT_TRUE(mem_pool.empty());
     ASSERT_FALSE(mem_pool.full());
     EXPECT_EQ(mem_pool.capacity(), max_num);
-    EXPECT_EQ(mem_pool.size(), 0);
+    EXPECT_EQ(mem_pool.size(), 0ul);
 }
 
 #endif
