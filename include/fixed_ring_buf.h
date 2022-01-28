@@ -42,7 +42,7 @@ public:
     const T &back(size_t index_ = 0) const;
 
 private:
-    typedef typename FixIntType<MAX_SIZE>::IntType IntType;
+    using IntType = typename FixIntType<MAX_SIZE>::IntType;
     IntType m_start = 0;
     IntType m_end = 0;
     IntType m_used_num = 0;
@@ -83,13 +83,13 @@ public:
     const T &back(size_t index_ = 0) const;
 
 private:
-    typedef size_t IntType;
+    using IntType = size_t;
     struct BuffHead
     {
-        IntType m_start;
-        IntType m_end;
-        IntType m_used_num;
-        IntType m_max_num;
+        IntType m_start = 0;
+        IntType m_end = 0;
+        IntType m_used_num = 0;
+        IntType m_max_num = 0;
     };
     BuffHead *m_head = nullptr;
     T *m_buf = nullptr;

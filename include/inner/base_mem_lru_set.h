@@ -8,8 +8,8 @@
 #ifndef BASE_MEM_LRU_SET_H
 #define BASE_MEM_LRU_SET_H
 
-#include <iterator>
 #include <functional>
+#include <iterator>
 #include "../base_struct.h"
 #include "base_mem_set.h"
 
@@ -48,7 +48,8 @@ public:
         bool operator!=(const Iterator& right_) const;
         Iterator& operator++();
         Iterator operator++(int);
-        // 不提供operator--函数了，为了省空间用了单向链表，没法做性能很好的前向迭代
+        Iterator& operator--();
+        Iterator operator--(int);
     };
 
 public:
@@ -328,6 +329,23 @@ operator++(int)
 {
     Iterator temp = (*this);
     ++(*this);
+    return temp;
+}
+
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator& BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::
+operator--()
+{
+    m_index = m_set->m_active_link[m_index].prev;
+    return (*this);
+}
+
+template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
+typename BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator BaseMemLRUSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator::
+operator--(int)
+{
+    Iterator temp = (*this);
+    --(*this);
     return temp;
 }
 

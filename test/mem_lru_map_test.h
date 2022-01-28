@@ -129,6 +129,84 @@ TEST(MemLRUMapTest, mem_lru_map_test_normal)
     EXPECT_EQ(lru_map.size(), 0ul);
 }
 
+TEST(MemLRUMapTest, mem_lru_map_test_normal_iterator)
+{
+    static const size_t MAX_SIZE = 1027;
+    MemLRUMap<uint32_t, BaseNode, MAX_SIZE> lru_map;
+
+    ASSERT_TRUE(lru_map.empty());
+    ASSERT_FALSE(lru_map.full());
+    EXPECT_EQ(lru_map.size(), 0ul);
+    EXPECT_EQ(lru_map.capacity(), MAX_SIZE);
+
+    static const uint32_t INSERT_NUM = 10;
+    map<uint32_t, uint32_t> node_map;
+    uint32_t seed = MAX_SIZE;
+    for (uint32_t i = 0; i < INSERT_NUM; ++i)
+    {
+        BaseNode node;
+        node.base = rand_r(&seed);
+
+        auto result_pair = lru_map.insert(i, node);
+        ASSERT_TRUE(result_pair.second);
+        EXPECT_NE(result_pair.first, lru_map.end());
+        EXPECT_EQ(result_pair.first->second.base, node.base);
+
+        auto ret2_pair = node_map.insert({i, node.base});
+        ASSERT_TRUE(ret2_pair.second);
+    }
+
+    uint32_t index = 0;
+    for (auto &&beg = lru_map.begin(), end = lru_map.end(); beg != end; ++beg)
+    {
+        ASSERT_TRUE(index < INSERT_NUM);
+        uint32_t key = INSERT_NUM - index - 1;
+        EXPECT_EQ(beg->first, key);
+
+        auto it = node_map.find(key);
+        EXPECT_NE(it, node_map.end());
+        EXPECT_EQ(beg->second.base, it->second);
+
+        ++index;
+    }
+
+    index = 0;
+    for (auto&& tmp : lru_map)
+    {
+        ASSERT_TRUE(index < INSERT_NUM);
+        uint32_t key = INSERT_NUM - index - 1;
+        EXPECT_EQ(tmp.first, key);
+
+        auto it = node_map.find(key);
+        EXPECT_NE(it, node_map.end());
+        EXPECT_EQ(tmp.second.base, it->second);
+
+        ++index;
+    }
+
+    // 反过来激活一遍
+    for (uint32_t i = 0; i < INSERT_NUM; ++i)
+    {
+        uint32_t key = INSERT_NUM - i - 1;
+        auto iter = lru_map.active(key);
+        EXPECT_NE(iter, lru_map.end());
+    }
+
+    index = 0;
+    for (auto &&beg = lru_map.begin(), end = lru_map.end(); beg != end; ++beg)
+    {
+        ASSERT_TRUE(index < INSERT_NUM);
+        uint32_t key = index;
+        EXPECT_EQ(beg->first, key);
+
+        auto it = node_map.find(key);
+        EXPECT_NE(it, node_map.end());
+        EXPECT_EQ(beg->second.base, it->second);
+
+        ++index;
+    }
+}
+
 TEST(MemLRUMapTest, mem_lru_map_test_normal_disuse)
 {
     static const size_t MAX_SIZE = 1027;
