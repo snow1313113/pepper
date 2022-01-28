@@ -9,13 +9,17 @@
 #define _FIXED_RING_BUF_H_
 
 #include <algorithm>
+#include <type_traits>
 #include "inner/head.h"
 #include "utils/traits_utils.h"
 
 namespace pepper
 {
-template <typename T, size_t MAX_SIZE = 0>
-class FixedRingBuf
+template <typename T, size_t MAX_SIZE = 0, typename = void>
+class FixedRingBuf;
+
+template <typename T, size_t MAX_SIZE>
+class FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>
 {
 public:
     /// 清空队列
@@ -51,7 +55,7 @@ private:
 
 /// SIZE 如果是0，则表示大小是通过init来指定
 template <typename T>
-class FixedRingBuf<T, 0>
+class FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>
 {
 public:
     /// 计算需要的内存
@@ -97,7 +101,7 @@ private:
 
 ////////////////////////////////////////////////////
 template <typename T, size_t MAX_SIZE>
-void FixedRingBuf<T, MAX_SIZE>::clear()
+void FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::clear()
 {
     m_start = 0;
     m_end = 0;
@@ -105,31 +109,32 @@ void FixedRingBuf<T, MAX_SIZE>::clear()
 }
 
 template <typename T, size_t MAX_SIZE>
-bool FixedRingBuf<T, MAX_SIZE>::empty() const
+bool FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::empty() const
 {
     return m_used_num == 0;
 }
 
 template <typename T, size_t MAX_SIZE>
-bool FixedRingBuf<T, MAX_SIZE>::full() const
+bool FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::full() const
 {
     return m_used_num == MAX_SIZE;
 }
 
 template <typename T, size_t MAX_SIZE>
-size_t FixedRingBuf<T, MAX_SIZE>::size() const
+size_t FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::size() const
 {
     return m_used_num;
 }
 
 template <typename T, size_t MAX_SIZE>
-size_t FixedRingBuf<T, MAX_SIZE>::capacity() const
+size_t FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::capacity() const
 {
     return MAX_SIZE;
 }
 
 template <typename T, size_t MAX_SIZE>
-bool FixedRingBuf<T, MAX_SIZE>::push(const T &value_, bool over_write_)
+bool FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::push(const T &value_,
+                                                                                        bool over_write_)
 {
     if (over_write_)
     {
@@ -150,7 +155,7 @@ bool FixedRingBuf<T, MAX_SIZE>::push(const T &value_, bool over_write_)
 }
 
 template <typename T, size_t MAX_SIZE>
-void FixedRingBuf<T, MAX_SIZE>::pop()
+void FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::pop()
 {
     if (empty() == false)
     {
@@ -160,28 +165,28 @@ void FixedRingBuf<T, MAX_SIZE>::pop()
 }
 
 template <typename T, size_t MAX_SIZE>
-T &FixedRingBuf<T, MAX_SIZE>::front(size_t index_)
+T &FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::front(size_t index_)
 {
     assert(index_ < m_used_num);
     return m_buf[(m_start + index_) % MAX_SIZE];
 }
 
 template <typename T, size_t MAX_SIZE>
-const T &FixedRingBuf<T, MAX_SIZE>::front(size_t index_) const
+const T &FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::front(size_t index_) const
 {
     assert(index_ < m_used_num);
     return m_buf[(m_start + index_) % MAX_SIZE];
 }
 
 template <typename T, size_t MAX_SIZE>
-T &FixedRingBuf<T, MAX_SIZE>::back(size_t index_)
+T &FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::back(size_t index_)
 {
     assert(index_ < m_used_num);
     return m_buf[(m_end + MAX_SIZE - 1 - index_) % MAX_SIZE];
 }
 
 template <typename T, size_t MAX_SIZE>
-const T &FixedRingBuf<T, MAX_SIZE>::back(size_t index_) const
+const T &FixedRingBuf<T, MAX_SIZE, std::enable_if_t<std::is_trivially_copyable_v<T>>>::back(size_t index_) const
 {
     assert(index_ < m_used_num);
     return m_buf[(m_end + MAX_SIZE - 1 - index_) % MAX_SIZE];
@@ -189,13 +194,14 @@ const T &FixedRingBuf<T, MAX_SIZE>::back(size_t index_) const
 
 ////////////////////////////////////////////////////
 template <typename T>
-size_t FixedRingBuf<T, 0>::mem_size(size_t size_)
+size_t FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::mem_size(size_t size_)
 {
     return sizeof(BuffHead) + sizeof(T) * size_;
 }
 
 template <typename T>
-bool FixedRingBuf<T, 0>::init(void *mem_, size_t mem_size_, bool check_)
+bool FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::init(void *mem_, size_t mem_size_,
+                                                                                 bool check_)
 {
     if (!mem_ || mem_size_ < sizeof(BuffHead))
         return false;
@@ -218,7 +224,7 @@ bool FixedRingBuf<T, 0>::init(void *mem_, size_t mem_size_, bool check_)
 }
 
 template <typename T>
-void FixedRingBuf<T, 0>::clear()
+void FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::clear()
 {
     m_head->m_start = 0;
     m_head->m_end = 0;
@@ -226,31 +232,31 @@ void FixedRingBuf<T, 0>::clear()
 }
 
 template <typename T>
-bool FixedRingBuf<T, 0>::empty() const
+bool FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::empty() const
 {
     return m_head->m_used_num == 0 && m_head->m_used_num < m_head->m_max_num;
 }
 
 template <typename T>
-bool FixedRingBuf<T, 0>::full() const
+bool FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::full() const
 {
     return m_head->m_used_num == m_head->m_max_num;
 }
 
 template <typename T>
-size_t FixedRingBuf<T, 0>::size() const
+size_t FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::size() const
 {
     return m_head->m_used_num;
 }
 
 template <typename T>
-size_t FixedRingBuf<T, 0>::capacity() const
+size_t FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::capacity() const
 {
     return m_head->m_max_num;
 }
 
 template <typename T>
-bool FixedRingBuf<T, 0>::push(const T &value_, bool over_write_)
+bool FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::push(const T &value_, bool over_write_)
 {
     if (over_write_)
     {
@@ -271,7 +277,7 @@ bool FixedRingBuf<T, 0>::push(const T &value_, bool over_write_)
 }
 
 template <typename T>
-void FixedRingBuf<T, 0>::pop()
+void FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::pop()
 {
     if (empty() == false)
     {
@@ -282,7 +288,7 @@ void FixedRingBuf<T, 0>::pop()
 }
 
 template <typename T>
-T &FixedRingBuf<T, 0>::front(size_t index_)
+T &FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::front(size_t index_)
 {
     assert(m_head);
     assert(index_ < m_head->m_used_num);
@@ -291,7 +297,7 @@ T &FixedRingBuf<T, 0>::front(size_t index_)
 }
 
 template <typename T>
-const T &FixedRingBuf<T, 0>::front(size_t index_) const
+const T &FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::front(size_t index_) const
 {
     assert(m_head);
     assert(index_ < m_head->m_used_num);
@@ -300,7 +306,7 @@ const T &FixedRingBuf<T, 0>::front(size_t index_) const
 }
 
 template <typename T>
-T &FixedRingBuf<T, 0>::back(size_t index_)
+T &FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::back(size_t index_)
 {
     assert(m_head);
     assert(index_ < m_head->m_used_num);
@@ -309,7 +315,7 @@ T &FixedRingBuf<T, 0>::back(size_t index_)
 }
 
 template <typename T>
-const T &FixedRingBuf<T, 0>::back(size_t index_) const
+const T &FixedRingBuf<T, 0, std::enable_if_t<std::is_trivially_copyable_v<T>>>::back(size_t index_) const
 {
     assert(m_head);
     assert(index_ < m_head->m_used_num);
