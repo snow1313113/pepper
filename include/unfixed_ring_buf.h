@@ -201,7 +201,7 @@ uint8_t *UnfixedRingBuf<MAX_SIZE>::front(size_t &len_, size_t index_)
 template <size_t MAX_SIZE>
 typename UnfixedRingBuf<MAX_SIZE>::IntType UnfixedRingBuf<MAX_SIZE>::find_start(size_t index_) const
 {
-    if (empty() || index_ >= MAX_SIZE)
+    if (empty() || index_ >= m_item_num)
         return MAX_SIZE;
 
     if (index_ == 0)
