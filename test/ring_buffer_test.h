@@ -118,7 +118,7 @@ TEST(RingBufferTest, fixed_ring_buffer_0)
     static const size_t MAX_SIZE = 1024;
     FixedRingBuf<TestNode> ring_buf;
 
-    size_t mem_size = FixedRingBuf<TestNode>::mem_size(MAX_SIZE);
+    size_t mem_size = FixedRingBuf<TestNode>::need_mem_size(MAX_SIZE);
     auto p = new uint8_t[mem_size];
     ASSERT_TRUE(ring_buf.init(p, mem_size));
 
@@ -193,7 +193,7 @@ TEST(RingBufferTest, fixed_ring_buffer_0)
 
     // 新的RingBuf对象，测试重新初始化的check参数
     FixedRingBuf<TestNode> reinit_ring_buf;
-    size_t new_mem_size = FixedRingBuf<TestNode>::mem_size(MAX_SIZE);
+    size_t new_mem_size = FixedRingBuf<TestNode>::need_mem_size(MAX_SIZE);
     ASSERT_TRUE(reinit_ring_buf.init(p, new_mem_size, true));
 
     ASSERT_TRUE(reinit_ring_buf.full());
