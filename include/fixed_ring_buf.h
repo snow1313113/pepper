@@ -13,7 +13,7 @@
 namespace pepper
 {
 template <typename T, size_t MAX_SIZE = 0>
-class FixedRingBuf : public FixedRingBufData<T, MAX_SIZE>
+class FixedRingBuf : public inner::FixedRingBufData<T, MAX_SIZE>
 {
 public:
     /// 清空队列
@@ -40,7 +40,7 @@ public:
     const T &back(size_t index_ = 0) const;
 
 private:
-    using Data = FixedRingBufData<T, MAX_SIZE>;
+    using Data = inner::FixedRingBufData<T, MAX_SIZE>;
     using IntType = typename Data::IntType;
 };
 

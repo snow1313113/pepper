@@ -15,6 +15,8 @@
 
 namespace pepper
 {
+namespace inner
+{
 template <typename T, size_t MAX_SIZE = 0, typename = void>
 struct FixedRingBufData;
 
@@ -185,6 +187,7 @@ public:
     }
 };
 
+}  // namespace inner
 }  // namespace pepper
 
 #endif

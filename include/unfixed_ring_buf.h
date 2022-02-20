@@ -15,7 +15,7 @@ namespace pepper
 {
 /// SIZE 如果是0，则表示大小是通过init来指定
 template <size_t MAX_SIZE = 0>
-class UnfixedRingBuf : public UnfixedRingBufData<MAX_SIZE>
+class UnfixedRingBuf : public inner::UnfixedRingBufData<MAX_SIZE>
 {
 public:
     /// 清空队列
@@ -40,7 +40,7 @@ public:
     uint8_t *front(size_t &len_, size_t index_ = 0);
 
 private:
-    using Data = UnfixedRingBufData<MAX_SIZE>;
+    using Data = inner::UnfixedRingBufData<MAX_SIZE>;
     using IntType = typename Data::IntType;
 
     struct ItemHeader
