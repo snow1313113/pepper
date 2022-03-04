@@ -1,5 +1,5 @@
 /*
- * * file name: base_mem_hash_map.h
+ * * file name: mem_hash_table.h
  * * description:
  * *     所有set 或者map类型的容器类的基础实现，用哈希桶实现，在少量数据的时候退化
  * *     在数据量少的话退化成数组
@@ -7,11 +7,12 @@
  * * create time:2022  2 20
  * */
 
-#ifndef _BASE_MEM_HASH_MAP_H_
-#define _BASE_MEM_HASH_MAP_H_
+#ifndef _MEM_HASH_TABLE_H_
+#define _MEM_HASH_TABLE_H_
 
 #include <iterator>
 #include <utility>
+#include "../base_struct.h"
 #include "../utils/traits_utils.h"
 #include "head.h"
 
@@ -19,12 +20,14 @@ namespace pepper
 {
 namespace inner
 {
-template <typename T, bool Inherit = std::is_empty<T>::value && !std::is_final<T>::value>
+template <typename T, bool INHERIT = std::is_empty<T>::value && !std::is_final<T>::value>
 struct EBOProxy
 {
-    T m_obj;
-    T& operator*() { return value_; }
-    T const& operator*() const { return value_; }
+    T& operator*() { return m_obj; }
+    T const& operator*() const { return m_obj; }
+
+private:
+    static T m_obj;
 };
 
 template <typename T>
@@ -34,33 +37,32 @@ struct EBOProxy<T, true> : public T
     T const& operator*() const { return *this; }
 };
 
-template <typename HASH, typename IS_EQUAL>
+template <typename HASH, typename IS_EQUAL, bool USE_LOCAL_VAR>
 struct Policy : private EBOProxy<HASH>, private EBOProxy<IS_EQUAL>
 {
     using Hasher = EBOProxy<HASH>;
     using IsEqual = EBOProxy<IS_EQUAL>;
 
-    HASH& hasher() { return *static_cast<Hasher&>(*this); }
-    const HASH& hasher() const { return *static_cast<const Hasher&>(*this); }
+    HASH& hash() { return *static_cast<Hasher&>(*this); }
+    const HASH& hash() const { return *static_cast<const Hasher&>(*this); }
 
     IS_EQUAL& is_equal() { return *static_cast<IsEqual&>(*this); }
     const IS_EQUAL& is_equal() const { return *static_cast<const IsEqual&>(*this); }
 };
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-struct BaseMemHashMap : public POLICY
+struct MemHashTable : public POLICY
 {
     using IntType = typename FixIntType<MAX_SIZE>::IntType;
-    using ValueType = std::conditional_t<std::is_same_v<VALUE, void>, KEY, std::pair<KEY, VALUE>>;
-    // todo
     using KeyType = KEY;
+    using ValueType = std::conditional_t<std::is_same_v<VALUE, void>, KEY, Pair<KEY, VALUE>>;
 
     class Iterator
     {
-        friend struct BaseMemHashMap;
-        const BaseMemHashMap* m_map = nullptr;
+        friend struct MemHashTable;
+        const MemHashTable* m_map = nullptr;
         IntType m_index = 0;
-        Iterator(const BaseMemHashMap* map_, IntType index_) : m_map(map_), m_index(index_) {}
+        Iterator(const MemHashTable* map_, IntType index_) : m_map(map_), m_index(index_) {}
 
     public:
         using difference_type = std::ptrdiff_t;
@@ -118,10 +120,17 @@ private:
                    : NearByPrime<MAX_SIZE>::PRIME;
     }
 
+    template <size_t SIZE_OF_BUCKETS>
+    IntType constexpr get_bucket_index_impl(const KeyType& value_, SizeIdentity<SIZE_OF_BUCKETS>) const
+    {
+        return hash()(value_) % SIZE_OF_BUCKETS;
+    }
+
+    IntType constexpr get_bucket_index_impl(const KeyType& value_, SizeIdentity<1>) const { return 0; }
+
     IntType get_bucket_index(const KeyType& key_) const
     {
-        // todo
-        return 0;
+        return get_bucket_index_impl(value_, SizeIdentity<BUCKETS_SIZE>());
     }
 
 private:
@@ -140,7 +149,7 @@ private:
 };
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-void BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::clear()
+void MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::clear()
 {
     m_used = 0;
     m_raw_used = 0;
@@ -150,32 +159,32 @@ void BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::clear()
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-bool BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::empty() const
+bool MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::empty() const
 {
     return m_used == 0 && MAX_SIZE > 0;
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-bool BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::full() const
+bool MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::full() const
 {
     return m_used == MAX_SIZE;
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-size_t BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::size() const
+size_t MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::size() const
 {
     return m_used;
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-size_t BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::capacity() const
+size_t MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::capacity() const
 {
     return MAX_SIZE;
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-std::pair<typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator, bool>
-BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::insert(const ValueType& value_)
+std::pair<typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator, bool>
+MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::insert(const ValueType& value_)
 {
     IntType bucket_index = get_bucket_index(value_);
     IntType index = find_index(bucket_index, value_);
@@ -191,8 +200,8 @@ BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::insert(const ValueType& value_)
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-std::pair<typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType, bool>
-BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::insert2(const ValueType& value_)
+std::pair<typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType, bool>
+MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::insert2(const ValueType& value_)
 {
     IntType bucket_index = get_bucket_index(value_);
     IntType index = find_index(bucket_index, value_);
@@ -207,8 +216,8 @@ BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::insert2(const ValueType& value_)
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::insert(
-    typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType bucket_index_, const ValueType& value_)
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::insert(
+    typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType bucket_index_, const ValueType& value_)
 {
     IntType empty_index = 0;
     if (m_free_index == 0)
@@ -240,29 +249,29 @@ typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType BaseMemHashMap<KE
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-const typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator
-BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::find(const KeyType& value_) const
+const typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::find(
+    const KeyType& value_) const
 {
     return Iterator(this, find_index(value_));
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::find(
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::find(
     const KeyType& value_)
 {
     return Iterator(this, find_index(value_));
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::find_index(
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::find_index(
     const KeyType& value_) const
 {
     return find_index(get_bucket_index(value_), value_);
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::find_index(
-    typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType bucket_index_, const KeyType& value_) const
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::find_index(
+    typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType bucket_index_, const KeyType& value_) const
 {
     assert(bucket_index_ >= 0);
     assert(bucket_index_ < BUCKETS_SIZE);
@@ -276,13 +285,13 @@ typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType BaseMemHashMap<KE
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-bool BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::exist(const KeyType& value_) const
+bool MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::exist(const KeyType& value_) const
 {
     return find(value_) != end();
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::erase(
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::erase(
     const Iterator& it_)
 {
     assert(it_.m_set == this);
@@ -292,7 +301,7 @@ typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType BaseMemHashMap<KE
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::erase(
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::erase(
     const KeyType& value_)
 {
     if (m_used == 0)
@@ -323,27 +332,27 @@ typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::IntType BaseMemHashMap<KE
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-const typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator
-BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::begin() const
+const typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::begin()
+    const
 {
     return Iterator(this, find_first_used_bucket());
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::begin()
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::begin()
 {
     return Iterator(this, find_first_used_bucket());
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-const typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator
-BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::end() const
+const typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::end()
+    const
 {
     return Iterator(this, 0);
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemHashMap<KEY, VALUE, MAX_SIZE, POLICY>::end()
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::end()
 {
     return Iterator(this, 0);
 }
