@@ -107,9 +107,7 @@ typename MemMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemMap<KEY, VALUE, MAX_S
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 bool MemMap<KEY, VALUE, MAX_SIZE, POLICY>::exist(const KEY& key_) const
 {
-    T temp;
-    temp.first = key_;
-    return BaseType::exist(temp);
+    return BaseType::exist(key_);
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>

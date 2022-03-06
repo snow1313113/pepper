@@ -45,10 +45,16 @@ TEST(MemMapTest, mem_map_test_normal)
         node.d = 0;
         seed = node.b;
 
+        bool is_exist = mem_map.exist(i);
+        ASSERT_FALSE(is_exist);
+
         auto result_pair = mem_map.insert(i, node);
         ASSERT_TRUE(result_pair.second);
         EXPECT_NE(result_pair.first, mem_map.end());
         EXPECT_EQ(result_pair.first->second.b, node.b);
+
+        is_exist = mem_map.exist(i);
+        ASSERT_TRUE(is_exist);
 
         auto ret2_pair = node_rand_map.insert(std::make_pair(i, node.b));
         ASSERT_TRUE(ret2_pair.second);
@@ -151,10 +157,16 @@ TEST(MemMapTest, mem_map_test_min_size)
         node.d = 0;
         seed = node.b;
 
+        bool is_exist = mem_map.exist(i);
+        ASSERT_FALSE(is_exist);
+
         auto result_pair = mem_map.insert(i, node);
         ASSERT_TRUE(result_pair.second);
         EXPECT_NE(result_pair.first, mem_map.end());
         EXPECT_EQ(result_pair.first->second.b, node.b);
+
+        is_exist = mem_map.exist(i);
+        ASSERT_TRUE(is_exist);
 
         auto ret2_pair = node_rand_map.insert(std::make_pair(i, node.b));
         ASSERT_TRUE(ret2_pair.second);
