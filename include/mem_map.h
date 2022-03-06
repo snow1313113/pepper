@@ -8,18 +8,21 @@
 #ifndef _MEM_MAP_H_
 #define _MEM_MAP_H_
 
-#include "inner/base_mem_set.h"
 #include "inner/base_specialization.h"
+#include "inner/mem_hash_table.h"
+#include "inner/policy.h"
 
 namespace pepper
 {
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-class MemMap : private BaseMemSet<std::pair<KEY, VALUE>, MAX_SIZE, std::hash<std::pair<KEY, VALUE>>,
-                                  IsEqual<std::pair<KEY, VALUE>>>
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+using BaseMemMap = inner::MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>;
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY = DefaultPolicy<KEY>>
+class MemMap : private BaseMemMap<KEY, VALUE, MAX_SIZE, POLICY>
 {
 public:
-    using T = std::pair<KEY, VALUE>;
-    using BaseType = BaseMemSet<T, MAX_SIZE, std::hash<T>, IsEqual<T>>;
+    using BaseType = BaseMemMap<KEY, VALUE, MAX_SIZE, POLICY>;
+    using T = typename BaseType::ValueType;
     using IntType = typename BaseType::IntType;
     using Iterator = typename BaseType::Iterator;
 
@@ -51,101 +54,96 @@ public:
     Iterator end();
 };
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-void MemMap<KEY, VALUE, MAX_SIZE>::clear()
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+void MemMap<KEY, VALUE, MAX_SIZE, POLICY>::clear()
 {
     return BaseType::clear();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-bool MemMap<KEY, VALUE, MAX_SIZE>::empty() const
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+bool MemMap<KEY, VALUE, MAX_SIZE, POLICY>::empty() const
 {
     return BaseType::empty();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-bool MemMap<KEY, VALUE, MAX_SIZE>::full() const
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+bool MemMap<KEY, VALUE, MAX_SIZE, POLICY>::full() const
 {
     return BaseType::full();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-size_t MemMap<KEY, VALUE, MAX_SIZE>::size() const
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+size_t MemMap<KEY, VALUE, MAX_SIZE, POLICY>::size() const
 {
     return BaseType::size();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-size_t MemMap<KEY, VALUE, MAX_SIZE>::capacity() const
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+size_t MemMap<KEY, VALUE, MAX_SIZE, POLICY>::capacity() const
 {
     return BaseType::capacity();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-std::pair<typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator, bool> MemMap<KEY, VALUE, MAX_SIZE>::insert(
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+std::pair<typename MemMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator, bool> MemMap<KEY, VALUE, MAX_SIZE, POLICY>::insert(
     const KEY& key_, const VALUE& value_)
 {
-    return BaseType::insert(std::make_pair(key_, value_));
+    return BaseType::insert({key_, value_});
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::find(const KEY& key_) const
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+const typename MemMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemMap<KEY, VALUE, MAX_SIZE, POLICY>::find(
+    const KEY& key_) const
 {
-    T temp;
-    temp.first = key_;
-    return BaseType::find(temp);
+    return BaseType::find(key_);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::find(const KEY& key_)
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+typename MemMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemMap<KEY, VALUE, MAX_SIZE, POLICY>::find(const KEY& key_)
 {
-    T temp;
-    temp.first = key_;
-    return BaseType::find(temp);
+    return BaseType::find(key_);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-bool MemMap<KEY, VALUE, MAX_SIZE>::exist(const KEY& key_) const
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+bool MemMap<KEY, VALUE, MAX_SIZE, POLICY>::exist(const KEY& key_) const
 {
     T temp;
     temp.first = key_;
     return BaseType::exist(temp);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-void MemMap<KEY, VALUE, MAX_SIZE>::erase(const Iterator& it_)
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+void MemMap<KEY, VALUE, MAX_SIZE, POLICY>::erase(const Iterator& it_)
 {
     BaseType::erase(it_);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-void MemMap<KEY, VALUE, MAX_SIZE>::erase(const KEY& key_)
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+void MemMap<KEY, VALUE, MAX_SIZE, POLICY>::erase(const KEY& key_)
 {
-    T temp;
-    temp.first = key_;
-    BaseType::erase(temp);
+    BaseType::erase(key_);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::begin() const
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+const typename MemMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemMap<KEY, VALUE, MAX_SIZE, POLICY>::begin() const
 {
     return BaseType::begin();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-const typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::end() const
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+const typename MemMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemMap<KEY, VALUE, MAX_SIZE, POLICY>::end() const
 {
     return BaseType::end();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::begin()
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+typename MemMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemMap<KEY, VALUE, MAX_SIZE, POLICY>::begin()
 {
     return BaseType::begin();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
-typename MemMap<KEY, VALUE, MAX_SIZE>::Iterator MemMap<KEY, VALUE, MAX_SIZE>::end()
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+typename MemMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemMap<KEY, VALUE, MAX_SIZE, POLICY>::end()
 {
     return BaseType::end();
 }

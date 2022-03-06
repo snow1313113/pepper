@@ -8,15 +8,19 @@
 #ifndef _MEM_SET_H_
 #define _MEM_SET_H_
 
-#include "inner/base_mem_set.h"
+#include "inner/mem_hash_table.h"
+#include "inner/policy.h"
 
 namespace pepper
 {
-template <typename T, size_t MAX_SIZE, typename HASH = std::hash<T>, typename IS_EQUAL = IsEqual<T> >
-class MemSet : private BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL>
+template <typename T, size_t MAX_SIZE, typename POLICY>
+using BaseMemSet = inner::MemHashTable<T, void, MAX_SIZE, POLICY>;
+
+template <typename T, size_t MAX_SIZE, typename POLICY = DefaultPolicy<T>>
+class MemSet : private BaseMemSet<T, MAX_SIZE, POLICY>
 {
 public:
-    using BaseType = BaseMemSet<T, MAX_SIZE, HASH, IS_EQUAL>;
+    using BaseType = BaseMemSet<T, MAX_SIZE, POLICY>;
     using IntType = typename BaseType::IntType;
     using ValueType = typename BaseType::ValueType;
     using Iterator = typename BaseType::Iterator;
@@ -49,94 +53,92 @@ public:
     Iterator end();
 };
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-void MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::clear()
+template <typename T, size_t MAX_SIZE, typename POLICY>
+void MemSet<T, MAX_SIZE, POLICY>::clear()
 {
     BaseType::clear();
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-bool MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::empty() const
+template <typename T, size_t MAX_SIZE, typename POLICY>
+bool MemSet<T, MAX_SIZE, POLICY>::empty() const
 {
     return BaseType::empty();
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-bool MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::full() const
+template <typename T, size_t MAX_SIZE, typename POLICY>
+bool MemSet<T, MAX_SIZE, POLICY>::full() const
 {
     return BaseType::full();
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-size_t MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::size() const
+template <typename T, size_t MAX_SIZE, typename POLICY>
+size_t MemSet<T, MAX_SIZE, POLICY>::size() const
 {
     return BaseType::size();
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-size_t MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::capacity() const
+template <typename T, size_t MAX_SIZE, typename POLICY>
+size_t MemSet<T, MAX_SIZE, POLICY>::capacity() const
 {
     return BaseType::capacity();
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-std::pair<typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator, bool> MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::insert(
-    const T& value_)
+template <typename T, size_t MAX_SIZE, typename POLICY>
+std::pair<typename MemSet<T, MAX_SIZE, POLICY>::Iterator, bool> MemSet<T, MAX_SIZE, POLICY>::insert(const T& value_)
 {
     return BaseType::insert(value_);
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-const typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(
-    const T& value_) const
+template <typename T, size_t MAX_SIZE, typename POLICY>
+const typename MemSet<T, MAX_SIZE, POLICY>::Iterator MemSet<T, MAX_SIZE, POLICY>::find(const T& value_) const
 {
     return BaseType::find(value_);
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::find(const T& value_)
+template <typename T, size_t MAX_SIZE, typename POLICY>
+typename MemSet<T, MAX_SIZE, POLICY>::Iterator MemSet<T, MAX_SIZE, POLICY>::find(const T& value_)
 {
     return BaseType::find(value_);
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-bool MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::exist(const T& value_) const
+template <typename T, size_t MAX_SIZE, typename POLICY>
+bool MemSet<T, MAX_SIZE, POLICY>::exist(const T& value_) const
 {
     return BaseType::exist(value_);
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-void MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const Iterator& it_)
+template <typename T, size_t MAX_SIZE, typename POLICY>
+void MemSet<T, MAX_SIZE, POLICY>::erase(const Iterator& it_)
 {
     BaseType::erase(it_);
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-void MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::erase(const T& value_)
+template <typename T, size_t MAX_SIZE, typename POLICY>
+void MemSet<T, MAX_SIZE, POLICY>::erase(const T& value_)
 {
     BaseType::erase(value_);
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-const typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::begin() const
+template <typename T, size_t MAX_SIZE, typename POLICY>
+const typename MemSet<T, MAX_SIZE, POLICY>::Iterator MemSet<T, MAX_SIZE, POLICY>::begin() const
 {
     return BaseType::begin();
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::begin()
+template <typename T, size_t MAX_SIZE, typename POLICY>
+typename MemSet<T, MAX_SIZE, POLICY>::Iterator MemSet<T, MAX_SIZE, POLICY>::begin()
 {
     return BaseType::begin();
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-const typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::end() const
+template <typename T, size_t MAX_SIZE, typename POLICY>
+const typename MemSet<T, MAX_SIZE, POLICY>::Iterator MemSet<T, MAX_SIZE, POLICY>::end() const
 {
     return BaseType::end();
 }
 
-template <typename T, size_t MAX_SIZE, typename HASH, typename IS_EQUAL>
-typename MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::Iterator MemSet<T, MAX_SIZE, HASH, IS_EQUAL>::end()
+template <typename T, size_t MAX_SIZE, typename POLICY>
+typename MemSet<T, MAX_SIZE, POLICY>::Iterator MemSet<T, MAX_SIZE, POLICY>::end()
 {
     return BaseType::end();
 }
