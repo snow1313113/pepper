@@ -20,49 +20,19 @@ namespace pepper
 {
 namespace inner
 {
-template <typename T, bool INHERIT = std::is_empty<T>::value && !std::is_final<T>::value>
-struct EBOProxy
-{
-    T& operator*() { return m_obj; }
-    T const& operator*() const { return m_obj; }
-
-private:
-    static T m_obj;
-};
-
-template <typename T>
-struct EBOProxy<T, true> : public T
-{
-    T& operator*() { return *this; }
-    T const& operator*() const { return *this; }
-};
-
-template <typename HASH, typename IS_EQUAL, bool USE_LOCAL_VAR>
-struct Policy : private EBOProxy<HASH>, private EBOProxy<IS_EQUAL>
-{
-    using Hasher = EBOProxy<HASH>;
-    using IsEqual = EBOProxy<IS_EQUAL>;
-
-    HASH& hash() { return *static_cast<Hasher&>(*this); }
-    const HASH& hash() const { return *static_cast<const Hasher&>(*this); }
-
-    IS_EQUAL& is_equal() { return *static_cast<IsEqual&>(*this); }
-    const IS_EQUAL& is_equal() const { return *static_cast<const IsEqual&>(*this); }
-};
-
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 struct MemHashTable : public POLICY
 {
     using IntType = typename FixIntType<MAX_SIZE>::IntType;
     using KeyType = KEY;
-    using ValueType = std::conditional_t<std::is_same_v<VALUE, void>, KEY, Pair<KEY, VALUE>>;
+    using ValueType = std::conditional_t<std::is_same_v<VALUE, void>, KeyType, Pair<KeyType, VALUE>>;
 
     class Iterator
     {
         friend struct MemHashTable;
-        const MemHashTable* m_map = nullptr;
+        const MemHashTable* m_table = nullptr;
         IntType m_index = 0;
-        Iterator(const MemHashTable* map_, IntType index_) : m_map(map_), m_index(index_) {}
+        Iterator(const MemHashTable* table_, IntType index_) : m_table(table_), m_index(index_) {}
 
     public:
         using difference_type = std::ptrdiff_t;
@@ -113,6 +83,10 @@ struct MemHashTable : public POLICY
     Iterator end();
 
 private:
+    IntType find_first_used_bucket() const;
+    IntType find_index(IntType bucket_index_, const KeyType& value_) const;
+    IntType insert(IntType bucket_index_, const ValueType& value_);
+
     static constexpr size_t fix_bucket_size()
     {
         return (sizeof(ValueType) > 4 && MAX_SIZE <= 40) || (sizeof(ValueType) <= 4 && MAX_SIZE <= 50)
@@ -121,17 +95,21 @@ private:
     }
 
     template <size_t SIZE_OF_BUCKETS>
-    IntType constexpr get_bucket_index_impl(const KeyType& value_, SizeIdentity<SIZE_OF_BUCKETS>) const
+    IntType constexpr get_bucket_index_impl(const KeyType& key_, SizeIdentity<SIZE_OF_BUCKETS>) const
     {
-        return hash()(value_) % SIZE_OF_BUCKETS;
+        return POLICY::hash()(key_) % SIZE_OF_BUCKETS;
     }
 
-    IntType constexpr get_bucket_index_impl(const KeyType& value_, SizeIdentity<1>) const { return 0; }
+    IntType constexpr get_bucket_index_impl(const KeyType& key_, SizeIdentity<1>) const { return 0; }
 
     IntType get_bucket_index(const KeyType& key_) const
     {
-        return get_bucket_index_impl(value_, SizeIdentity<BUCKETS_SIZE>());
+        return get_bucket_index_impl(key_, SizeIdentity<BUCKETS_SIZE>());
     }
+
+    const KeyType& key_of_value(const KeyType& key_) const { return key_; }
+    using SecondType = std::conditional_t<std::is_same_v<ValueType, KeyType>, bool, VALUE>;
+    const KeyType& key_of_value(const Pair<KeyType, SecondType>& pair_) const { return pair_.first; }
 
 private:
     /// 使用了多少个节点
@@ -186,8 +164,8 @@ template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 std::pair<typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator, bool>
 MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::insert(const ValueType& value_)
 {
-    IntType bucket_index = get_bucket_index(value_);
-    IntType index = find_index(bucket_index, value_);
+    IntType bucket_index = get_bucket_index(key_of_value(value_));
+    IntType index = find_index(bucket_index, key_of_value(value_));
     if (index != 0)
         return std::make_pair(Iterator(this, index), false);
     else
@@ -203,8 +181,8 @@ template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 std::pair<typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType, bool>
 MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::insert2(const ValueType& value_)
 {
-    IntType bucket_index = get_bucket_index(value_);
-    IntType index = find_index(bucket_index, value_);
+    IntType bucket_index = get_bucket_index(key_of_value(value_));
+    IntType index = find_index(bucket_index, key_of_value(value_));
     if (index != 0)
         return std::make_pair(index, false);
     else
@@ -275,10 +253,10 @@ typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, V
 {
     assert(bucket_index_ >= 0);
     assert(bucket_index_ < BUCKETS_SIZE);
-    IS_EQUAL is_equal;
+    auto&& equal = POLICY::is_equal();
     for (IntType index = m_buckets[bucket_index_]; index != 0; index = m_next[index - 1])
     {
-        if (is_equal(m_value[index - 1], value_))
+        if (equal(key_of_value(m_value[index - 1]), value_))
             return index;
     }
     return 0;
@@ -294,7 +272,7 @@ template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::erase(
     const Iterator& it_)
 {
-    assert(it_.m_set == this);
+    assert(it_.m_table == this);
     if (it_.m_index > 0)
         return erase(m_value[it_.m_index - 1]);
     return 0;
@@ -313,11 +291,11 @@ typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, V
     if (m_buckets[bucket_index] == 0)
         return 0;
 
-    IS_EQUAL is_equal;
+    auto&& equal = POLICY::is_equal();
     IntType* pre = &(m_buckets[bucket_index]);
     for (IntType index = m_buckets[bucket_index]; index != 0; pre = &(m_next[index - 1]), index = m_next[index - 1])
     {
-        if (is_equal(m_value[index - 1], value_))
+        if (equal(key_of_value(m_value[index - 1]), value_))
         {
             assert(m_used > 0);
             *pre = m_next[index - 1];
@@ -345,6 +323,18 @@ typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemHashTable<KEY, 
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType
+MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::find_first_used_bucket() const
+{
+    for (IntType i = 0; i < BUCKETS_SIZE; ++i)
+    {
+        if (m_buckets[i] != 0)
+            return m_buckets[i];
+    }
+    return 0;
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 const typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::end()
     const
 {
@@ -355,6 +345,79 @@ template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::end()
 {
     return Iterator(this, 0);
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+const typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::ValueType&
+    MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::operator*() const
+{
+    return m_table->m_value[m_index - 1];
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::ValueType& MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::
+operator*()
+{
+    return const_cast<MemHashTable*>(m_table)->m_value[m_index - 1];
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+const typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::ValueType*
+    MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::operator->() const
+{
+    return &(operator*());
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::ValueType* MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::
+operator->()
+{
+    return &(operator*());
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+bool MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::operator==(const Iterator& right_) const
+{
+    return (m_table == right_.m_table) && (m_index == right_.m_index);
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+bool MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::operator!=(const Iterator& right_) const
+{
+    return (m_table != right_.m_table) || (m_index != right_.m_index);
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator& MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::
+operator++()
+{
+    IntType next_index = m_table->m_next[m_index - 1];
+    if (next_index == 0)
+    {
+        // 该链上的最后一个节点，找下一个hash
+        IntType next_bucket = m_table->get_bucket_index(m_table->key_of_value(m_table->m_value[m_index - 1])) + 1;
+        while (next_bucket < BUCKETS_SIZE)
+        {
+            if (m_table->m_buckets[next_bucket] != 0)
+            {
+                next_index = m_table->m_buckets[next_bucket];
+                break;
+            }
+            ++next_bucket;
+        }
+    }
+
+    m_index = next_index;
+    return (*this);
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::
+operator++(int)
+{
+    Iterator temp = (*this);
+    ++(*this);
+    return temp;
 }
 
 }  // namespace inner
