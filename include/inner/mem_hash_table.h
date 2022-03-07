@@ -82,6 +82,11 @@ struct MemHashTable : public POLICY
     Iterator begin();
     Iterator end();
 
+    // 这两个函数加得很无奈，需要通过index来构造迭代器，但是又不想把接口暴露出来
+    // 结果导致了需要通过BaseMemSet来做，有点蛋疼
+    const ValueType& deref(IntType index_) const;
+    ValueType& deref(IntType index_);
+
 private:
     IntType find_first_used_bucket() const;
     IntType find_index(IntType bucket_index_, const KeyType& value_) const;
@@ -195,7 +200,7 @@ MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::insert2(const ValueType& value_)
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::insert(
-    typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType bucket_index_, const ValueType& value_)
+    IntType bucket_index_, const ValueType& value_)
 {
     IntType empty_index = 0;
     if (m_free_index == 0)
@@ -249,7 +254,7 @@ typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, V
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::find_index(
-    typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType bucket_index_, const KeyType& value_) const
+    IntType bucket_index_, const KeyType& value_) const
 {
     assert(bucket_index_ >= 0);
     assert(bucket_index_ < BUCKETS_SIZE);
@@ -307,6 +312,20 @@ typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::IntType MemHashTable<KEY, V
     }
 
     return 0;
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+const typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::ValueType& MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::deref(
+    IntType index_) const
+{
+    return m_value[index_ - 1];
+}
+
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
+typename MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::ValueType& MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>::deref(
+    IntType index_)
+{
+    return m_value[index_ - 1];
 }
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
