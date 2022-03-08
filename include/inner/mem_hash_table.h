@@ -87,6 +87,10 @@ struct MemHashTable : public POLICY
     const ValueType& deref(IntType index_) const;
     ValueType& deref(IntType index_);
 
+    const KeyType& key_of_value(const KeyType& key_) const { return key_; }
+    using SecondType = std::conditional_t<std::is_same_v<ValueType, KeyType>, bool, VALUE>;
+    const KeyType& key_of_value(const Pair<KeyType, SecondType>& pair_) const { return pair_.first; }
+
 private:
     IntType find_first_used_bucket() const;
     IntType find_index(IntType bucket_index_, const KeyType& value_) const;
@@ -111,10 +115,6 @@ private:
     {
         return get_bucket_index_impl(key_, SizeIdentity<BUCKETS_SIZE>());
     }
-
-    const KeyType& key_of_value(const KeyType& key_) const { return key_; }
-    using SecondType = std::conditional_t<std::is_same_v<ValueType, KeyType>, bool, VALUE>;
-    const KeyType& key_of_value(const Pair<KeyType, SecondType>& pair_) const { return pair_.first; }
 
 private:
     /// 使用了多少个节点
