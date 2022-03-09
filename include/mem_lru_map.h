@@ -15,7 +15,21 @@
 namespace pepper
 {
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY = DefaultPolicy<KEY>>
-using MemLRUMap = inner::BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>;
+class MemLRUMap : public inner::BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>
+{
+public:
+    using BaseType = inner::BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>;
+    using Iterator = typename BaseType::Iterator;
+    using DisuseCallback = typename BaseType::DisuseCallback;
+    using BaseType::insert;
+
+    /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
+    std::pair<Iterator, bool> insert(const KEY& key_, const VALUE& value_, bool force_ = false,
+                                     const DisuseCallback& call_back_ = nullptr)
+    {
+        return BaseType::insert({key_, value_}, force_, call_back_);
+    }
+};
 
 }  // namespace pepper
 

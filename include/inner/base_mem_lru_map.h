@@ -67,7 +67,7 @@ public:
     /// 列表最大容量
     size_t capacity() const;
     /// 插入一个元素，如果存在则返回失败（其实我更喜欢直接返回bool）
-    std::pair<Iterator, bool> insert(const KEY& key_, const VALUE& value_, bool force_ = false,
+    std::pair<Iterator, bool> insert(const ValueType& value_, bool force_ = false,
                                      const DisuseCallback& call_back_ = nullptr);
     /// 找到节点的迭代器
     const Iterator find(const KeyType& key_) const;
@@ -135,12 +135,12 @@ size_t BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::capacity() const
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 std::pair<typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator, bool>
-BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::insert(const KEY& key_, const VALUE& value_, bool force_,
+BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::insert(const ValueType& value_, bool force_,
                                                     const DisuseCallback& call_back_)
 {
     if (BaseType::full())
     {
-        auto iter = find(key_);
+        auto iter = find(BaseType::key_of_value(value_));
         if (iter != end())
             return std::make_pair(iter, false);
 
@@ -149,7 +149,7 @@ BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::insert(const KEY& key_, const VALUE
     }
 
     // 需要看看有没有存在
-    auto result_pair = BaseType::insert2({key_, value_});
+    auto result_pair = BaseType::insert2(value_);
     if (result_pair.second)
     {
         IntType index = result_pair.first;
