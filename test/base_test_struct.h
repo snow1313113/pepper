@@ -10,6 +10,7 @@
 
 struct BaseNode
 {
+    uint32_t key;
     uint32_t base;
 };
 

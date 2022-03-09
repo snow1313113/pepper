@@ -241,7 +241,6 @@ struct NearByPrime<1, false>
 template <typename T>
 struct IsEqual
 {
-    typedef T KeyType;
     bool operator()(const T &x, const T &y) const { return x == y; }
 };
 
