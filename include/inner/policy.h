@@ -44,8 +44,8 @@ struct Policy : private EBOProxy<HASH>, private EBOProxy<IS_EQUAL>
 
 }  // namespace inner
 
-template <typename T>
-using DefaultPolicy = inner::Policy<std::hash<T>, IsEqual<T>>;
+template <typename T, typename HASH = std::hash<T>, typename IS_EQUAL = IsEqual<T>>
+using BasePolicy = inner::Policy<HASH, IS_EQUAL>;
 
 }  // namespace pepper
 

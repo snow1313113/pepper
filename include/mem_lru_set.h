@@ -14,7 +14,7 @@
 
 namespace pepper
 {
-template <typename T, size_t MAX_SIZE, typename POLICY = DefaultPolicy<T>>
+template <typename T, size_t MAX_SIZE, typename POLICY = BasePolicy<T>>
 using MemLRUSet = inner::BaseMemLRUMap<T, void, MAX_SIZE, POLICY>;
 
 }  // namespace pepper

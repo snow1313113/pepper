@@ -16,7 +16,7 @@ namespace pepper
 template <typename T, size_t MAX_SIZE, typename POLICY>
 using BaseMemSet = inner::MemHashTable<T, void, MAX_SIZE, POLICY>;
 
-template <typename T, size_t MAX_SIZE, typename POLICY = DefaultPolicy<T>>
+template <typename T, size_t MAX_SIZE, typename POLICY = BasePolicy<T>>
 class MemSet : private BaseMemSet<T, MAX_SIZE, POLICY>
 {
 public:

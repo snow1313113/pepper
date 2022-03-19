@@ -17,7 +17,7 @@ namespace pepper
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
 using BaseMemMap = inner::MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>;
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY = DefaultPolicy<KEY>>
+template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY = BasePolicy<KEY>>
 class MemMap : private BaseMemMap<KEY, VALUE, MAX_SIZE, POLICY>
 {
 public:
