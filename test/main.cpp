@@ -4,6 +4,7 @@
 #include "mem_lru_map_test.h"
 #include "mem_lru_set_test.h"
 #include "mem_map_test.h"
+#include "mem_set_test.h"
 #include "ring_buffer_test.h"
 
 int main(int argc, char* argv[])

@@ -24,9 +24,10 @@ class MemMap : private BaseMemMap<KEY, VALUE, MAX_SIZE>
 {
 public:
     using BaseType = BaseMemMap<KEY, VALUE, MAX_SIZE>;
-    using NodeType = typename BaseType::ValueType;
     using IntType = typename BaseType::IntType;
+    using NodeType = typename BaseType::ValueType;
     using Iterator = typename BaseType::Iterator;
+
     using BaseType::init;
     using BaseType::need_mem_size;
 

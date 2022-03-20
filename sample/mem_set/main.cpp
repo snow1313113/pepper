@@ -1,5 +1,5 @@
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <vector>
 #include "../../include/mem_set.h"
 using namespace std;
@@ -12,10 +12,8 @@ int main()
     typedef MemSet<uint64_t, MAX_SIZE> MySet;
     size_t max_num = 1000000000;
     MySet s;
-    cout << "MemSet size " << sizeof(s)
-        << " need ValueSize " << sizeof(MySet::ValueType) * s.capacity()
-        << " use " << sizeof(MySet::ValueType) * s.capacity() * 100 / static_cast<double>(sizeof(s)) << "%"
-        << endl;
+    cout << "MemSet size " << sizeof(s) << " need ValueSize " << sizeof(MySet::NodeType) * s.capacity() << " use "
+         << sizeof(MySet::NodeType) * s.capacity() * 100 / static_cast<double>(sizeof(s)) << "%" << endl;
     s.clear();
 
     // 产生一个随机数组
@@ -25,7 +23,7 @@ int main()
         if (i == 50)
             temp[i] = 0;
         else
-            //temp[i] = arand_range(1, max_num);
+            // temp[i] = arand_range(1, max_num);
             temp[i] = i * (i + 1) + 1;
     }
 
@@ -41,8 +39,7 @@ int main()
     if (result_it.second)
     {
         uint64_t temp = *(result_it.first);
-        cout << "insert full succe " << temp
-            << " sizeof " << s.size() << endl;
+        cout << "insert full succe " << temp << " sizeof " << s.size() << endl;
     }
 
     for (size_t i = 0; i < MAX_SIZE; ++i)
@@ -54,8 +51,7 @@ int main()
 
     // 测试迭代器访问
     size_t count = 0;
-    for (auto beg = s.begin(), end = s.end();
-            beg != end; ++beg)
+    for (auto beg = s.begin(), end = s.end(); beg != end; ++beg)
     {
         cout << (*beg) << " ";
         ++count;
@@ -81,8 +77,7 @@ int main()
         if (!result_it.second)
         {
             uint64_t temp = *(result_it.first);
-            cout << "insert " << temp
-                << " error, size " << s.size() << endl;
+            cout << "insert " << temp << " error, size " << s.size() << endl;
         }
     }
     for (size_t i = 0; i < MAX_SIZE / 2; ++i)
@@ -91,8 +86,7 @@ int main()
         if (result_it.second)
         {
             uint64_t temp = *(result_it.first);
-            cout << "insert the same " << temp
-                << " sizeof " << s.size() << endl;
+            cout << "insert the same " << temp << " sizeof " << s.size() << endl;
         }
     }
     cout << "after insert: size " << s.size() << endl;
@@ -106,5 +100,3 @@ int main()
     //    size_t max_num_2 = 1000000000;
     return 0;
 }
-
-

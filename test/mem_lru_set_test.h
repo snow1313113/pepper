@@ -23,36 +23,6 @@ using std::list;
 using std::map;
 using std::set;
 
-namespace std
-{
-template <>
-struct hash<BaseNode>
-{
-    size_t operator()(const BaseNode &t_) const { return hash<uint32_t>{}(t_.key); }
-};
-
-template <>
-struct hash<TestNode>
-{
-    size_t operator()(const TestNode &t_) const { return hash<uint32_t>{}(t_.a); }
-};
-}  // namespace std
-
-namespace pepper
-{
-template <>
-struct IsEqual<BaseNode>
-{
-    bool operator()(const BaseNode &x, const BaseNode &y) const { return x.key == y.key; }
-};
-
-template <>
-struct IsEqual<TestNode>
-{
-    bool operator()(const TestNode &x, const TestNode &y) const { return x.a == y.a; }
-};
-}  // namespace pepper
-
 TEST(MemLRUSetTest, mem_lru_set_test_normal)
 {
     static const size_t MAX_SIZE = 1027;
