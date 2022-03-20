@@ -1,5 +1,5 @@
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <vector>
 #include "../../include/mem_map.h"
 using namespace std;
@@ -12,10 +12,8 @@ int main()
     typedef MemMap<uint64_t, int32_t, MAX_SIZE> MyMap;
     size_t max_num = 1000000000;
     MyMap s;
-    cout << "MemMap size " << sizeof(s)
-        << " need ValueSize " << sizeof(MyMap::T) * s.capacity()
-        << " use " << sizeof(MyMap::T) * s.capacity() * 100 / static_cast<double>(sizeof(s)) << "%"
-        << endl;
+    cout << "MemMap size " << sizeof(s) << " need ValueSize " << sizeof(MyMap::NodeType) * s.capacity() << " use "
+         << sizeof(MyMap::NodeType) * s.capacity() * 100 / static_cast<double>(sizeof(s)) << "%" << endl;
     s.clear();
 
     // 产生一个随机数组
@@ -25,7 +23,7 @@ int main()
         if (i == 50)
             temp[i] = 0;
         else
-            //temp[i] = arand_range(1, max_num);
+            // temp[i] = arand_range(1, max_num);
             temp[i] = i * (i + 1) + 1;
     }
 
@@ -42,9 +40,7 @@ int main()
     auto result_it = s.insert(max_num + 1, VALUE);
     if (result_it.second)
     {
-        cout << "insert full succe, key : " << max_num + 1
-            << " value : " << VALUE
-            << " sizeof " << s.size() << endl;
+        cout << "insert full succe, key : " << max_num + 1 << " value : " << VALUE << " sizeof " << s.size() << endl;
     }
 
     for (size_t i = 0; i < MAX_SIZE; ++i)
@@ -56,8 +52,7 @@ int main()
 
     // 测试迭代器访问
     size_t count = 0;
-    for (auto beg = s.begin(), end = s.end();
-            beg != end; ++beg)
+    for (auto beg = s.begin(), end = s.end(); beg != end; ++beg)
     {
         bool is_exist = false;
         for (size_t i = 0; i < MAX_SIZE; ++i)
@@ -96,9 +91,7 @@ int main()
         auto result_it = s.insert(temp[i], VALUE - i);
         if (!result_it.second)
         {
-            cout << "insert, key : " << temp[i]
-                << " value : " << VALUE - i
-                << " error, size " << s.size() << endl;
+            cout << "insert, key : " << temp[i] << " value : " << VALUE - i << " error, size " << s.size() << endl;
         }
     }
     for (size_t i = 0; i < MAX_SIZE / 2; ++i)
@@ -106,9 +99,7 @@ int main()
         auto result_it = s.insert(temp[i], VALUE - i);
         if (result_it.second)
         {
-            cout << "insert the same, key :  " << temp[i]
-                << " value : " << VALUE - i
-                << " sizeof " << s.size() << endl;
+            cout << "insert the same, key :  " << temp[i] << " value : " << VALUE - i << " sizeof " << s.size() << endl;
         }
     }
     cout << "after insert: size " << s.size() << endl;
@@ -118,5 +109,3 @@ int main()
     cout << "after clear: size " << s.size() << endl;
     return 0;
 }
-
-

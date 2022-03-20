@@ -91,12 +91,113 @@ private:
     /// 存储链表下标，每一个和value数组一一对应，为了字节对齐
     IntType m_next[MAX_SIZE] = {0};
     NodeType m_value[MAX_SIZE];
+
+public:
+    // not impliment
+    static size_t need_mem_size(size_t max_num_, size_t buckets_num_);
+    bool init(void* mem_, size_t mem_size_, size_t max_num_, size_t buckets_num_, bool check_ = false);
 };
 
 template <typename KEY, typename VALUE, typename HASH, typename IS_EQUAL>
 struct HashTablePolicy<KEY, VALUE, 0, HASH, IS_EQUAL> : public BasePolicy<KEY, HASH, IS_EQUAL>
 {
-    // todo
+protected:
+    using BaseType = BasePolicy<KEY, HASH, IS_EQUAL>;
+    using IntType = std::size_t;
+    using KeyType = KEY;
+    using SecondType = VALUE;
+    using NodeType = std::conditional_t<std::is_same_v<SecondType, void>, KeyType, Pair<KeyType, SecondType>>;
+
+    void clear()
+    {
+        if (!m_head)
+            return;
+        m_head->m_used = 0;
+        m_head->m_raw_used = 0;
+        m_head->m_free_index = 0;
+        // todo 处理析构函数
+        memset(m_buckets, 0, sizeof(IntType) * m_head->m_buckets_num);
+        memset(m_next, 0, sizeof(IntType) * m_head->m_max_num);
+    }
+
+    IntType constexpr used() const { return m_head->m_used; }
+    IntType constexpr raw_used() const { return m_head->m_raw_used; }
+    IntType constexpr free_index() const { return m_head->m_free_index; }
+    IntType constexpr max_num() const { return m_head->m_max_num; }
+    IntType constexpr buckets_num() const { return m_head->m_buckets_num; }
+    NodeType& value(size_t index_) { return m_value[index_]; }
+    const NodeType& value(size_t index_) const { return m_value[index_]; }
+    IntType& buckets(size_t index_) { return m_buckets[index_]; }
+    const IntType& buckets(size_t index_) const { return m_buckets[index_]; }
+    IntType& next(size_t index_) { return m_next[index_]; }
+    const IntType& next(size_t index_) const { return m_next[index_]; }
+
+    inline void set_used(IntType used_) { m_head->m_used = used_; }
+    inline IntType incr_used() { return ++(m_head->m_used); }
+    inline IntType decr_used() { return --(m_head->m_used); }
+
+    inline void set_raw_used(IntType raw_used_) { m_head->m_raw_used = raw_used_; }
+    inline IntType incr_raw_used() { return ++(m_head->m_raw_used); }
+    inline IntType decr_raw_used() { return --(m_head->m_raw_used); }
+
+    inline void set_free_index(IntType free_index_) { m_head->m_free_index = free_index_; }
+
+    inline IntType get_bucket_index(const KeyType& key_) const { return BaseType::hash()(key_) % buckets_num(); }
+
+public:
+    static size_t need_mem_size(size_t max_num_, size_t buckets_num_)
+    {
+        return sizeof(Head) + sizeof(IntType) * buckets_num_ + sizeof(IntType) * max_num_ + sizeof(NodeType) * max_num_;
+    }
+
+    bool init(void* mem_, size_t mem_size_, size_t max_num_, size_t buckets_num_, bool check_ = false)
+    {
+        if (!mem_ || need_mem_size(max_num_, buckets_num_) != mem_size_)
+            return false;
+        auto tmp_head = reinterpret_cast<Head*>(mem_);
+        if (check_)
+        {
+            if (tmp_head->m_mem_size != mem_size_ || tmp_head->m_max_num != max_num_ ||
+                tmp_head->m_buckets_num != buckets_num_)
+                return false;
+        }
+        else
+        {
+            memset(mem_, 0, mem_size_);
+            tmp_head->m_max_num = max_num_;
+            tmp_head->m_buckets_num = buckets_num_;
+            tmp_head->m_mem_size = mem_size_;
+        }
+        m_head = tmp_head;
+        m_buckets = reinterpret_cast<IntType*>(reinterpret_cast<uint8_t*>(mem_) + sizeof(Head));
+        m_next = reinterpret_cast<IntType*>(reinterpret_cast<uint8_t*>(mem_) + sizeof(Head) +
+                                            sizeof(IntType) * buckets_num_);
+        m_value = reinterpret_cast<NodeType*>(reinterpret_cast<uint8_t*>(mem_) + sizeof(Head) +
+                                              sizeof(IntType) * buckets_num_ + sizeof(IntType) * max_num_);
+        return true;
+    }
+
+private:
+    struct Head
+    {
+        /// 使用了多少个节点
+        IntType m_used = 0;
+        // 使用的节点下标，m_next的下标，加入这个是为了clear的时候不用做多余的操作
+        IntType m_raw_used = 0;
+        /// 空闲链头个节点，m_next的下标，从1开始，0 表示没有
+        IntType m_free_index = 0;
+        /// 最大节点数
+        IntType m_max_num = 0;
+        /// 最大桶数量
+        IntType m_buckets_num = 0;
+        /// 总内存大小
+        IntType m_mem_size = 0;
+    };
+
+    Head* m_head = nullptr;
+    IntType* m_buckets = nullptr;
+    IntType* m_next = nullptr;
+    NodeType* m_value = nullptr;
 };
 
 }  // namespace inner

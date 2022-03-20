@@ -19,14 +19,16 @@ namespace pepper
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
 using BaseMemMap = exp::MemHashTable<inner::HashTablePolicy<KEY, VALUE, MAX_SIZE> >;
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
+template <typename KEY, typename VALUE, size_t MAX_SIZE = 0>
 class MemMap : private BaseMemMap<KEY, VALUE, MAX_SIZE>
 {
 public:
     using BaseType = BaseMemMap<KEY, VALUE, MAX_SIZE>;
-    using T = typename BaseType::ValueType;
+    using NodeType = typename BaseType::ValueType;
     using IntType = typename BaseType::IntType;
     using Iterator = typename BaseType::Iterator;
+    using BaseType::init;
+    using BaseType::need_mem_size;
 
     /// 清空列表
     void clear();
