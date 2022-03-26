@@ -11,22 +11,22 @@
 #include <functional>
 #include <iterator>
 #include "../base_struct.h"
-#include "mem_hash_table.h"
+#include "new_hash_table.h"
 
 namespace pepper
 {
 namespace inner
 {
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-struct BaseMemLRUMap : private MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>
+template <typename POLICY>
+struct BaseMemLRUMap : public POLICY
 {
 public:
-    using BaseType = MemHashTable<KEY, VALUE, MAX_SIZE, POLICY>;
-    // 不能直接用BaseType的inttype，因为我们的大小是不一样的
-    using IntType = typename FixIntType<MAX_SIZE + 1>::IntType;
+    using BaseType = POLICY;
+    using IntType = typename BaseType::IntType;
     using KeyType = typename BaseType::KeyType;
-    using ValueType = typename BaseType::ValueType;
+    using ValueType = typename BaseType::NodeType;
     using DisuseCallback = std::function<bool(ValueType&)>;
+    using LinkNode = typename BaseType::LinkNode;
 
     class Iterator
     {
@@ -89,54 +89,49 @@ public:
     Iterator begin();
     Iterator end();
 
+    using BaseType::init;
+    using BaseType::need_mem_size;
+
 private:
     const ValueType& deref(IntType index_) const;
     ValueType& deref(IntType index_);
-
-private:
-    using LinkNode = Link<IntType>;
-    /// 第一个节点作为flag 活跃双向链表，最近被访问的放在最前面，和每一个value数组一一对应
-    LinkNode m_active_link[MAX_SIZE + 1];
 };
 
 //////////////////////////////////////////////////////////////////////
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-void BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::clear()
+template <typename POLICY>
+void BaseMemLRUMap<POLICY>::clear()
 {
     BaseType::clear();
-    m_active_link[0].prev = 0;
-    m_active_link[0].next = 0;
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-bool BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::empty() const
+template <typename POLICY>
+bool BaseMemLRUMap<POLICY>::empty() const
 {
     return BaseType::empty();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-bool BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::full() const
+template <typename POLICY>
+bool BaseMemLRUMap<POLICY>::full() const
 {
     return BaseType::full();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-size_t BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::size() const
+template <typename POLICY>
+size_t BaseMemLRUMap<POLICY>::size() const
 {
     return BaseType::size();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-size_t BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::capacity() const
+template <typename POLICY>
+size_t BaseMemLRUMap<POLICY>::capacity() const
 {
     return BaseType::capacity();
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-std::pair<typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator, bool>
-BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::insert(const ValueType& value_, bool force_,
-                                                    const DisuseCallback& call_back_)
+template <typename POLICY>
+std::pair<typename BaseMemLRUMap<POLICY>::Iterator, bool> BaseMemLRUMap<POLICY>::insert(
+    const ValueType& value_, bool force_, const DisuseCallback& call_back_)
 {
     if (BaseType::full())
     {
@@ -149,210 +144,195 @@ BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::insert(const ValueType& value_, boo
     }
 
     // 需要看看有没有存在
-    auto result_pair = BaseType::insert2(value_);
+    auto result_pair = BaseType::insert(value_);
     if (result_pair.second)
     {
         IntType index = result_pair.first;
         // 新插入的挂到active链头
-        LinkNode& head = m_active_link[0];
-        m_active_link[head.next].prev = index;
-        m_active_link[index].prev = 0;
-        m_active_link[index].next = head.next;
+        LinkNode& head = BaseType::active_link(0);
+        BaseType::active_link(head.next).prev = index;
+        BaseType::active_link(index).prev = 0;
+        BaseType::active_link(index).next = head.next;
         head.next = index;
     }
 
     return std::make_pair(Iterator(this, result_pair.first), result_pair.second);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-const typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::find(
-    const KeyType& key_) const
+template <typename POLICY>
+const typename BaseMemLRUMap<POLICY>::Iterator BaseMemLRUMap<POLICY>::find(const KeyType& key_) const
 {
     return Iterator(this, BaseType::find_index(key_));
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::find(
-    const KeyType& key_)
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::Iterator BaseMemLRUMap<POLICY>::find(const KeyType& key_)
 {
     return Iterator(this, BaseType::find_index(key_));
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-bool BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::exist(const KeyType& key_) const
+template <typename POLICY>
+bool BaseMemLRUMap<POLICY>::exist(const KeyType& key_) const
 {
     return BaseType::exist(key_);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-void BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::erase(const Iterator& it_)
+template <typename POLICY>
+void BaseMemLRUMap<POLICY>::erase(const Iterator& it_)
 {
     assert(it_.m_set == this);
     erase(*it_);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-void BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::erase(const KeyType& key_)
+template <typename POLICY>
+void BaseMemLRUMap<POLICY>::erase(const KeyType& key_)
 {
     IntType index = BaseType::erase(key_);
     if (index > 0)
     {
-        IntType next_index = m_active_link[index].next;
-        IntType prev_index = m_active_link[index].prev;
-        m_active_link[prev_index].next = next_index;
-        m_active_link[next_index].prev = prev_index;
+        IntType next_index = BaseType::active_link(index).next;
+        IntType prev_index = BaseType::active_link(index).prev;
+        BaseType::active_link(prev_index).next = next_index;
+        BaseType::active_link(next_index).prev = prev_index;
 
-        m_active_link[index].next = 0;
-        m_active_link[index].prev = 0;
+        BaseType::active_link(index).next = 0;
+        BaseType::active_link(index).prev = 0;
     }
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::active(
-    const KeyType& key_)
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::Iterator BaseMemLRUMap<POLICY>::active(const KeyType& key_)
 {
     IntType index = BaseType::find_index(key_);
     if (index != 0)
     {
         // 先摘除
-        IntType next_index = m_active_link[index].next;
-        IntType prev_index = m_active_link[index].prev;
-        m_active_link[prev_index].next = next_index;
-        m_active_link[next_index].prev = prev_index;
+        IntType next_index = BaseType::active_link(index).next;
+        IntType prev_index = BaseType::active_link(index).prev;
+        BaseType::active_link(prev_index).next = next_index;
+        BaseType::active_link(next_index).prev = prev_index;
 
         // 插入到active链的头部
-        LinkNode& head = m_active_link[0];
-        m_active_link[head.next].prev = index;
-        m_active_link[index].prev = 0;
-        m_active_link[index].next = head.next;
+        LinkNode& head = BaseType::active_link(0);
+        BaseType::active_link(head.next).prev = index;
+        BaseType::active_link(index).prev = 0;
+        BaseType::active_link(index).next = head.next;
         head.next = index;
     }
 
     return Iterator(this, index);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-size_t BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::disuse(size_t num_, const DisuseCallback& call_back_)
+template <typename POLICY>
+size_t BaseMemLRUMap<POLICY>::disuse(size_t num_, const DisuseCallback& call_back_)
 {
     for (size_t i = 0; i < num_; ++i)
     {
         if (BaseType::empty())
             return i;
-        if (call_back_ && !call_back_(deref(m_active_link[0].prev)))
+        if (call_back_ && !call_back_(deref(BaseType::active_link(0).prev)))
             return i;
-        erase(BaseType::key_of_value(deref(m_active_link[0].prev)));
+        erase(BaseType::key_of_value(deref(BaseType::active_link(0).prev)));
     }
     return num_;
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-const typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator
-BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::begin() const
+template <typename POLICY>
+const typename BaseMemLRUMap<POLICY>::Iterator BaseMemLRUMap<POLICY>::begin() const
 {
-    return Iterator(this, m_active_link[0].next);
+    return Iterator(this, BaseType::active_link(0).next);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::begin()
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::Iterator BaseMemLRUMap<POLICY>::begin()
 {
-    return Iterator(this, m_active_link[0].next);
+    return Iterator(this, BaseType::active_link(0).next);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-const typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::end()
-    const
+template <typename POLICY>
+const typename BaseMemLRUMap<POLICY>::Iterator BaseMemLRUMap<POLICY>::end() const
 {
     return Iterator(this, 0);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::end()
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::Iterator BaseMemLRUMap<POLICY>::end()
 {
     return Iterator(this, 0);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-const typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::ValueType&
-BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::deref(IntType index_) const
+template <typename POLICY>
+const typename BaseMemLRUMap<POLICY>::ValueType& BaseMemLRUMap<POLICY>::deref(IntType index_) const
 {
     return BaseType::deref(index_);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::ValueType& BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::deref(
-    IntType index_)
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::ValueType& BaseMemLRUMap<POLICY>::deref(IntType index_)
 {
     return BaseType::deref(index_);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-const typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::ValueType&
-    BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::operator*() const
+template <typename POLICY>
+const typename BaseMemLRUMap<POLICY>::ValueType& BaseMemLRUMap<POLICY>::Iterator::operator*() const
 {
     return m_set->deref(m_index);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::ValueType& BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::
-operator*()
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::ValueType& BaseMemLRUMap<POLICY>::Iterator::operator*()
 {
     return const_cast<BaseMemLRUMap*>(m_set)->deref(m_index);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-const typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::ValueType*
-    BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::operator->() const
+template <typename POLICY>
+const typename BaseMemLRUMap<POLICY>::ValueType* BaseMemLRUMap<POLICY>::Iterator::operator->() const
 {
     return &(operator*());
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::ValueType* BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::
-operator->()
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::ValueType* BaseMemLRUMap<POLICY>::Iterator::operator->()
 {
     return &(operator*());
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-bool BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::operator==(const Iterator& right_) const
+template <typename POLICY>
+bool BaseMemLRUMap<POLICY>::Iterator::operator==(const Iterator& right_) const
 {
     return (m_set == right_.m_set) && (m_index == right_.m_index);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-bool BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::operator!=(const Iterator& right_) const
+template <typename POLICY>
+bool BaseMemLRUMap<POLICY>::Iterator::operator!=(const Iterator& right_) const
 {
     return (m_set != right_.m_set) || (m_index != right_.m_index);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator& BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::
-operator++()
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::Iterator& BaseMemLRUMap<POLICY>::Iterator::operator++()
 {
-    m_index = m_set->m_active_link[m_index].next;
+    m_index = m_set->active_link(m_index).next;
     return (*this);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::
-operator++(int)
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::Iterator BaseMemLRUMap<POLICY>::Iterator::operator++(int)
 {
     Iterator temp = (*this);
     ++(*this);
     return temp;
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator& BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::
-operator--()
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::Iterator& BaseMemLRUMap<POLICY>::Iterator::operator--()
 {
-    m_index = m_set->m_active_link[m_index].prev;
+    m_index = m_set->active_link(m_index).prev;
     return (*this);
 }
 
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY>
-typename BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>::Iterator::
-operator--(int)
+template <typename POLICY>
+typename BaseMemLRUMap<POLICY>::Iterator BaseMemLRUMap<POLICY>::Iterator::operator--(int)
 {
     Iterator temp = (*this);
     --(*this);
