@@ -17,7 +17,7 @@
 namespace pepper
 {
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
-using BaseMemMap = exp::MemHashTable<inner::HashTablePolicy<KEY, VALUE, MAX_SIZE> >;
+using BaseMemMap = exp::MemHashTable<inner::HashTablePolicy<KEY, VALUE, MAX_SIZE>>;
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE = 0>
 class MemMap : private BaseMemMap<KEY, VALUE, MAX_SIZE>

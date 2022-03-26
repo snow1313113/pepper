@@ -8,17 +8,18 @@
 #ifndef _MEM_LRU_MAP_H_
 #define _MEM_LRU_MAP_H_
 
-#include "inner/base_mem_lru_map.h"
+//#include "inner/base_mem_lru_map.h"
 #include "inner/base_specialization.h"
-#include "inner/policy.h"
+#include "inner/lru_policy.h"
+#include "inner/new_base_lru_map.h"
 
 namespace pepper
 {
-template <typename KEY, typename VALUE, size_t MAX_SIZE, typename POLICY = BasePolicy<KEY>>
-class MemLRUMap : public inner::BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>
+template <typename KEY, typename VALUE, size_t MAX_SIZE>
+class MemLRUMap : public exp::BaseMemLRUMap<inner::LRUPolicy<KEY, VALUE, MAX_SIZE>>
 {
 public:
-    using BaseType = inner::BaseMemLRUMap<KEY, VALUE, MAX_SIZE, POLICY>;
+    using BaseType = exp::BaseMemLRUMap<inner::LRUPolicy<KEY, VALUE, MAX_SIZE>>;
     using Iterator = typename BaseType::Iterator;
     using DisuseCallback = typename BaseType::DisuseCallback;
     using BaseType::insert;

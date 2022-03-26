@@ -92,7 +92,7 @@ struct MemHashTable : public POLICY
 
 private:
     IntType find_first_used_bucket() const;
-    IntType find_index(IntType bucket_index_, const KeyType& value_) const;
+    IntType find_index_impl(IntType bucket_index_, const KeyType& value_) const;
     IntType insert(IntType bucket_index_, const ValueType& value_);
 };
 
@@ -130,7 +130,7 @@ template <typename POLICY>
 std::pair<typename MemHashTable<POLICY>::Iterator, bool> MemHashTable<POLICY>::insert(const ValueType& value_)
 {
     IntType bucket_index = BaseType::get_bucket_index(key_of_value(value_));
-    IntType index = find_index(bucket_index, key_of_value(value_));
+    IntType index = find_index_impl(bucket_index, key_of_value(value_));
     if (index != 0)
         return std::make_pair(Iterator(this, index), false);
     else
@@ -146,7 +146,7 @@ template <typename POLICY>
 std::pair<typename MemHashTable<POLICY>::IntType, bool> MemHashTable<POLICY>::insert2(const ValueType& value_)
 {
     IntType bucket_index = BaseType::get_bucket_index(key_of_value(value_));
-    IntType index = find_index(bucket_index, key_of_value(value_));
+    IntType index = find_index_impl(bucket_index, key_of_value(value_));
     if (index != 0)
         return std::make_pair(index, false);
     else
@@ -203,12 +203,12 @@ typename MemHashTable<POLICY>::Iterator MemHashTable<POLICY>::find(const KeyType
 template <typename POLICY>
 typename MemHashTable<POLICY>::IntType MemHashTable<POLICY>::find_index(const KeyType& value_) const
 {
-    return find_index(BaseType::get_bucket_index(value_), value_);
+    return find_index_impl(BaseType::get_bucket_index(value_), value_);
 }
 
 template <typename POLICY>
-typename MemHashTable<POLICY>::IntType MemHashTable<POLICY>::find_index(IntType bucket_index_,
-                                                                        const KeyType& value_) const
+typename MemHashTable<POLICY>::IntType MemHashTable<POLICY>::find_index_impl(IntType bucket_index_,
+                                                                             const KeyType& value_) const
 {
     assert(bucket_index_ >= 0);
     assert(bucket_index_ < BaseType::buckets_num());
