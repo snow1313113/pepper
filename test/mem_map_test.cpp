@@ -8,6 +8,7 @@
 #ifndef _MEM_MAP_TEST_H_
 #define _MEM_MAP_TEST_H_
 
+#include "mem_map.h"
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
@@ -15,7 +16,6 @@
 #include <set>
 #include "base_test_struct.h"
 #include "gtest/gtest.h"
-#include "mem_map.h"
 
 using namespace pepper;
 using std::map;
@@ -245,8 +245,8 @@ TEST(MemMapTest, mem_map_test_min_size)
     EXPECT_EQ(mem_map.size(), 0ul);
 }
 
-void zero_size_test(char* mem_, size_t mem_size_, size_t max_size_, size_t buckets_num_, set<size_t>& del_set_,
-                    map<size_t, size_t>& node_rand_map_)
+static void zero_size_test(char* mem_, size_t mem_size_, size_t max_size_, size_t buckets_num_, set<size_t>& del_set_,
+                           map<size_t, size_t>& node_rand_map_)
 {
     MemMap<uint32_t, TestNode> mem_map;
     bool result = mem_map.init(mem_, mem_size_, max_size_, buckets_num_);
@@ -294,7 +294,6 @@ TEST(MemMapTest, mem_map_test_0_size)
 {
     static const size_t MAX_SIZE = 20;
     static const size_t BUCKETS_NUM = 17;
-    MemMap<uint32_t, TestNode> mem_map;
 
     size_t mem_size = MemMap<uint32_t, TestNode>::need_mem_size(MAX_SIZE, BUCKETS_NUM);
     ASSERT_TRUE(mem_size > 0);
@@ -305,9 +304,10 @@ TEST(MemMapTest, mem_map_test_0_size)
     map<size_t, size_t> node_rand_map;
 
     std::unique_ptr<char[]> raw_mem(new char[mem_size]);
-
+    // 在函数调用里面的MemMap使用，出了这个函数后里面的MemMap就会调用析构
     zero_size_test(raw_mem.get(), mem_size, MAX_SIZE, BUCKETS_NUM, del_set, node_rand_map);
 
+    MemMap<uint32_t, TestNode> mem_map;
     bool result = mem_map.init(raw_mem.get(), mem_size, MAX_SIZE, BUCKETS_NUM, true);
     ASSERT_TRUE(result);
 

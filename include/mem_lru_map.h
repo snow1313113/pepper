@@ -14,7 +14,7 @@
 
 namespace pepper
 {
-template <typename KEY, typename VALUE, size_t MAX_SIZE>
+template <typename KEY, typename VALUE, size_t MAX_SIZE = 0>
 class MemLRUMap : public inner::BaseMemLRUMap<inner::LRUPolicy<KEY, VALUE, MAX_SIZE>>
 {
 public:
