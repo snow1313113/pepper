@@ -10,7 +10,7 @@
 
 #include "../base_struct.h"
 #include "hash_table_policy.h"
-#include "new_hash_table.h"
+#include "mem_hash_table.h"
 
 namespace pepper
 {
@@ -18,10 +18,10 @@ namespace inner
 {
 template <typename KEY, typename VALUE, size_t MAX_SIZE, typename HASH = std::hash<KEY>,
           typename IS_EQUAL = IsEqual<KEY>>
-struct LRUPolicy : private exp::MemHashTable<HashTablePolicy<KEY, VALUE, MAX_SIZE, HASH, IS_EQUAL>>
+struct LRUPolicy : private MemHashTable<HashTablePolicy<KEY, VALUE, MAX_SIZE, HASH, IS_EQUAL>>
 {
 protected:
-    using TableType = exp::MemHashTable<HashTablePolicy<KEY, VALUE, MAX_SIZE, HASH, IS_EQUAL>>;
+    using TableType = MemHashTable<HashTablePolicy<KEY, VALUE, MAX_SIZE, HASH, IS_EQUAL>>;
     // 要多用一个节点，所以要能存下MAX_SIZE + 1
     using IntType = typename FixIntType<MAX_SIZE + 1>::IntType;
     using KeyType = KEY;
@@ -60,10 +60,10 @@ private:
 };
 
 template <typename KEY, typename VALUE, typename HASH, typename IS_EQUAL>
-struct LRUPolicy<KEY, VALUE, 0, HASH, IS_EQUAL> : exp::MemHashTable<HashTablePolicy<KEY, VALUE, 0, HASH, IS_EQUAL>>
+struct LRUPolicy<KEY, VALUE, 0, HASH, IS_EQUAL> : MemHashTable<HashTablePolicy<KEY, VALUE, 0, HASH, IS_EQUAL>>
 {
 protected:
-    using TableType = exp::MemHashTable<HashTablePolicy<KEY, VALUE, 0, HASH, IS_EQUAL>>;
+    using TableType = MemHashTable<HashTablePolicy<KEY, VALUE, 0, HASH, IS_EQUAL>>;
     using IntType = std::size_t;
     using KeyType = KEY;
     using SecondType = VALUE;

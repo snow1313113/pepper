@@ -9,15 +9,13 @@
 #define _MEM_SET_H_
 
 #include "inner/base_specialization.h"
-//#include "inner/mem_hash_table.h"
 #include "inner/hash_table_policy.h"
-#include "inner/new_hash_table.h"
-#include "inner/policy.h"
+#include "inner/mem_hash_table.h"
 
 namespace pepper
 {
 template <typename T, size_t MAX_SIZE>
-using BaseMemSet = exp::MemHashTable<inner::HashTablePolicy<T, void, MAX_SIZE>>;
+using BaseMemSet = inner::MemHashTable<inner::HashTablePolicy<T, void, MAX_SIZE>>;
 
 template <typename T, size_t MAX_SIZE = 0>
 class MemSet : private BaseMemSet<T, MAX_SIZE>

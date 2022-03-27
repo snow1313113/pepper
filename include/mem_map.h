@@ -9,15 +9,13 @@
 #define _MEM_MAP_H_
 
 #include "inner/base_specialization.h"
-//#include "inner/mem_hash_table.h"
 #include "inner/hash_table_policy.h"
-#include "inner/new_hash_table.h"
-#include "inner/policy.h"
+#include "inner/mem_hash_table.h"
 
 namespace pepper
 {
 template <typename KEY, typename VALUE, size_t MAX_SIZE>
-using BaseMemMap = exp::MemHashTable<inner::HashTablePolicy<KEY, VALUE, MAX_SIZE>>;
+using BaseMemMap = inner::MemHashTable<inner::HashTablePolicy<KEY, VALUE, MAX_SIZE>>;
 
 template <typename KEY, typename VALUE, size_t MAX_SIZE = 0>
 class MemMap : private BaseMemMap<KEY, VALUE, MAX_SIZE>

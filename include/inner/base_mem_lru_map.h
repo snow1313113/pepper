@@ -10,8 +10,6 @@
 
 #include <functional>
 #include <iterator>
-#include "../base_struct.h"
-#include "new_hash_table.h"
 
 namespace pepper
 {
