@@ -185,7 +185,7 @@ typename MemHashTable<POLICY>::IntType MemHashTable<POLICY>::insert(IntType buck
     BaseType::incr_used();
 
     // 一切操作完了再拷贝数据，最坏情况是某一个数据拷贝失败，但是容器的结构不会破坏
-    BaseType::value(empty_index - 1) = value_;
+    BaseType::copy_value(empty_index - 1, value_);
 
     return empty_index;
 }

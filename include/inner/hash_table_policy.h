@@ -25,6 +25,7 @@ protected:
     using KeyType = KEY;
     using SecondType = VALUE;
     using NodeType = std::conditional_t<std::is_same_v<SecondType, void>, KeyType, Pair<KeyType, SecondType>>;
+    using RealNodeType = std::conditional_t<std::is_trivially_copyable_v<NodeType>, NodeType, char>;
 
     void clear()
     {
@@ -41,8 +42,7 @@ protected:
     IntType constexpr free_index() const { return m_free_index; }
     IntType constexpr max_num() const { return MAX_SIZE; }
     IntType constexpr buckets_num() const { return BUCKETS_SIZE; }
-    NodeType& value(size_t index_) { return m_value[index_]; }
-    const NodeType& value(size_t index_) const { return m_value[index_]; }
+
     IntType& buckets(size_t index_) { return m_buckets[index_]; }
     const IntType& buckets(size_t index_) const { return m_buckets[index_]; }
     IntType& next(size_t index_) { return m_next[index_]; }
@@ -57,6 +57,22 @@ protected:
     inline IntType decr_raw_used() { return --m_raw_used; }
 
     inline void set_free_index(IntType free_index_) { m_free_index = free_index_; }
+
+    NodeType& value(size_t index_) { return m_value[index_offset(index_)]; }
+    const NodeType& value(size_t index_) const { return m_value[index_offset(index_)]; }
+
+    template <typename T = NodeType>
+    inline std::enable_if_t<std::is_trivially_copyable_v<T>> copy_value(IntType index_, const T& node_value_)
+    {
+        value(index_) = node_value_;
+    }
+
+    // use placement new to construct the node if is not trivially copyable
+    template <typename T = NodeType>
+    inline std::enable_if_t<!std::is_trivially_copyable_v<T>> copy_value(IntType index_, const T& node_value_)
+    {
+        new (&(value(index_))) T(node_value_);
+    }
 
     IntType get_bucket_index(const KeyType& key_) const
     {
@@ -79,6 +95,7 @@ private:
 
     IntType constexpr get_bucket_index_impl(const KeyType& key_, SizeIdentity<1>) const { return 0; }
 
+    static constexpr IntType index_offset(IntType index_) { return index_ * sizeof(NodeType) / sizeof(RealNodeType); }
     /// 使用了多少个节点
     IntType m_used = 0;
     // 使用的节点下标，m_next的下标，加入这个是为了clear的时候不用做多余的操作
@@ -90,7 +107,8 @@ private:
     IntType m_buckets[BUCKETS_SIZE] = {0};
     /// 存储链表下标，每一个和value数组一一对应，为了字节对齐
     IntType m_next[MAX_SIZE] = {0};
-    NodeType m_value[MAX_SIZE];
+    static constexpr size_t REAL_NODE_SIZE = index_offset(MAX_SIZE);
+    RealNodeType m_value[REAL_NODE_SIZE];
 
 public:
     // not impliment
@@ -107,6 +125,7 @@ protected:
     using KeyType = KEY;
     using SecondType = VALUE;
     using NodeType = std::conditional_t<std::is_same_v<SecondType, void>, KeyType, Pair<KeyType, SecondType>>;
+    using RealNodeType = std::conditional_t<std::is_trivially_copyable_v<NodeType>, NodeType, char>;
 
     void clear()
     {
@@ -125,8 +144,6 @@ protected:
     IntType constexpr free_index() const { return m_head->m_free_index; }
     IntType constexpr max_num() const { return m_head->m_max_num; }
     IntType constexpr buckets_num() const { return m_head->m_buckets_num; }
-    NodeType& value(size_t index_) { return m_value[index_]; }
-    const NodeType& value(size_t index_) const { return m_value[index_]; }
     IntType& buckets(size_t index_) { return m_buckets[index_]; }
     const IntType& buckets(size_t index_) const { return m_buckets[index_]; }
     IntType& next(size_t index_) { return m_next[index_]; }
@@ -142,12 +159,29 @@ protected:
 
     inline void set_free_index(IntType free_index_) { m_head->m_free_index = free_index_; }
 
+    NodeType& value(size_t index_) { return m_value[index_]; }
+    const NodeType& value(size_t index_) const { return m_value[index_]; }
+
+    template <typename T = NodeType>
+    inline std::enable_if_t<std::is_trivially_copyable_v<T>> copy_value(IntType index_, const T& node_value_)
+    {
+        value(index_) = node_value_;
+    }
+
+    // use placement new to construct the node if is not trivially copyable
+    template <typename T = NodeType>
+    inline std::enable_if_t<!std::is_trivially_copyable_v<T>> copy_value(IntType index_, const T& node_value_)
+    {
+        new (&(value(index_))) T(node_value_);
+    }
+
     inline IntType get_bucket_index(const KeyType& key_) const { return BaseType::hash()(key_) % buckets_num(); }
 
 public:
     static size_t need_mem_size(size_t max_num_, size_t buckets_num_)
     {
-        return sizeof(Head) + sizeof(IntType) * buckets_num_ + sizeof(IntType) * max_num_ + sizeof(NodeType) * max_num_;
+        return sizeof(Head) + sizeof(IntType) * buckets_num_ + sizeof(IntType) * max_num_ +
+               sizeof(RealNodeType) * (max_num_ * sizeof(NodeType) / sizeof(RealNodeType));
     }
 
     bool init(void* mem_, size_t mem_size_, size_t max_num_, size_t buckets_num_, bool check_ = false)
@@ -172,12 +206,14 @@ public:
         m_buckets = reinterpret_cast<IntType*>(reinterpret_cast<uint8_t*>(mem_) + sizeof(Head));
         m_next = reinterpret_cast<IntType*>(reinterpret_cast<uint8_t*>(mem_) + sizeof(Head) +
                                             sizeof(IntType) * buckets_num_);
-        m_value = reinterpret_cast<NodeType*>(reinterpret_cast<uint8_t*>(mem_) + sizeof(Head) +
-                                              sizeof(IntType) * buckets_num_ + sizeof(IntType) * max_num_);
+        m_value = reinterpret_cast<RealNodeType*>(reinterpret_cast<uint8_t*>(mem_) + sizeof(Head) +
+                                                  sizeof(IntType) * buckets_num_ + sizeof(IntType) * max_num_);
         return true;
     }
 
 private:
+    static constexpr IntType index_offset(IntType index_) { return index_ * sizeof(NodeType) / sizeof(RealNodeType); }
+
     struct Head
     {
         /// 使用了多少个节点
@@ -197,7 +233,7 @@ private:
     Head* m_head = nullptr;
     IntType* m_buckets = nullptr;
     IntType* m_next = nullptr;
-    NodeType* m_value = nullptr;
+    RealNodeType* m_value = nullptr;
 };
 
 }  // namespace inner
